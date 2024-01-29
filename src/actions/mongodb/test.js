@@ -1,13 +1,13 @@
 "use server";
 
-import mongoDB from "@/actions/mongodb";
+import mongoDB from "@/actions/mongodb/mongodb";
 import Run from "@/models/Run";
 import urls from "@/utils/urls";
 
 export const test = async () => {
   await mongoDB();
 
-  const new_run = await Run.create({
+  const newRun = await Run.create({
     season: "season",
     keystone_run_id: 1,
   });

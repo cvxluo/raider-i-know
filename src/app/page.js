@@ -3,12 +3,11 @@
 import { getProfile } from "@/actions/raiderio/characters/profile";
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
 
-import { test } from "@/actions/test";
+import { test } from "@/actions/mongodb/test";
 import { useEffect } from "react";
 
 export default function Home() {
   useEffect(() => {
-    /*
     const region = "us";
     const realm = "azshara";
     const name = "Vexea";
@@ -17,7 +16,6 @@ export default function Home() {
     getProfile(region, realm, name, fields).then((res) => {
       console.log(res);
     });
-    */
     /*
     const season = "season-df-3";
     const region = "us";
@@ -28,10 +26,6 @@ export default function Home() {
       console.log(res);
     });
     */
-
-    test().then((res) => {
-      console.log(res);
-    });
   }, []);
   return (
     <div>

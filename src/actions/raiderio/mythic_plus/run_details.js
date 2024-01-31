@@ -8,12 +8,6 @@ export const getRunDetails = async (season, id) => {
     id: id,
   });
 
-  console.log(
-    urls.raiderio.baseURL +
-      urls.raiderio.mythic_plus.run_details +
-      "?" +
-      params,
-  );
   return fetch(
     urls.raiderio.baseURL +
       urls.raiderio.mythic_plus.run_details +

@@ -5,6 +5,8 @@ import Run from "@/models/Run";
 
 import { getRunDetails } from "../raiderio/mythic_plus/run_details";
 import { summarizeRunDetails } from "@/utils/funcs";
+import Character from "@/models/Character";
+import { createCharacter } from "./character";
 
 export const createRun = async (run) => {
   await mongoDB();
@@ -20,9 +22,34 @@ export const createRun = async (run) => {
     roster,
   } = run;
 
-  const newRun = await Run.create(run);
+  // upsert roster
+  const newCharacterIDs = await Promise.all(
+    roster.map(async (character) => {
+      const newCharacter = await createCharacter(
+        character.region,
+        character.realm,
+        character.name,
+      );
+      return newCharacter._id;
+    }),
+  );
 
-  return newRun;
+  const reducedRun = { ...run, roster: newCharacterIDs };
+
+  const newRun = await Run.findOneAndUpdate(
+    {
+      keystone_run_id: keystone_run_id,
+    },
+    reducedRun,
+    {
+      new: true,
+      upsert: true,
+    },
+  ).lean();
+
+  const flattenedRun = JSON.parse(JSON.stringify(newRun));
+
+  return flattenedRun;
 };
 
 export const createRunFromID = async (season, keystone_run_id) => {
@@ -30,11 +57,9 @@ export const createRunFromID = async (season, keystone_run_id) => {
 
   const runFromID = await getRunDetails(season, keystone_run_id);
 
-  const trimmedRun = summarizeRunDetails(runFromID);
+  const summarizedRun = summarizeRunDetails(runFromID);
 
-  const newRun = await Run.create(trimmedRun).lean();
-
-  return newRun.toObject();
+  return createRun(summarizedRun);
 };
 
 export const getRun = async (run) => {
@@ -42,9 +67,11 @@ export const getRun = async (run) => {
 
   const retrievedRun = await Run.findOne({
     keystone_run_id: run.keystone_run_id,
-  });
+  }).lean();
 
-  return retrievedRun;
+  const flattenedRun = JSON.parse(JSON.stringify(retrievedRun));
+
+  return flattenedRun;
 };
 
 export const getRunFromID = async (keystone_run_id) => {
@@ -64,5 +91,7 @@ export const getAllRuns = async () => {
 
   const runs = await Run.find({});
 
-  return runs;
+  const flattenedRuns = JSON.parse(JSON.stringify(runs));
+
+  return flattenedRuns;
 };

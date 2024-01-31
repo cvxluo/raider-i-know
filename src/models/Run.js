@@ -38,10 +38,13 @@ const RunSchema = new Schema({
     type: Number,
     required: true,
   },
-  roster: {
-    type: [CharacterSchema],
-    required: true,
-  },
+  roster: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Character",
+      required: true,
+    },
+  ],
 });
 export { RunSchema };
 export default mongoose.models?.Run ?? mongoose.model("Run", RunSchema);

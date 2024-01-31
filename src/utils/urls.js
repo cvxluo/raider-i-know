@@ -32,6 +32,7 @@ const config = {
     },
     mythic_plus: {
       runs: "/mythic-plus/runs",
+      run_details: "/mythic-plus/run-details",
     },
   },
 };

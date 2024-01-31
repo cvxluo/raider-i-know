@@ -2,17 +2,23 @@
 
 import urls from "@/utils/urls";
 
-export const getRuns = async (season, region, dungeon, affixes, page) => {
+export const getRunDetails = async (season, id) => {
   const params = new URLSearchParams({
     season: season,
-    region: region,
-    dungeon: dungeon,
-    affixes: affixes,
-    page: page,
+    id: id,
   });
 
+  console.log(
+    urls.raiderio.baseURL +
+      urls.raiderio.mythic_plus.run_details +
+      "?" +
+      params,
+  );
   return fetch(
-    urls.raiderio.baseURL + urls.raiderio.mythic_plus.runs + "?" + params,
+    urls.raiderio.baseURL +
+      urls.raiderio.mythic_plus.run_details +
+      "?" +
+      params,
     {
       method: "GET",
       mode: "same-origin",

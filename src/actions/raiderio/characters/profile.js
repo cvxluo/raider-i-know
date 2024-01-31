@@ -24,7 +24,7 @@ export const getProfile = async (region, realm, name, fields) => {
       },
     },
   )
-    .then((res) => res.text())
+    .then((res) => res.json())
     .then((res) => {
       return res;
     });

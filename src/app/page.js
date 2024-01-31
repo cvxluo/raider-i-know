@@ -10,12 +10,19 @@ import {
   createRunFromID,
   getRunFromID,
 } from "@/actions/mongodb/run";
+import {
+  testGetRuns,
+  testGetTopDungeonRuns,
+  testGetTopRuns,
+} from "@/utils/testfuncs";
 
 export default function Home() {
   const [characterName, setCharacterName] = useState("");
   const [runID, setRunID] = useState(0);
 
-  const test = async () => {};
+  const test = async () => {
+    testGetTopRuns();
+  };
 
   return (
     <Box>

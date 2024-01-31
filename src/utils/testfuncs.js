@@ -1,4 +1,10 @@
-import { createRun } from "@/actions/mongodb/run";
+import {
+  getTopDungeonRuns,
+  getTopRuns,
+} from "@/actions/mongodb/data_collection/run_collection";
+import { createRun, createRunFromID } from "@/actions/mongodb/run";
+
+import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
 
 export const testCreateRun = async () => {
   const testRun = {
@@ -34,8 +40,29 @@ export const testGetRuns = async () => {
   const region = "us";
   const dungeon = "all";
   const affixes = "fortified-incorporeal-sanguine";
-  const page = 0;
+  const page = 100;
   getRuns(season, region, dungeon, affixes, page).then((res) => {
+    console.log(res);
+  });
+};
+
+export const testGetTopDungeonRuns = async () => {
+  const season = "season-df-3";
+  const region = "us";
+  const dungeon = "everbloom";
+  const affixes = "fortified-incorporeal-sanguine";
+
+  getTopDungeonRuns(season, region, dungeon, affixes).then((res) => {
+    console.log(res);
+  });
+};
+
+export const testGetTopRuns = async () => {
+  const season = "season-df-3";
+  const region = "us";
+  const affixes = "fortified-incorporeal-sanguine";
+
+  getTopRuns(season, region, affixes).then((res) => {
     console.log(res);
   });
 };

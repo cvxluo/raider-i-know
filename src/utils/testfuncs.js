@@ -1,7 +1,8 @@
 import {
   getTopDungeonRuns,
   getTopRuns,
-} from "@/actions/mongodb/data_collection/run_collection";
+  saveTopRuns,
+} from "@/actions/mongodb/data_collection/top_runs";
 import { createRun, createRunFromID } from "@/actions/mongodb/run";
 
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
@@ -65,4 +66,12 @@ export const testGetTopRuns = async () => {
   getTopRuns(season, region, affixes).then((res) => {
     console.log(res);
   });
+};
+
+export const testSaveTopRuns = async () => {
+  const season = "season-df-3";
+  const region = "us";
+  const affixes = "fortified-incorporeal-sanguine";
+
+  saveTopRuns(season, region, affixes);
 };

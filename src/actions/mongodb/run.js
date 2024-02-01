@@ -5,34 +5,26 @@ import Run from "@/models/Run";
 
 import { getRunDetails } from "../raiderio/mythic_plus/run_details";
 import { summarizeRunDetails } from "@/utils/funcs";
-import Character from "@/models/Character";
-import { createCharacter } from "./character";
+import { saveRoster } from "./character";
 
 export const createRun = async (run) => {
   await mongoDB();
 
-  const {
-    season,
-    dungeon,
-    keystone_run_id,
-    mythic_level,
-    completed_at,
-    weekly_modifiers,
-    keystone_team_id,
-    roster,
-  } = run;
+  console.log(
+    "Creating run",
+    run.keystone_run_id,
+    "of dungeon",
+    run.dungeon.name,
+    "in database...",
+  );
+
+  const keystone_run_id = run.keystone_run_id;
+  const roster = run.roster;
 
   // upsert roster
-  const newCharacterIDs = await Promise.all(
-    roster.map(async (character) => {
-      const newCharacter = await createCharacter(
-        character.region,
-        character.realm,
-        character.name,
-      );
-      return newCharacter._id;
-    }),
-  );
+  // consider a cleaner split between methods that clean their data and methods that don't
+  // the calling function should most likely be the one summarizing
+  const newCharacterIDs = await saveRoster(roster);
 
   const reducedRun = { ...run, roster: newCharacterIDs };
 

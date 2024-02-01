@@ -5,12 +5,17 @@ class RequestQueue {
   constructor() {
     this.queue = [];
     this.isRequesting = false;
-    this.MAX_REQUESTS = 250; // 300; - slightly lower to prevent 429s
-    this.TIMEOUT = 1 * 60 * 1000; // 1 minute
+    this.MAX_REQUESTS = 3; // 300; - lower to prevent 429s
+    this.TIMEOUT = 1 * 1 * 1000; // 1 * 60 * 1000; // 1 minute
     this.requestsProcessing = 0;
   }
 
   addRequest(request) {
+    console.log(
+      "Adding request to queue,",
+      this.requestsProcessing,
+      "requests processing.",
+    );
     return new Promise((resolve, reject) => {
       this.queue.push({
         request,
@@ -42,6 +47,7 @@ class RequestQueue {
       return;
     }
 
+    console.log("Processing request,", this.queue.length, "left in queue.");
     const item = this.queue.shift();
     this.requestsProcessing++;
 

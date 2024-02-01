@@ -2,6 +2,7 @@
 
 import mongoDB from "@/actions/mongodb/mongodb";
 import Character from "@/models/Character";
+import { summarizeRoster } from "@/utils/funcs";
 
 export const createCharacter = async (region, realm, name) => {
   await mongoDB();
@@ -48,4 +49,21 @@ export const getAllCharacters = async () => {
   const flattenedCharacters = JSON.parse(JSON.stringify(characters));
 
   return flattenedCharacters;
+};
+
+export const saveRoster = async (rosterDetails) => {
+  await mongoDB();
+
+  const newCharacterIDs = await Promise.all(
+    rosterDetails.map(async (character) => {
+      const newCharacter = await createCharacter(
+        character.region,
+        character.realm,
+        character.name,
+      );
+      return newCharacter._id;
+    }),
+  );
+
+  return newCharacterIDs;
 };

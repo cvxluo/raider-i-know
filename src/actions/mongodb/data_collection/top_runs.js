@@ -9,33 +9,31 @@ import { summarizeRunDetails } from "@/utils/funcs";
 const PAGE_LIMIT = 100;
 
 export const getTopDungeonRuns = async (season, region, dungeon, affixes) => {
-  const requests = await Promise.allSettled(
+  const runs = await Promise.allSettled(
     [...Array(PAGE_LIMIT + 1).keys()].map((pageNum) => {
-      return useRIOThrottle(getRuns, {
+      const runSet = useRIOThrottle(getRuns, {
         season,
         region,
         dungeon,
         affixes,
         page: pageNum,
-      });
+      })
+        .then((res) => {
+          return res.rankings;
+        })
+        .then((rankings) => {
+          return rankings.map((runDetails) => {
+            const cleanRun = summarizeRunDetails(runDetails.run);
+
+            return createRun(cleanRun);
+          });
+        });
+
+      return runSet;
     }),
   );
 
-  return requests
-    .filter((request) => {
-      return (
-        request !== undefined &&
-        request.status === "fulfilled" &&
-        !("error" in request.value)
-      );
-    })
-    .map((request) => {
-      return request.value.rankings;
-    })
-    .flat()
-    .map((runDetails) => {
-      return runDetails.run;
-    });
+  return runs;
 };
 
 // this sends about 100 * 8 (num pages * 8 dungeons) requests to rio
@@ -47,9 +45,9 @@ export const getTopRuns = async (season, region, affixes) => {
     }),
   );
 
-  return runs.map((dungeon_runs) => {
-    return dungeon_runs.value;
-  });
+  console.log("RUNS: ", runs);
+
+  return runs;
 };
 
 // This sends 100 * 8 * 10 (num pages * 8 dungeons * 10 sets of affixes) requests to rio
@@ -57,17 +55,7 @@ export const saveTopRuns = async (season, region, affixes) => {
   console.log("Saving top runs...");
   const dungeon_top_runs = await getTopRuns(season, region, affixes);
 
-  dungeon_top_runs.map((dungeon_runs) => {
-    dungeon_runs.map((run) => {
-      const cleanRun = summarizeRunDetails(run);
-      try {
-        createRun(cleanRun);
-      } catch (err) {
-        console.log("Failed to save run err:");
-        console.log(err);
-      }
-    });
-  });
+  return dungeon_top_runs;
 };
 
 export const saveAllTopRuns = async (season, region) => {

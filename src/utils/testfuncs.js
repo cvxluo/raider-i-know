@@ -1,6 +1,7 @@
 import {
   getTopDungeonRuns,
   getTopRuns,
+  saveAllTopRuns,
   saveTopRuns,
 } from "@/actions/mongodb/data_collection/top_runs";
 import { createRun, createRunFromID } from "@/actions/mongodb/run";
@@ -42,7 +43,7 @@ export const testGetRuns = async () => {
   const dungeon = "all";
   const affixes = "fortified-incorporeal-sanguine";
   const page = 100;
-  getRuns(season, region, dungeon, affixes, page).then((res) => {
+  getRuns({ season, region, dungeon, affixes, page }).then((res) => {
     console.log(res);
   });
 };
@@ -74,4 +75,12 @@ export const testSaveTopRuns = async () => {
   const affixes = "fortified-incorporeal-sanguine";
 
   saveTopRuns(season, region, affixes);
+};
+
+export const testSaveTopAffixes = async () => {
+  const season = "season-df-3";
+  const region = "us";
+  const affixes = "fortified-incorporeal-sanguine";
+
+  saveAllTopRuns(season, region, affixes);
 };

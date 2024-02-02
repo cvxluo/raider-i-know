@@ -1,7 +1,7 @@
 "use server";
 
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
-import { Dungeons } from "@/utils/consts";
+import { AffixSets, Dungeons } from "@/utils/consts";
 import { useRIOThrottle } from "@/utils/useRIOThrottle";
 import { createRun } from "../run";
 import { summarizeRunDetails } from "@/utils/funcs";
@@ -11,7 +11,13 @@ const PAGE_LIMIT = 100;
 export const getTopDungeonRuns = async (season, region, dungeon, affixes) => {
   const requests = await Promise.allSettled(
     [...Array(PAGE_LIMIT + 1).keys()].map((pageNum) => {
-      return useRIOThrottle(getRuns(season, region, dungeon, affixes, pageNum));
+      return useRIOThrottle(getRuns, {
+        season,
+        region,
+        dungeon,
+        affixes,
+        page: pageNum,
+      });
     }),
   );
 
@@ -46,6 +52,7 @@ export const getTopRuns = async (season, region, affixes) => {
   });
 };
 
+// This sends 100 * 8 * 10 (num pages * 8 dungeons * 10 sets of affixes) requests to rio
 export const saveTopRuns = async (season, region, affixes) => {
   console.log("Saving top runs...");
   const dungeon_top_runs = await getTopRuns(season, region, affixes);
@@ -56,8 +63,20 @@ export const saveTopRuns = async (season, region, affixes) => {
       try {
         createRun(cleanRun);
       } catch (err) {
+        console.log("Failed to save run err:");
         console.log(err);
       }
     });
+  });
+};
+
+export const saveAllTopRuns = async (season, region) => {
+  console.log("Saving all top runs...");
+  const affixes = AffixSets.map((affixSet) => {
+    return affixSet.join("-").toLowerCase();
+  });
+
+  affixes.map((affix) => {
+    saveTopRuns(season, region, affix);
   });
 };

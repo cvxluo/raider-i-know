@@ -6,7 +6,7 @@ class RequestQueue {
     this.queue = [];
     this.isRequesting = false;
     this.MAX_REQUESTS = 3; // 300; - lower to prevent 429s
-    this.TIMEOUT = 1 * 1 * 1000; // 1 * 60 * 1000; // 1 minute
+    this.TIMEOUT = 1 * 1 * 1000; // 1 * 60 * 1000;
     this.requestsProcessing = 0;
   }
 
@@ -52,7 +52,7 @@ class RequestQueue {
     this.requestsProcessing++;
 
     try {
-      item.resolve(item.request);
+      item.resolve(item.request());
 
       setTimeout(() => {
         this.requestsProcessing--;

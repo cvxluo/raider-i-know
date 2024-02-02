@@ -14,6 +14,7 @@ import {
   testGetRuns,
   testGetTopDungeonRuns,
   testGetTopRuns,
+  testSaveTopAffixes,
   testSaveTopRuns,
 } from "@/utils/testfuncs";
 
@@ -22,7 +23,9 @@ export default function Home() {
   const [runID, setRunID] = useState(0);
 
   const test = async () => {
-    testSaveTopRuns();
+    testSaveTopAffixes();
+
+    // testGetRuns();
   };
 
   return (

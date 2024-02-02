@@ -15,7 +15,6 @@ export const getRunDetails = async (season, id) => {
       params,
     {
       method: "GET",
-      mode: "same-origin",
       headers: {
         "Content-Type": "application/json",
       },

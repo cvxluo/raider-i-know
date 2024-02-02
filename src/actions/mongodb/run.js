@@ -5,34 +5,28 @@ import Run from "@/models/Run";
 
 import { getRunDetails } from "../raiderio/mythic_plus/run_details";
 import { summarizeRunDetails } from "@/utils/funcs";
-import Character from "@/models/Character";
-import { createCharacter } from "./character";
+import { createManyCharacters, saveRoster } from "./character";
+
+const LOG_RUN_CREATION = false;
 
 export const createRun = async (run) => {
   await mongoDB();
 
-  const {
-    season,
-    dungeon,
-    keystone_run_id,
-    mythic_level,
-    completed_at,
-    weekly_modifiers,
-    keystone_team_id,
-    roster,
-  } = run;
+  console.log(
+    "Creating run",
+    run.keystone_run_id,
+    "of dungeon",
+    run.dungeon.name,
+    "in database...",
+  );
+
+  const keystone_run_id = run.keystone_run_id;
+  const roster = run.roster;
 
   // upsert roster
-  const newCharacterIDs = await Promise.all(
-    roster.map(async (character) => {
-      const newCharacter = await createCharacter(
-        character.region,
-        character.realm,
-        character.name,
-      );
-      return newCharacter._id;
-    }),
-  );
+  // consider a cleaner split between methods that clean their data and methods that don't
+  // the calling function should most likely be the one summarizing
+  const newCharacterIDs = await saveRoster(roster);
 
   const reducedRun = { ...run, roster: newCharacterIDs };
 
@@ -45,11 +39,62 @@ export const createRun = async (run) => {
       new: true,
       upsert: true,
     },
-  ).lean();
+  )
+    .lean()
+    .catch((e) => {
+      console.error("Error creating run in database.");
+      throw e;
+    });
 
   const flattenedRun = JSON.parse(JSON.stringify(newRun));
 
   return flattenedRun;
+};
+
+// https://stackoverflow.com/questions/39988848/trying-to-do-a-bulk-upsert-with-mongoose-whats-the-cleanest-way-to-do-this
+// bulk upsert
+export const createManyRuns = async (runs) => {
+  await mongoDB();
+
+  if (LOG_RUN_CREATION) {
+    console.log("Creating", runs.length, "runs in database with ids...");
+    console.log(runs.map((run) => run.keystone_run_id));
+  }
+
+  const simpleRuns = await Promise.allSettled(
+    runs.map(async (run) => {
+      const newCharacterIDs = await createManyCharacters(run.roster).map(
+        (character) => character._id,
+      );
+      return {
+        ...run,
+        roster: newCharacterIDs,
+      };
+    }),
+  ).catch((e) => {
+    console.error("Error creating roster in database.");
+    throw e;
+  });
+
+  const newRuns = await Run.collection
+    .bulkWrite(
+      runs.map((run) => ({
+        updateOne: {
+          filter: { keystone_run_id: run.keystone_run_id },
+          update: { $set: run },
+          upsert: true,
+        },
+      })),
+    )
+    .lean()
+    .catch((e) => {
+      console.error("Error creating runs in database.");
+      throw e;
+    });
+
+  const flattenedRuns = JSON.parse(JSON.stringify(newRuns));
+
+  return flattenedRuns;
 };
 
 export const createRunFromID = async (season, keystone_run_id) => {

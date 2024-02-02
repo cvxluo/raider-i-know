@@ -5,7 +5,9 @@ import Run from "@/models/Run";
 
 import { getRunDetails } from "../raiderio/mythic_plus/run_details";
 import { summarizeRunDetails } from "@/utils/funcs";
-import { saveRoster } from "./character";
+import { createManyCharacters, saveRoster } from "./character";
+
+const LOG_RUN_CREATION = false;
 
 export const createRun = async (run) => {
   await mongoDB();
@@ -54,8 +56,25 @@ export const createRun = async (run) => {
 export const createManyRuns = async (runs) => {
   await mongoDB();
 
-  console.log("Creating", runs.length, "runs in database with ids...");
-  console.log(runs.map((run) => run.keystone_run_id));
+  if (LOG_RUN_CREATION) {
+    console.log("Creating", runs.length, "runs in database with ids...");
+    console.log(runs.map((run) => run.keystone_run_id));
+  }
+
+  const simpleRuns = await Promise.allSettled(
+    runs.map(async (run) => {
+      const newCharacterIDs = await createManyCharacters(run.roster).map(
+        (character) => character._id,
+      );
+      return {
+        ...run,
+        roster: newCharacterIDs,
+      };
+    }),
+  ).catch((e) => {
+    console.error("Error creating roster in database.");
+    throw e;
+  });
 
   const newRuns = await Run.collection
     .bulkWrite(

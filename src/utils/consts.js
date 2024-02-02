@@ -28,7 +28,7 @@ export const AffixSets = [
   ["Tyrannical", "Entangling", "Bursting"],
   ["Fortified", "Spiteful", "Volcanic"],
   ["Tyrannical", "Storming", "Raging"],
-  ["Fortified", "Entangling", "Bursting"],
+  ["Fortified", "Entangling", "Bolstering"],
   ["Tyrannical", "Spiteful", "Incorporeal"],
   ["Fortified", "Afflicted", "Raging"],
   ["Tyrannical", "Volcanic", "Sanguine"],

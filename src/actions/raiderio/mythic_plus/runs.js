@@ -2,11 +2,14 @@
 
 import urls from "@/utils/urls";
 
+const LOG_RUN_FETCH = true;
+
 export const getRuns = async (runInfo) => {
   const { season, region, dungeon, affixes, page } = runInfo;
 
-  console.log("Fetching runs for", season, region, dungeon, affixes, page);
-
+  if (LOG_RUN_FETCH) {
+    console.log("Fetching runs for", season, region, dungeon, affixes, page);
+  }
   const params = new URLSearchParams({
     season: season,
     region: region,

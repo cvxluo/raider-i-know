@@ -47,7 +47,7 @@ export const getTopRuns = async (season, region, affixes) => {
     }),
   );
 
-  console.log("RUNS: ", runs);
+  // console.log("RUNS: ", runs);
 
   return runs;
 };

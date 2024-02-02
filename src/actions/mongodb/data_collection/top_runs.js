@@ -3,7 +3,7 @@
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
 import { AffixSets, Dungeons } from "@/utils/consts";
 import { useRIOThrottle } from "@/utils/useRIOThrottle";
-import { createRun } from "../run";
+import { createManyRuns, createRun } from "../run";
 import { summarizeRunDetails } from "@/utils/funcs";
 
 const PAGE_LIMIT = 100;
@@ -22,11 +22,13 @@ export const getTopDungeonRuns = async (season, region, dungeon, affixes) => {
           return res.rankings;
         })
         .then((rankings) => {
-          return rankings.map((runDetails) => {
+          const rankingsSet = rankings.map((runDetails) => {
             const cleanRun = summarizeRunDetails(runDetails.run);
 
-            return createRun(cleanRun);
+            return cleanRun;
           });
+
+          return createManyRuns(rankingsSet);
         });
 
       return runSet;

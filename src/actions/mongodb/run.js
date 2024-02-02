@@ -37,11 +37,45 @@ export const createRun = async (run) => {
       new: true,
       upsert: true,
     },
-  ).lean();
+  )
+    .lean()
+    .catch((e) => {
+      console.error("Error creating run in database.");
+      throw e;
+    });
 
   const flattenedRun = JSON.parse(JSON.stringify(newRun));
 
   return flattenedRun;
+};
+
+// https://stackoverflow.com/questions/39988848/trying-to-do-a-bulk-upsert-with-mongoose-whats-the-cleanest-way-to-do-this
+// bulk upsert
+export const createManyRuns = async (runs) => {
+  await mongoDB();
+
+  console.log("Creating", runs.length, "runs in database with ids...");
+  console.log(runs.map((run) => run.keystone_run_id));
+
+  const newRuns = await Run.collection
+    .bulkWrite(
+      runs.map((run) => ({
+        updateOne: {
+          filter: { keystone_run_id: run.keystone_run_id },
+          update: { $set: run },
+          upsert: true,
+        },
+      })),
+    )
+    .lean()
+    .catch((e) => {
+      console.error("Error creating runs in database.");
+      throw e;
+    });
+
+  const flattenedRuns = JSON.parse(JSON.stringify(newRuns));
+
+  return flattenedRuns;
 };
 
 export const createRunFromID = async (season, keystone_run_id) => {

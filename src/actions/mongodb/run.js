@@ -86,6 +86,28 @@ export const getRunFromID = async (keystone_run_id) => {
   return flattenedRun;
 };
 
+export const getRunsFromCharacter = async (character) => {
+  await mongoDB();
+
+  const region = character.region;
+  const realm = character.realm;
+  const name = character.name;
+
+  const retrievedRuns = await Run.find({
+    roster: {
+      $elemMatch: {
+        region: region,
+        realm: realm,
+        name: name,
+      },
+    },
+  }).lean();
+
+  const flattenedRuns = JSON.parse(JSON.stringify(retrievedRuns));
+
+  return flattenedRuns;
+};
+
 export const getAllRuns = async () => {
   await mongoDB();
 

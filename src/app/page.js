@@ -9,6 +9,7 @@ import {
   createRun,
   createRunFromID,
   getRunFromID,
+  getRunsFromCharacter,
 } from "@/actions/mongodb/run";
 import {
   testGetRuns,
@@ -29,9 +30,9 @@ export default function Home() {
   const handleCharSubmit = async (charInfo) => {
     const { region, realm, name } = charInfo;
 
-    const profile = await getCharacter(region, realm, name);
+    const runsWithChar = await getRunsFromCharacter({ region, realm, name });
 
-    console.log(profile);
+    console.log(runsWithChar);
   };
 
   return (

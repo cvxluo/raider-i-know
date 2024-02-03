@@ -15,6 +15,8 @@ import {
   testGetTopDungeonRuns,
   testGetTopRuns,
 } from "@/utils/testfuncs";
+import CharacterSelector from "@/components/CharacterSelector";
+import { getCharacter } from "@/actions/mongodb/character";
 
 export default function Home() {
   const [characterName, setCharacterName] = useState("");
@@ -22,6 +24,14 @@ export default function Home() {
 
   const test = async () => {
     testGetTopRuns();
+  };
+
+  const handleCharSubmit = async (charInfo) => {
+    const { region, realm, name } = charInfo;
+
+    const profile = await getCharacter(region, realm, name);
+
+    console.log(profile);
   };
 
   return (
@@ -40,6 +50,8 @@ export default function Home() {
       >
         Test
       </Button>
+
+      <CharacterSelector handleCharSubmit={handleCharSubmit} />
     </Box>
   );
 }

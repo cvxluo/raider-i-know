@@ -1,8 +1,9 @@
-import { getRun, getRunFromID } from "@/actions/mongodb/run";
+import { getRunFromID } from "@/actions/mongodb/run";
 import urls from "@/utils/urls";
 
 // this only retrieves the ObjectID from the database
 // in the future, probably use to get runs for a particular character?
+// also, probably the wrong name for route - should be getRunsFromID or just remove getRuns for this
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
 

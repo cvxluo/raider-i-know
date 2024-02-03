@@ -34,3 +34,28 @@ export const summarizeRunDetails = (runDetails) => {
 
   return summarizedRun;
 };
+
+export const countCharactersInRuns = (runs) => {
+  const characters = {};
+
+  runs.forEach((run) => {
+    run.roster.forEach((character) => {
+      const { region, realm, name } = character;
+
+      const characterKey = `${name}-${realm}-${region}`;
+
+      if (characters[characterKey]) {
+        characters[characterKey]++;
+      } else {
+        characters[characterKey] = 1;
+      }
+    });
+  });
+
+  return characters;
+};
+
+// TODO: rename/formalize this func
+export const slugCharacter = (character) => {
+  return `${character.name}-${character.realm}-${character.region}`;
+};

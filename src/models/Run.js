@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { CharacterSchema } from "./Character";
 
 const { Schema } = mongoose;
 

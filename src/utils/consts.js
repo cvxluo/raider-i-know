@@ -262,3 +262,16 @@ export const Dungeons = [
   "throne-of-the-tides",
   "waycrest-manor",
 ];
+
+export const AffixSets = [
+  ["Fortified", "Incorporeal", "Sanguine"],
+  ["Tyrannical", "Entangling", "Bursting"],
+  ["Fortified", "Spiteful", "Volcanic"],
+  ["Tyrannical", "Storming", "Raging"],
+  ["Fortified", "Entangling", "Bolstering"],
+  ["Tyrannical", "Spiteful", "Incorporeal"],
+  ["Fortified", "Afflicted", "Raging"],
+  ["Tyrannical", "Volcanic", "Sanguine"],
+  ["Fortified", "Storming", "Bursting"],
+  ["Tyrannical", "Afflicted", "Bolstering"],
+];

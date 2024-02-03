@@ -1,25 +1,14 @@
 "use client";
 
-import { getProfile } from "@/actions/raiderio/characters/profile";
-import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
-
-import { useEffect, useState } from "react";
-import { Box, Button, Input, List } from "@chakra-ui/react";
 import {
-  createRun,
-  createRunFromID,
   getLimitedRunsAtDegree,
-  getRunFromID,
   getRunsWithCharacter,
 } from "@/actions/mongodb/run";
-import {
-  testGetRuns,
-  testGetTopDungeonRuns,
-  testGetTopRuns,
-} from "@/utils/testfuncs";
 import CharacterSelector from "@/components/CharacterSelector";
-import { getCharacter } from "@/actions/mongodb/character";
 import { countCharactersInRuns } from "@/utils/funcs";
+import { testSaveTopAffixes } from "@/utils/testfuncs";
+import { Box, Button, List } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [characterName, setCharacterName] = useState("");
@@ -29,7 +18,9 @@ export default function Home() {
   const [charCounts, setCharCounts] = useState({});
 
   const test = async () => {
-    testGetTopRuns();
+    testSaveTopAffixes();
+
+    // testGetRuns();
   };
 
   const handleCharSubmit = async (charInfo) => {

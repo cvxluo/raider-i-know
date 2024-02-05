@@ -5,6 +5,7 @@ import Run from "@/models/Run";
 
 import {
   countCharactersInRuns,
+  filterRunsToLimit,
   slugCharacter,
   summarizeRunDetails,
 } from "@/utils/funcs";
@@ -157,13 +158,112 @@ export const getRunsWithCharacter = async (character) => {
   return flattenedRuns;
 };
 
-// returns a dict with runs with degrees of separation for a particular character
-// {0: 0 degrees (runs character was in), 1: 1 degree (runs character was in with other characters), 2: 2 degrees, 3: 3 degrees, ...}
+// returns an array with runs with degrees of separation for a particular character
+// [0 degrees (runs character was in), 1 degree (runs character was in with other characters), 2 degrees, 3 degrees, ...]
 // limit is the minimum number of runs a a character must have with another character to be included in the result
 // need to limit degree and limit aggressively, branching factor is high
-export const getLimitedRunsAtDegree = async (degree, character, limit) => {
+export const getLimitedRunsAtDegree = async (
+  degree,
+  character,
+  limit,
+  excludes = [],
+) => {
   await mongoDB();
 
+  const degreeRuns = [];
+  const allCharSlugs = [slugCharacter(character)];
+  let charsToSearch = [character];
+
+  for (let i = 0; i <= degree; i++) {
+    const runs = await Promise.all(
+      charsToSearch.map(async (char) => {
+        return await getRunsWithCharacter(char);
+      }),
+    ).then((runs) => {
+      return runs.flat();
+    });
+
+    const charCounts = countCharactersInRuns(runs);
+    const limitedChars = Object.keys(charCounts).filter(
+      (key) => charCounts[key] >= limit,
+    );
+
+    charsToSearch = limitedChars
+      .map((char) => {
+        const [name, realm, region] = char.split("-");
+        const character = { name, realm, region };
+        return character;
+      })
+      .filter((character) => {
+        return !excludes.some((exclude) => {
+          return (
+            exclude.region === character.region &&
+            exclude.realm === character.realm &&
+            exclude.name === character.name
+          );
+        });
+      });
+
+    allCharSlugs.push(
+      ...charsToSearch.map((char) => {
+        return slugCharacter(char);
+      }),
+    );
+
+    degreeRuns[i] = runs.filter((run) => {
+      return !degreeRuns
+        .flat()
+        .map((run) => run.keystone_run_id)
+        .includes(run.keystone_run_id);
+    });
+  }
+
+  return degreeRuns;
+
+  /*
+  const runs = await getRunsWithCharacter(character);
+  const limitedRuns = filterRunsToLimit(runs, limit, [character, ...excludes]);
+  const charCounts = countCharactersInRuns(limitedRuns);
+  const charSlugs = Object.keys(charCounts);
+
+  if (degree == 0) {
+    return limitedRuns;
+  }
+
+  // TODO: this can be replaced with getCharactersInRuns instead
+  const limitedChars = charSlugs
+  .filter((key) => charCounts[key] >= limit)
+  .map((char) => {
+    const [name, realm, region] = char.split("-");
+    const character = { name, realm, region };
+    return character;
+  });
+
+  console.log(limitedChars);
+  console.log(limitedRuns.length);
+
+
+  return [limitedRuns].concat(
+    await Promise.all(
+      limitedChars.map(async (char) => {
+        const charRuns = await getLimitedRunsAtDegree(degree - 1, char, limit, [
+          ...excludes,
+          character,
+        ]);
+
+        
+        console.log(charRuns.length);
+        console.log([...excludes, character]);
+        return charRuns;
+      }),
+    ).then((runs) => {
+      console.log(runs);
+      return runs.flat();
+    }),
+  );
+  */
+
+  /*
   const degreeRuns = {};
   const allCharSlugs = [slugCharacter(character)];
   let charsToSearch = [character];
@@ -207,6 +307,7 @@ export const getLimitedRunsAtDegree = async (degree, character, limit) => {
   }
 
   return degreeRuns;
+  */
 };
 
 export const getRunsAtDegree = async (degree, character) => {

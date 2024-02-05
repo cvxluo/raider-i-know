@@ -5,7 +5,7 @@ import {
   getRunsWithCharacter,
 } from "@/actions/mongodb/run";
 import CharacterSelector from "@/components/CharacterSelector";
-import { countCharactersInRuns } from "@/utils/funcs";
+import { countCharactersInRuns, filterRunsToLimit } from "@/utils/funcs";
 import { testSaveTopAffixes } from "@/utils/testfuncs";
 import { Box, Button, List } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -29,9 +29,10 @@ export default function Home() {
     console.log(charInfo);
 
     const runs = await getRunsWithCharacter({ region, realm, name });
-    setRunsWithChar(runs);
+    const limitedRuns = filterRunsToLimit(runs, 10, [charInfo]);
+    setRunsWithChar(limitedRuns);
 
-    const limited = await getLimitedRunsAtDegree(1, charInfo, 10);
+    const limited = await getLimitedRunsAtDegree(2, charInfo, 30);
 
     console.log(limited);
   };

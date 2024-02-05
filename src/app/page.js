@@ -4,6 +4,7 @@ import {
   getLimitedRunsAtDegree,
   getRunsWithCharacter,
 } from "@/actions/mongodb/run";
+import CharForceGraph from "@/components/CharForceGraph";
 import CharacterSelector from "@/components/CharacterSelector";
 import { countCharactersInRuns, filterRunsToLimit } from "@/utils/funcs";
 import { testSaveTopAffixes } from "@/utils/testfuncs";
@@ -16,6 +17,8 @@ export default function Home() {
 
   const [runsWithChar, setRunsWithChar] = useState([]);
   const [charCounts, setCharCounts] = useState({});
+  const [limitedRuns, setLimitedRuns] = useState([]);
+  const [mainChar, setMainChar] = useState({});
 
   const test = async () => {
     testSaveTopAffixes();
@@ -25,14 +28,16 @@ export default function Home() {
 
   const handleCharSubmit = async (charInfo) => {
     const { region, realm, name } = charInfo;
+    setMainChar(charInfo);
 
     console.log(charInfo);
 
     const runs = await getRunsWithCharacter({ region, realm, name });
-    const limitedRuns = filterRunsToLimit(runs, 10, [charInfo]);
+    const limitedRuns = filterRunsToLimit(runs, 30, [charInfo]);
     setRunsWithChar(limitedRuns);
 
-    const limited = await getLimitedRunsAtDegree(2, charInfo, 30);
+    const limited = await getLimitedRunsAtDegree(1, charInfo, 30);
+    setLimitedRuns(limited);
 
     console.log(limited);
   };
@@ -52,6 +57,8 @@ export default function Home() {
       </Button>
 
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
+
+      <CharForceGraph degrees={limitedRuns} mainChar={mainChar} />
 
       <List>
         {Object.keys(charCounts).map((char) => {

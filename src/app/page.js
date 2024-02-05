@@ -4,7 +4,12 @@ import {
   getLimitedRunsAtDegree,
   getRunsWithCharacter,
 } from "@/actions/mongodb/run";
-import CharForceGraph from "@/components/CharForceGraph";
+
+import dynamic from "next/dynamic";
+const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
+  ssr: false,
+});
+
 import CharacterSelector from "@/components/CharacterSelector";
 import { countCharactersInRuns, filterRunsToLimit } from "@/utils/funcs";
 import { testSaveTopAffixes } from "@/utils/testfuncs";

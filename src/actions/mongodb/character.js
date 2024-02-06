@@ -2,7 +2,6 @@
 
 import mongoDB from "@/actions/mongodb/mongodb";
 import Character from "@/models/Character";
-import { summarizeRoster } from "@/utils/funcs";
 
 const LOG_CHARACTER_CREATION = false;
 

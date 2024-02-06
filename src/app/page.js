@@ -1,49 +1,73 @@
 "use client";
 
-import { getProfile } from "@/actions/raiderio/characters/profile";
-import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
-
-import { useEffect, useState } from "react";
-import { Box, Button, Input } from "@chakra-ui/react";
 import {
-  createRun,
-  createRunFromID,
-  getRunFromID,
+  getLimitedRunsAtDegree,
+  getRunsWithCharacter,
+  getCharGraph,
 } from "@/actions/mongodb/run";
-import {
-  testGetRuns,
-  testGetTopDungeonRuns,
-  testGetTopRuns,
-  testSaveTopAffixes,
-  testSaveTopRuns,
-} from "@/utils/testfuncs";
+
+import dynamic from "next/dynamic";
+const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
+  ssr: false,
+});
+
+import CharacterSelector from "@/components/CharacterSelector";
+import { countCharactersInRuns, filterRunsToLimit } from "@/utils/funcs";
+import { testSaveTopAffixes } from "@/utils/testfuncs";
+import { Box, Button, List } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [characterName, setCharacterName] = useState("");
   const [runID, setRunID] = useState(0);
 
-  const test = async () => {
-    testSaveTopAffixes();
+  const [runsWithChar, setRunsWithChar] = useState([]);
+  const [charCounts, setCharCounts] = useState({});
+  const [limitedRuns, setLimitedRuns] = useState([]);
+  const [mainChar, setMainChar] = useState({});
+  const [charGraph, setCharGraph] = useState([]);
 
-    // testGetRuns();
+  const handleCharSubmit = async (charInfo) => {
+    const { region, realm, name } = charInfo;
+    setMainChar(charInfo);
+
+    console.log(charInfo);
+
+    const runs = await getRunsWithCharacter({ region, realm, name });
+    const limitedRuns = filterRunsToLimit(runs, 30, [charInfo]);
+    setRunsWithChar(limitedRuns);
+
+    const limited = await getLimitedRunsAtDegree(1, charInfo, 30);
+    setLimitedRuns(limited);
+
+    const charGraph = await getCharGraph(charInfo, 2, 30, [charInfo]);
+    setCharGraph(charGraph);
+    console.log(charGraph);
   };
+
+  useEffect(() => {
+    setCharCounts(countCharactersInRuns(runsWithChar));
+  }, [runsWithChar]);
 
   return (
     <Box>
-      <Input
-        placeholder="Run ID"
-        value={runID}
-        onChange={(e) => {
-          setRunID(e.target.value);
-        }}
-      ></Input>
-      <Button
-        onClick={() => {
-          test();
-        }}
-      >
-        Test
-      </Button>
+      <CharacterSelector handleCharSubmit={handleCharSubmit} />
+
+      <CharForceGraph
+        degrees={limitedRuns}
+        mainChar={mainChar}
+        charGraph={charGraph}
+      />
+
+      <List>
+        {Object.keys(charCounts).map((char) => {
+          return (
+            <li key={char}>
+              {char} - {charCounts[char]}
+            </li>
+          );
+        })}
+      </List>
     </Box>
   );
 }

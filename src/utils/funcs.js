@@ -71,6 +71,29 @@ export const getCharactersInRuns = (runs, excludes = []) => {
   });
 };
 
+export const getLimitedChars = (runs, limit, excludes = []) => {
+  const charCounts = countCharactersInRuns(runs);
+  const limitedChars = Object.keys(charCounts).filter(
+    (key) => charCounts[key] >= limit,
+  );
+
+  return limitedChars
+    .map((char) => {
+      const [name, realm, region] = char.split("-");
+      const character = { name, realm, region };
+      return character;
+    })
+    .filter((character) => {
+      return !excludes.some((exclude) => {
+        return (
+          exclude.region === character.region &&
+          exclude.realm === character.realm &&
+          exclude.name === character.name
+        );
+      });
+    });
+};
+
 // gives back only runs where a character in the run appears at least limit times
 export const filterRunsToLimit = (runs, limit, excludeChars = []) => {
   const charCounts = countCharactersInRuns(runs);

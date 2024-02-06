@@ -3,6 +3,7 @@
 import {
   getLimitedRunsAtDegree,
   getRunsWithCharacter,
+  getCharGraph,
 } from "@/actions/mongodb/run";
 
 import dynamic from "next/dynamic";
@@ -24,12 +25,7 @@ export default function Home() {
   const [charCounts, setCharCounts] = useState({});
   const [limitedRuns, setLimitedRuns] = useState([]);
   const [mainChar, setMainChar] = useState({});
-
-  const test = async () => {
-    testSaveTopAffixes();
-
-    // testGetRuns();
-  };
+  const [charGraph, setCharGraph] = useState([]);
 
   const handleCharSubmit = async (charInfo) => {
     const { region, realm, name } = charInfo;
@@ -44,7 +40,9 @@ export default function Home() {
     const limited = await getLimitedRunsAtDegree(1, charInfo, 30);
     setLimitedRuns(limited);
 
-    console.log(limited);
+    const charGraph = await getCharGraph(charInfo, 2, 30, [charInfo]);
+    setCharGraph(charGraph);
+    console.log(charGraph);
   };
 
   useEffect(() => {
@@ -53,17 +51,13 @@ export default function Home() {
 
   return (
     <Box>
-      <Button
-        onClick={() => {
-          test();
-        }}
-      >
-        Test
-      </Button>
-
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
 
-      <CharForceGraph degrees={limitedRuns} mainChar={mainChar} />
+      <CharForceGraph
+        degrees={limitedRuns}
+        mainChar={mainChar}
+        charGraph={charGraph}
+      />
 
       <List>
         {Object.keys(charCounts).map((char) => {

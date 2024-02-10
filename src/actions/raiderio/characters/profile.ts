@@ -1,8 +1,14 @@
 "use server";
 
+import { Character } from "@/utils/types";
 import urls from "@/utils/urls";
 
-export const getProfile = async (region, realm, name, fields) => {
+export const getProfile = async (
+  region: string,
+  realm: string,
+  name: string,
+  fields?: string,
+): Promise<Character> => {
   const params = new URLSearchParams({
     region,
     realm,

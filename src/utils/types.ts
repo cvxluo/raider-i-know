@@ -69,5 +69,10 @@ export interface CharacterRaw {
   };
 }
 
+export interface CharacterNode {
+  character: Character;
+  parentCharacter: Character;
+}
+
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;
 export type Request = (...args: any[]) => Promise<RequestReturn>;

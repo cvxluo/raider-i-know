@@ -243,7 +243,7 @@ export const getCharGraph = async (
   character: Character,
   degree: number,
   limit: number,
-  excludes = [],
+  excludes: Character[] = [],
 ) => {
   const charGraph = [
     [

@@ -50,7 +50,7 @@ export default function Home() {
   }, [runsWithChar]);
 
   const handleTest = async () => {
-    const res = await testSaveTopAffixes("season-1", "us", "affixes-1");
+    const res = await testSaveTopAffixes();
     console.log(res);
   };
 

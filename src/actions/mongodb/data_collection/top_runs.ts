@@ -5,7 +5,7 @@ import { AffixSets, Dungeons } from "@/utils/consts";
 import { summarizeRunDetails } from "@/utils/funcs";
 import { useRIOThrottle } from "@/utils/useRIOThrottle";
 import { createManyRuns } from "../run";
-import { RunRaw } from "@/utils/types";
+import { RankingRaw, RunRaw } from "@/utils/types";
 
 const PAGE_LIMIT = 100;
 
@@ -25,7 +25,7 @@ export const getTopDungeonRuns = async (
         page: pageNum,
       })
         .then((res) => {
-          return res.rankings;
+          return (res as RankingRaw).rankings;
         })
         .then((rankings) => {
           const rankingsSet = rankings.map((ranking: { run: RunRaw }) => {

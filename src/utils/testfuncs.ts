@@ -11,7 +11,10 @@ import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
 export const testCreateRun = async () => {
   const testRun = {
     season: "season-df-3",
-    dungeon: "everbloom",
+    dungeon: {
+      name: "everbloom",
+      id: 7109,
+    },
     keystone_run_id: 123456789,
     completed_at: new Date(),
     weekly_modifiers: ["fortified", "sanguine"],
@@ -82,5 +85,5 @@ export const testSaveTopAffixes = async () => {
   const region = "us";
   const affixes = "fortified-incorporeal-sanguine";
 
-  saveAllTopRuns(season, region, affixes);
+  saveAllTopRuns(season, region);
 };

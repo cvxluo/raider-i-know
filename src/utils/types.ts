@@ -42,6 +42,14 @@ export interface RunRaw {
   roster: CharacterRaw[];
 }
 
+export interface RankingRaw {
+  rankings: {
+    rank: number;
+    score: number;
+    run: RunRaw;
+  }[];
+}
+
 export interface Affix {
   id: number;
   name: string;
@@ -60,3 +68,6 @@ export interface CharacterRaw {
     name: string;
   };
 }
+
+export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;
+export type Request = (...args: any[]) => Promise<RequestReturn>;

@@ -1,37 +1,4 @@
-import { Run, Character } from "./types";
-
-interface Affix {
-  id: number;
-  name: string;
-  description: string;
-  slug: string;
-}
-
-interface RunRaw {
-  season: string;
-  dungeon: {
-    name: string;
-    id: number;
-  };
-  keystone_run_id: number;
-  mythic_level: number;
-  completed_at: Date;
-  weekly_modifiers: Affix[];
-  keystone_team_id: number;
-  roster: CharacterRaw[];
-}
-
-interface CharacterRaw {
-  character: {
-    region: {
-      name: string;
-    };
-    realm: {
-      name: string;
-    };
-    name: string;
-  };
-}
+import { Run, Character, RunRaw, CharacterRaw, Affix } from "./types";
 
 export const summarizeRunDetails = (runDetails: RunRaw) => {
   const season = runDetails.season;

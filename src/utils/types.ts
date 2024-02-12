@@ -27,3 +27,36 @@ export interface Region {
   slug: string;
   short_name: string;
 }
+
+export interface RunRaw {
+  season: string;
+  dungeon: {
+    name: string;
+    id: number;
+  };
+  keystone_run_id: number;
+  mythic_level: number;
+  completed_at: Date;
+  weekly_modifiers: Affix[];
+  keystone_team_id: number;
+  roster: CharacterRaw[];
+}
+
+export interface Affix {
+  id: number;
+  name: string;
+  description: string;
+  slug: string;
+}
+
+export interface CharacterRaw {
+  character: {
+    region: {
+      name: string;
+    };
+    realm: {
+      name: string;
+    };
+    name: string;
+  };
+}

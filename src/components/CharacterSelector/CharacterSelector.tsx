@@ -9,9 +9,14 @@ import {
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { Realms, Regions } from "@/utils/consts";
+import { Character } from "@/utils/types";
 
-const CharacterSelector = ({ handleCharSubmit }) => {
-  const [charInfo, setCharInfo] = useState({
+const CharacterSelector = ({
+  handleCharSubmit,
+}: {
+  handleCharSubmit: (charInfo: Character) => void;
+}) => {
+  const [charInfo, setCharInfo] = useState<Character>({
     name: "",
     region: Regions[0],
     realm: Realms[0],

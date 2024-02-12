@@ -1,14 +1,19 @@
 "use server";
 
 import mongoDB from "@/actions/mongodb/mongodb";
-import Character from "@/models/Character";
+import CharacterModel from "@/models/Character";
+import { Character } from "@/utils/types";
 
 const LOG_CHARACTER_CREATION = false;
 
-export const createCharacter = async (region, realm, name) => {
+export const createCharacter = async (
+  region: string,
+  realm: string,
+  name: string,
+) => {
   await mongoDB();
 
-  const newCharacter = await Character.findOneAndReplace(
+  const newCharacter = await CharacterModel.findOneAndReplace(
     {
       region,
       realm,
@@ -30,15 +35,17 @@ export const createCharacter = async (region, realm, name) => {
       throw e;
     });
 
-  return newCharacter;
+  const flattenedCharacter = JSON.parse(JSON.stringify(newCharacter));
+
+  return flattenedCharacter;
 };
 
 // upsert operation
 // TODO: consider writing an upsertMany func for this and manyRuns
-export const createManyCharacters = async (characters) => {
+export const createManyCharacters = async (characters: Character[]) => {
   await mongoDB();
 
-  const res = await Character.collection
+  const res = await CharacterModel.collection
     .bulkWrite(
       characters.map((character) => ({
         updateOne: {
@@ -66,13 +73,19 @@ export const createManyCharacters = async (characters) => {
       throw e;
     });
 
-  return res;
+  const flattenedRes = JSON.parse(JSON.stringify(res));
+
+  return flattenedRes;
 };
 
-export const getCharacter = async (region, realm, name) => {
+export const getCharacter = async (
+  region: string,
+  realm: string,
+  name: string,
+) => {
   await mongoDB();
 
-  const character = await Character.findOne({
+  const character = await CharacterModel.findOne({
     region,
     realm,
     name,
@@ -86,31 +99,29 @@ export const getCharacter = async (region, realm, name) => {
 export const getAllCharacters = async () => {
   await mongoDB();
 
-  const characters = await Character.find().lean();
+  const characters = await CharacterModel.find().lean();
 
   const flattenedCharacters = JSON.parse(JSON.stringify(characters));
 
   return flattenedCharacters;
 };
 
-export const saveRoster = async (rosterDetails) => {
+export const saveRoster = async (rosterDetails: Character[]) => {
   await mongoDB();
 
   const newCharacterIDs = await Promise.all(
-    rosterDetails
-      .map(async (character) => {
-        const newCharacter = await createCharacter(
-          character.region,
-          character.realm,
-          character.name,
-        );
-        return newCharacter._id;
-      })
-      .catch((e) => {
-        console.error("Error saving roster in database.");
-        throw e;
-      }),
-  );
+    rosterDetails.map(async (character) => {
+      const newCharacter = await createCharacter(
+        character.region,
+        character.realm,
+        character.name,
+      );
+      return newCharacter._id;
+    }),
+  ).catch((e) => {
+    console.error("Error saving roster in database.");
+    throw e;
+  });
 
   return newCharacterIDs;
 };

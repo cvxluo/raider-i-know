@@ -4,7 +4,13 @@ import urls from "@/utils/urls";
 
 const LOG_RUN_FETCH = true;
 
-export const getRuns = async (runInfo) => {
+export const getRuns = async (runInfo: {
+  season: string;
+  region: string;
+  dungeon: string;
+  affixes: string;
+  page: number;
+}) => {
   const { season, region, dungeon, affixes, page } = runInfo;
 
   if (LOG_RUN_FETCH) {
@@ -15,7 +21,7 @@ export const getRuns = async (runInfo) => {
     region: region,
     dungeon: dungeon,
     affixes: affixes,
-    page: page,
+    page: page.toString(),
   });
 
   return fetch(

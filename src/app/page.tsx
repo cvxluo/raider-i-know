@@ -16,18 +16,23 @@ import { countCharactersInRuns, filterRunsToLimit } from "@/utils/funcs";
 import { testSaveTopAffixes } from "@/utils/testfuncs";
 import { Box, Button, List } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { Character, CharacterNode, Run } from "@/utils/types";
 
 export default function Home() {
   const [characterName, setCharacterName] = useState("");
   const [runID, setRunID] = useState(0);
 
-  const [runsWithChar, setRunsWithChar] = useState([]);
-  const [charCounts, setCharCounts] = useState({});
-  const [limitedRuns, setLimitedRuns] = useState([]);
-  const [mainChar, setMainChar] = useState({});
-  const [charGraph, setCharGraph] = useState([]);
+  const [runsWithChar, setRunsWithChar] = useState<Run[]>([]);
+  const [charCounts, setCharCounts] = useState<{ [key: string]: number }>({});
+  const [limitedRuns, setLimitedRuns] = useState<Run[][]>([]);
+  const [mainChar, setMainChar] = useState({
+    name: "",
+    region: "",
+    realm: "",
+  });
+  const [charGraph, setCharGraph] = useState<CharacterNode[][]>([]);
 
-  const handleCharSubmit = async (charInfo) => {
+  const handleCharSubmit = async (charInfo: Character) => {
     const { region, realm, name } = charInfo;
     setMainChar(charInfo);
 
@@ -49,8 +54,14 @@ export default function Home() {
     setCharCounts(countCharactersInRuns(runsWithChar));
   }, [runsWithChar]);
 
+  const handleTest = async () => {
+    const res = await testSaveTopAffixes();
+    console.log(res);
+  };
+
   return (
     <Box>
+      <Button onClick={handleTest}>test</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
 
       <CharForceGraph

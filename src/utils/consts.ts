@@ -1,7 +1,7 @@
-export const Regions = ["United States & Oceania", "Europe"];
+export const Regions: string[] = ["United States & Oceania", "Europe"];
 
 // TODO: change this to slugs eventually
-export const Realms = [
+export const Realms: string[] = [
   "Area 52",
   "Illidan",
   "Stormrage",
@@ -252,7 +252,7 @@ export const Realms = [
 ];
 
 // consider using rio's static data to get dungeon data per-season
-export const Dungeons = [
+export const Dungeons: string[] = [
   "ataldazar",
   "black-rook-hold",
   "doti-galakronds-fall",
@@ -263,7 +263,7 @@ export const Dungeons = [
   "waycrest-manor",
 ];
 
-export const AffixSets = [
+export const AffixSets: string[][] = [
   ["Fortified", "Incorporeal", "Sanguine"],
   ["Tyrannical", "Entangling", "Bursting"],
   ["Fortified", "Spiteful", "Volcanic"],

@@ -12,8 +12,17 @@ import { Realms, Regions } from "@/utils/consts";
 
 import { ForceGraph2D } from "react-force-graph";
 import { slugCharacter } from "@/utils/funcs";
+import { Character, CharacterNode, Run } from "@/utils/types";
 
-const CharForceGraph = ({ degrees, mainChar, charGraph }) => {
+const CharForceGraph = ({
+  degrees,
+  mainChar,
+  charGraph,
+}: {
+  degrees: Run[][];
+  mainChar: Character;
+  charGraph: CharacterNode[][];
+}) => {
   /*
   const characters = [
     {

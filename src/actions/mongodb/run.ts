@@ -1,7 +1,7 @@
 "use server";
 
 import mongoDB from "@/actions/mongodb/mongodb";
-import Run from "@/models/Run";
+import RunModel from "@/models/Run";
 
 import {
   countCharactersInRuns,
@@ -12,10 +12,11 @@ import {
 } from "@/utils/funcs";
 import { getRunDetails } from "../raiderio/mythic_plus/run_details";
 import { createManyCharacters, saveRoster } from "./character";
+import { Character, Run } from "@/utils/types";
 
 const LOG_RUN_CREATION = false;
 
-export const createRun = async (run) => {
+export const createRun = async (run: Run): Promise<Run> => {
   await mongoDB();
 
   console.log(
@@ -36,7 +37,7 @@ export const createRun = async (run) => {
 
   const reducedRun = { ...run, roster: newCharacterIDs };
 
-  const newRun = await Run.findOneAndUpdate(
+  const newRun = await RunModel.findOneAndUpdate(
     {
       keystone_run_id: keystone_run_id,
     },
@@ -59,7 +60,7 @@ export const createRun = async (run) => {
 
 // https://stackoverflow.com/questions/39988848/trying-to-do-a-bulk-upsert-with-mongoose-whats-the-cleanest-way-to-do-this
 // bulk upsert
-export const createManyRuns = async (runs) => {
+export const createManyRuns = async (runs: Run[]): Promise<Run[]> => {
   await mongoDB();
 
   if (LOG_RUN_CREATION) {
@@ -69,8 +70,9 @@ export const createManyRuns = async (runs) => {
 
   const simpleRuns = await Promise.allSettled(
     runs.map(async (run) => {
-      const newCharacterIDs = await createManyCharacters(run.roster).map(
-        (character) => character._id,
+      const characters = await createManyCharacters(run.roster);
+      const newCharacterIDs = characters.map(
+        (character: Character) => character._id,
       );
       return {
         ...run,
@@ -82,7 +84,7 @@ export const createManyRuns = async (runs) => {
     throw e;
   });
 
-  const newRuns = await Run.collection
+  const newRuns = await RunModel.collection
     .bulkWrite(
       runs.map((run) => ({
         updateOne: {
@@ -92,7 +94,6 @@ export const createManyRuns = async (runs) => {
         },
       })),
     )
-    .lean()
     .catch((e) => {
       console.error("Error creating runs in database.");
       throw e;
@@ -103,7 +104,10 @@ export const createManyRuns = async (runs) => {
   return flattenedRuns;
 };
 
-export const createRunFromID = async (season, keystone_run_id) => {
+export const createRunFromID = async (
+  season: string,
+  keystone_run_id: number,
+) => {
   await mongoDB();
 
   const runFromID = await getRunDetails(season, keystone_run_id);
@@ -113,10 +117,10 @@ export const createRunFromID = async (season, keystone_run_id) => {
   return createRun(summarizedRun);
 };
 
-export const getRun = async (run) => {
+export const getRun = async (run: Run) => {
   await mongoDB();
 
-  const retrievedRun = await Run.findOne({
+  const retrievedRun = await RunModel.findOne({
     keystone_run_id: run.keystone_run_id,
   }).lean();
 
@@ -125,10 +129,10 @@ export const getRun = async (run) => {
   return flattenedRun;
 };
 
-export const getRunFromID = async (keystone_run_id) => {
+export const getRunFromID = async (keystone_run_id: number) => {
   await mongoDB();
 
-  const retrievedRun = await Run.findOne({
+  const retrievedRun = await RunModel.findOne({
     keystone_run_id: keystone_run_id,
   }).lean();
 
@@ -137,14 +141,14 @@ export const getRunFromID = async (keystone_run_id) => {
   return flattenedRun;
 };
 
-export const getRunsWithCharacter = async (character) => {
+export const getRunsWithCharacter = async (character: Character) => {
   await mongoDB();
 
   const region = character.region;
   const realm = character.realm;
   const name = character.name;
 
-  const retrievedRuns = await Run.find({
+  const retrievedRuns = await RunModel.find({
     roster: {
       $elemMatch: {
         region: region,
@@ -164,14 +168,14 @@ export const getRunsWithCharacter = async (character) => {
 // limit is the minimum number of runs a a character must have with another character to be included in the result
 // need to limit degree and limit aggressively, branching factor is high
 export const getLimitedRunsAtDegree = async (
-  degree,
-  character,
-  limit,
-  excludes = [],
+  degree: number,
+  character: Character,
+  limit: number,
+  excludes: Character[] = [],
 ) => {
   await mongoDB();
 
-  const degreeRuns = [];
+  const degreeRuns: Run[][] = [];
   const allCharSlugs = [slugCharacter(character)];
   let charsToSearch = [character];
 
@@ -220,95 +224,6 @@ export const getLimitedRunsAtDegree = async (
   }
 
   return degreeRuns;
-
-  /*
-  const runs = await getRunsWithCharacter(character);
-  const limitedRuns = filterRunsToLimit(runs, limit, [character, ...excludes]);
-  const charCounts = countCharactersInRuns(limitedRuns);
-  const charSlugs = Object.keys(charCounts);
-
-  if (degree == 0) {
-    return limitedRuns;
-  }
-
-  // TODO: this can be replaced with getCharactersInRuns instead
-  const limitedChars = charSlugs
-  .filter((key) => charCounts[key] >= limit)
-  .map((char) => {
-    const [name, realm, region] = char.split("-");
-    const character = { name, realm, region };
-    return character;
-  });
-
-  console.log(limitedChars);
-  console.log(limitedRuns.length);
-
-
-  return [limitedRuns].concat(
-    await Promise.all(
-      limitedChars.map(async (char) => {
-        const charRuns = await getLimitedRunsAtDegree(degree - 1, char, limit, [
-          ...excludes,
-          character,
-        ]);
-
-        
-        console.log(charRuns.length);
-        console.log([...excludes, character]);
-        return charRuns;
-      }),
-    ).then((runs) => {
-      console.log(runs);
-      return runs.flat();
-    }),
-  );
-  */
-
-  /*
-  const degreeRuns = {};
-  const allCharSlugs = [slugCharacter(character)];
-  let charsToSearch = [character];
-
-  for (let i = 0; i <= degree; i++) {
-    const runs = await Promise.all(
-      charsToSearch.map(async (char) => {
-        return await getRunsWithCharacter(char);
-      }),
-    ).then((runs) => {
-      return runs.flat();
-    });
-
-    const charCounts = countCharactersInRuns(runs);
-    const limitedChars = Object.keys(charCounts).filter(
-      (key) => charCounts[key] >= limit,
-    );
-
-    charsToSearch = limitedChars
-      .map((char) => {
-        const [name, realm, region] = char.split("-");
-        const character = { name, realm, region };
-        return character;
-      })
-      .filter((character) => {
-        return !allCharSlugs.includes(slugCharacter(character));
-      });
-
-    allCharSlugs.push(
-      ...charsToSearch.map((char) => {
-        return slugCharacter(char);
-      }),
-    );
-
-    degreeRuns[i] = runs.filter((run) => {
-      return !Object.values(degreeRuns)
-        .flat()
-        .map((run) => run.keystone_run_id)
-        .includes(run.keystone_run_id);
-    });
-  }
-
-  return degreeRuns;
-  */
 };
 
 /*
@@ -324,17 +239,22 @@ export const getLimitedRunsAtDegree = async (
   [...],
 ]
 */
-export const getCharGraph = async (character, degree, limit, excludes) => {
+export const getCharGraph = async (
+  character: Character,
+  degree: number,
+  limit: number,
+  excludes = [],
+) => {
   const charGraph = [
     [
       {
         character: character,
-        parentCharacter: null,
+        parentCharacter: character,
       },
     ],
   ];
   let charsToSearch = [character];
-  const allCharsSearched = [];
+  const allCharsSearched: Character[] = [];
 
   for (let i = 0; i <= degree; i++) {
     const characters = await Promise.all(
@@ -363,7 +283,7 @@ export const getCharGraph = async (character, degree, limit, excludes) => {
   return charGraph;
 };
 
-export const getRunsAtDegree = async (degree, character) => {
+export const getRunsAtDegree = async (degree: number, character: Character) => {
   await mongoDB();
 
   return await getLimitedRunsAtDegree(degree, character, 0);
@@ -372,7 +292,7 @@ export const getRunsAtDegree = async (degree, character) => {
 export const getAllRuns = async () => {
   await mongoDB();
 
-  const runs = await Run.find({});
+  const runs = await RunModel.find({});
 
   const flattenedRuns = JSON.parse(JSON.stringify(runs));
 

@@ -7,7 +7,7 @@ export const getProfile = async (
   region: string,
   realm: string,
   name: string,
-  fields?: string,
+  fields = "",
 ): Promise<Character> => {
   const params = new URLSearchParams({
     region,

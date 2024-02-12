@@ -10,7 +10,7 @@ const PAGE_LIMIT = 100;
 
 export const getTopDungeonRuns = async (season, region, dungeon, affixes) => {
   const runs = await Promise.allSettled(
-    [...Array(PAGE_LIMIT + 1).keys()].map((pageNum) => {
+    [...Array(PAGE_LIMIT + 1)].map((_, pageNum) => {
       const runSet = useRIOThrottle(getRuns, {
         season,
         region,

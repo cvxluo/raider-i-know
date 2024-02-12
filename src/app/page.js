@@ -49,8 +49,14 @@ export default function Home() {
     setCharCounts(countCharactersInRuns(runsWithChar));
   }, [runsWithChar]);
 
+  const handleTest = async () => {
+    const res = await testSaveTopAffixes("season-1", "us", "affixes-1");
+    console.log(res);
+  };
+
   return (
     <Box>
+      <Button onClick={handleTest}>test</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
 
       <CharForceGraph

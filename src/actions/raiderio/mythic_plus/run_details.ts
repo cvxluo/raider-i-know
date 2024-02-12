@@ -2,10 +2,10 @@
 
 import urls from "@/utils/urls";
 
-export const getRunDetails = async (season, id) => {
+export const getRunDetails = async (season: string, id: number) => {
   const params = new URLSearchParams({
-    season: season,
-    id: id,
+    season,
+    id: id.toString(),
   });
 
   return fetch(

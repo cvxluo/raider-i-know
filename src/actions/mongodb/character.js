@@ -66,7 +66,9 @@ export const createManyCharacters = async (characters) => {
       throw e;
     });
 
-  return res;
+  const flattenedRes = JSON.parse(JSON.stringify(res));
+
+  return flattenedRes;
 };
 
 export const getCharacter = async (region, realm, name) => {

@@ -1,14 +1,14 @@
 import mongoose, { Types } from "mongoose";
 
 export interface Character {
-  _id: Types.ObjectId;
+  _id?: Types.ObjectId;
   region: string;
   realm: string;
   name: string;
 }
 
 export interface Run {
-  _id: Types.ObjectId;
+  _id?: Types.ObjectId;
   season: string;
   dungeon: {
     name: string;
@@ -20,4 +20,10 @@ export interface Run {
   weekly_modifiers: string[];
   keystone_team_id: number;
   roster: Character[];
+}
+
+export interface Region {
+  name: string;
+  slug: string;
+  short_name: string;
 }

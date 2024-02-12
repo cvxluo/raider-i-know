@@ -1,4 +1,39 @@
-export const summarizeRunDetails = (runDetails) => {
+import { Run, Character } from "./types";
+
+interface Affix {
+  id: number;
+  name: string;
+  description: string;
+  slug: string;
+}
+
+interface RunRaw {
+  season: string;
+  dungeon: {
+    name: string;
+    id: number;
+  };
+  keystone_run_id: number;
+  mythic_level: number;
+  completed_at: Date;
+  weekly_modifiers: Affix[];
+  keystone_team_id: number;
+  roster: CharacterRaw[];
+}
+
+interface CharacterRaw {
+  character: {
+    region: {
+      name: string;
+    };
+    realm: {
+      name: string;
+    };
+    name: string;
+  };
+}
+
+export const summarizeRunDetails = (runDetails: RunRaw) => {
   const season = runDetails.season;
   const dungeon = runDetails.dungeon;
   const keystone_run_id = runDetails.keystone_run_id;
@@ -25,8 +60,14 @@ export const summarizeRunDetails = (runDetails) => {
   return summarizedRun;
 };
 
-export const countCharactersInRuns = (runs) => {
-  const characters = {};
+export const countCharactersInRuns = (
+  runs: Run[],
+): {
+  [key: string]: number;
+} => {
+  const characters: {
+    [key: string]: number;
+  } = {};
 
   runs.forEach((run) => {
     run.roster.forEach((character) => {
@@ -45,7 +86,7 @@ export const countCharactersInRuns = (runs) => {
   return characters;
 };
 
-export const getCharactersInRun = (run, excludes = []) => {
+export const getCharactersInRun = (run: RunRaw, excludes: Character[] = []) => {
   return run.roster
     .map((rosterItem) => {
       return {
@@ -65,13 +106,20 @@ export const getCharactersInRun = (run, excludes = []) => {
     });
 };
 
-export const getCharactersInRuns = (runs, excludes = []) => {
+export const getCharactersInRuns = (
+  runs: RunRaw[],
+  excludes: Character[] = [],
+) => {
   return runs.map((run) => {
     return getCharactersInRun(run, excludes);
   });
 };
 
-export const getLimitedChars = (runs, limit, excludes = []) => {
+export const getLimitedChars = (
+  runs: Run[],
+  limit: number,
+  excludes: Character[] = [],
+) => {
   const charCounts = countCharactersInRuns(runs);
   const limitedChars = Object.keys(charCounts).filter(
     (key) => charCounts[key] >= limit,
@@ -95,12 +143,16 @@ export const getLimitedChars = (runs, limit, excludes = []) => {
 };
 
 // gives back only runs where a character in the run appears at least limit times
-export const filterRunsToLimit = (runs, limit, excludeChars = []) => {
+export const filterRunsToLimit = (
+  runs: Run[],
+  limit: number,
+  excludes: Character[] = [],
+) => {
   const charCounts = countCharactersInRuns(runs);
 
-  // use excludeChars to exclude queried character from being counted
+  // use excludes to exclude queried character from being counted
   // slightly clunky - TODO: fix this
-  excludeChars.map((character) => {
+  excludes.map((character) => {
     const { region, realm, name } = character;
     const characterKey = slugCharacter({ region, realm, name });
     charCounts[characterKey] = -1;
@@ -118,11 +170,12 @@ export const filterRunsToLimit = (runs, limit, excludeChars = []) => {
 };
 
 // TODO: rename/formalize this func
-export const slugCharacter = (character) => {
+export const slugCharacter = (character: Character): string => {
   return `${character.name}-${character.realm}-${character.region}`;
 };
 
-const summarizeRoster = (roster) => {
+// slightly scuffed typing for characters, since this is meant to be used with roster items retrieved from rio
+const summarizeRoster = (roster: CharacterRaw[]) => {
   return roster.map((rosterItem) => {
     return {
       region: rosterItem.character.region.name,
@@ -132,7 +185,7 @@ const summarizeRoster = (roster) => {
   });
 };
 
-const summarizeAffixes = (weekly_modifiers) => {
+const summarizeAffixes = (weekly_modifiers: Affix[]) => {
   return weekly_modifiers.map((modifier) => {
     return modifier.name;
   });

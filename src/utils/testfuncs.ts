@@ -7,6 +7,7 @@ import {
 import { createRun, createRunFromID } from "@/actions/mongodb/run";
 
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
+import { AffixSets } from "./consts";
 
 export const testCreateRun = async () => {
   const testRun = {
@@ -17,14 +18,32 @@ export const testCreateRun = async () => {
     },
     keystone_run_id: 123456789,
     completed_at: new Date(),
-    weekly_modifiers: ["fortified", "sanguine"],
+    weekly_modifiers: [
+      {
+        id: 10,
+        name: "fortified",
+        description: "description",
+        slug: "fortified",
+      },
+    ],
     mythic_level: 15,
     keystone_team_id: 123456789,
     roster: [
       {
-        region: "us",
-        realm: "azshara",
+        region: {
+          name: "us",
+          slug: "us",
+          short_name: "us",
+        },
+        realm: {
+          id: 123,
+          connected_realm_id: 123,
+          name: "test realm",
+          slug: "test",
+          locale: "en_US",
+        },
         name: "Vexea",
+        faction: "horde",
       },
     ],
   };

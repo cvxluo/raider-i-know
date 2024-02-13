@@ -7,10 +7,10 @@ import { NextRequest } from "next/server";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const realm = searchParams.get("realm")
+  const realmName = searchParams.get("realm")
     ? (searchParams.get("realm") as string)
     : "";
-  const region = searchParams.get("region")
+  const regionName = searchParams.get("region")
     ? (searchParams.get("region") as string)
     : "";
   const name = searchParams.get("name")
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     : "";
 
   try {
-    const character = await getCharacter(region, realm, name);
+    const character = await getCharacter(regionName, realmName, name);
 
     return Response.json(character);
   } catch (e) {

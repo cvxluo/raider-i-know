@@ -25,10 +25,20 @@ export default function Home() {
   const [runsWithChar, setRunsWithChar] = useState<Run[]>([]);
   const [charCounts, setCharCounts] = useState<{ [key: string]: number }>({});
   const [limitedRuns, setLimitedRuns] = useState<Run[][]>([]);
-  const [mainChar, setMainChar] = useState({
+  const [mainChar, setMainChar] = useState<Character>({
     name: "",
-    region: "",
-    realm: "",
+    region: {
+      name: "",
+      slug: "",
+      short_name: "",
+    },
+    realm: {
+      id: 0,
+      name: "",
+      slug: "",
+      connected_realm_id: 0,
+      locale: "",
+    },
   });
   const [charGraph, setCharGraph] = useState<CharacterNode[][]>([]);
 
@@ -38,7 +48,7 @@ export default function Home() {
 
     console.log(charInfo);
 
-    const runs = await getRunsWithCharacter({ region, realm, name });
+    const runs = await getRunsWithCharacter({ region, realm: realm, name });
     const limitedRuns = filterRunsToLimit(runs, 30, [charInfo]);
     setRunsWithChar(limitedRuns);
 

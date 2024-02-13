@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { Realms, Regions } from "@/utils/consts";
-import { Character } from "@/utils/types";
+import { Character, Realm, Region } from "@/utils/types";
 
 const CharacterSelector = ({
   handleCharSubmit,
@@ -41,28 +41,38 @@ const CharacterSelector = ({
             isInvalid={isError}
           />
           <Select
-            value={charInfo.realm}
+            value={charInfo.realm.name}
             onChange={(e) =>
-              setCharInfo({ ...charInfo, realm: e.target.value })
+              setCharInfo({
+                ...charInfo,
+                realm: Realms.find(
+                  (realm) => e.target.value === realm.name,
+                ) as Realm,
+              })
             }
             width={600}
           >
             {Realms.map((realm, index) => (
-              <option key={index} value={realm}>
-                {realm}
+              <option key={index} value={realm.name}>
+                {realm.name}
               </option>
             ))}
           </Select>
           <Select
-            value={charInfo.region}
+            value={charInfo.region.name}
             onChange={(e) =>
-              setCharInfo({ ...charInfo, region: e.target.value })
+              setCharInfo({
+                ...charInfo,
+                region: Regions.find(
+                  (region) => e.target.value === region.name,
+                ) as Region,
+              })
             }
             width={1200}
           >
             {Regions.map((region, index) => (
-              <option key={index} value={region}>
-                {region}
+              <option key={index} value={region.name}>
+                {region.name}
               </option>
             ))}
           </Select>

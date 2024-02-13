@@ -2,20 +2,25 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
+const DungeonSchema = new Schema({
+  id: {
+    type: Number,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+});
+
 const RunSchema = new Schema({
   season: {
     type: String,
     required: true,
   },
   dungeon: {
-    id: {
-      type: Number,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
+    type: DungeonSchema,
+    required: true,
   },
   keystone_run_id: {
     type: Number,

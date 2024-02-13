@@ -12,7 +12,13 @@ import {
 } from "@/utils/funcs";
 import { getRunDetails } from "../raiderio/mythic_plus/run_details";
 import { createManyCharacters, saveRoster } from "./character";
-import { Character, Run } from "@/utils/types";
+import {
+  Character,
+  CharacterMinimal,
+  Run,
+  RunReducedRoster,
+} from "@/utils/types";
+import { summarizeRoster } from "@/utils/funcs";
 
 const LOG_RUN_CREATION = false;
 
@@ -70,23 +76,30 @@ export const createManyRuns = async (runs: Run[]): Promise<Run[]> => {
 
   const simpleRuns = await Promise.allSettled(
     runs.map(async (run) => {
-      const characters = await createManyCharacters(run.roster);
-      const newCharacterIDs = characters.map(
-        (character: Character) => character._id,
-      );
+      // const characters = await createManyCharacters(run.roster);
+      const characters = await saveRoster(summarizeRoster(run.roster));
       return {
         ...run,
-        roster: newCharacterIDs,
+        roster: characters.map((character) => character._id),
       };
     }),
-  ).catch((e) => {
-    console.error("Error creating roster in database.");
-    throw e;
-  });
+  )
+    .then((results) => {
+      return results
+        .filter((result) => result.status === "fulfilled")
+        .map(
+          (result) =>
+            (result as PromiseFulfilledResult<RunReducedRoster>).value,
+        );
+    })
+    .catch((e) => {
+      console.error("Error creating roster in database.");
+      throw e;
+    });
 
   const newRuns = await RunModel.collection
     .bulkWrite(
-      runs.map((run) => ({
+      simpleRuns.map((run) => ({
         updateOne: {
           filter: { keystone_run_id: run.keystone_run_id },
           update: { $set: run },
@@ -144,8 +157,8 @@ export const getRunFromID = async (keystone_run_id: number) => {
 export const getRunsWithCharacter = async (character: Character) => {
   await mongoDB();
 
-  const region = character.region;
-  const realm = character.realm;
+  const region = character.region.name;
+  const realm = character.realm.name;
   const name = character.name;
 
   const retrievedRuns = await RunModel.find({
@@ -196,14 +209,28 @@ export const getLimitedRunsAtDegree = async (
     charsToSearch = limitedChars
       .map((char) => {
         const [name, realm, region] = char.split("-");
-        const character = { name, realm, region };
+        const character = {
+          name,
+          realm: {
+            id: 0,
+            connected_realm_id: 0,
+            name: realm,
+            slug: "slug",
+            locale: "",
+          },
+          region: {
+            name: region,
+            slug: "slug",
+            short_name: "",
+          },
+        };
         return character;
       })
       .filter((character) => {
         return !excludes.some((exclude) => {
           return (
-            exclude.region === character.region &&
-            exclude.realm === character.realm &&
+            exclude.region.name === character.region.name &&
+            exclude.realm.name === character.realm.name &&
             exclude.name === character.name
           );
         });

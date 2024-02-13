@@ -19,9 +19,11 @@ export const summarizeRunDetails = (runDetails: RunRaw) => {
     keystone_run_id,
     mythic_level,
     completed_at: new Date(completed_at),
-    weekly_modifiers: summarizeAffixes(weekly_modifiers),
+    weekly_modifiers,
     keystone_team_id,
-    roster: summarizeRoster(roster),
+    roster: roster.map((rosterItem) => {
+      return rosterItem.character;
+    }),
   };
 
   return summarizedRun;
@@ -65,8 +67,8 @@ export const getCharactersInRun = (run: RunRaw, excludes: Character[] = []) => {
     .filter((character) => {
       return !excludes.some((exclude) => {
         return (
-          exclude.region === character.region &&
-          exclude.realm === character.realm &&
+          exclude.region.slug === character.region &&
+          exclude.realm.slug === character.realm &&
           exclude.name === character.name
         );
       });
@@ -95,14 +97,28 @@ export const getLimitedChars = (
   return limitedChars
     .map((char) => {
       const [name, realm, region] = char.split("-");
-      const character = { name, realm, region };
+      const character = {
+        name,
+        realm: {
+          id: 0,
+          connected_realm_id: 0,
+          name: realm,
+          slug: "slug",
+          locale: "",
+        },
+        region: {
+          name: region,
+          slug: "slug",
+          short_name: "",
+        },
+      };
       return character;
     })
     .filter((character) => {
       return !excludes.some((exclude) => {
         return (
-          exclude.region === character.region &&
-          exclude.realm === character.realm &&
+          exclude.region.name === character.region.name &&
+          exclude.realm.name === character.realm.name &&
           exclude.name === character.name
         );
       });
@@ -141,13 +157,17 @@ export const slugCharacter = (character: Character): string => {
   return `${character.name}-${character.realm}-${character.region}`;
 };
 
-// slightly scuffed typing for characters, since this is meant to be used with roster items retrieved from rio
-const summarizeRoster = (roster: CharacterRaw[]) => {
+// reduces roster's characters to only relevant info
+export const summarizeRoster = (roster: Character[]) => {
   return roster.map((rosterItem) => {
     return {
-      region: rosterItem.character.region.name,
-      realm: rosterItem.character.realm.name,
-      name: rosterItem.character.name,
+      region: rosterItem.region,
+      realm: rosterItem.realm,
+      name: rosterItem.name,
+      id: rosterItem.id,
+      faction: rosterItem.faction,
+      class: rosterItem.class,
+      race: rosterItem.race,
     };
   });
 };

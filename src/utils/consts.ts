@@ -1,7 +1,15 @@
-export const Regions: string[] = ["United States & Oceania", "Europe"];
+import { Realm, Region } from "./types";
+
+export const Regions: Region[] = [
+  {
+    name: "United States & Oceania",
+    slug: "us",
+    short_name: "US",
+  },
+];
 
 // TODO: change this to slugs eventually
-export const Realms: string[] = [
+export const RealmNames: string[] = [
   "Area 52",
   "Illidan",
   "Stormrage",
@@ -250,6 +258,17 @@ export const Realms: string[] = [
   "Tortheldrin",
   "Garithos",
 ];
+
+// need to eventually insert all the actual realm data to use this
+export const Realms: Realm[] = RealmNames.map((realm) => {
+  return {
+    id: 0,
+    connected_realm_id: 0,
+    name: realm,
+    slug: realm.toLowerCase().replace(/ /g, "-"),
+    locale: "en_US",
+  };
+});
 
 // consider using rio's static data to get dungeon data per-season
 export const Dungeons: string[] = [

@@ -12,4 +12,4 @@ jobs:
       - name: Install dependencies
         run: npm install --frozen-lockfile
       - name: Lint files and run type-checks
-        run: npm lint
+        run: npm run lint

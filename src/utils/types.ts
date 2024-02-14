@@ -56,7 +56,7 @@ export interface Run {
 }
 
 export interface RunReducedRoster extends Omit<Run, "roster"> {
-  roster: mongoose.Schema.Types.ObjectId[]; // the character ids
+  roster: mongoose.Types.ObjectId[]; // the character ids
 }
 
 export interface Region {

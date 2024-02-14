@@ -82,8 +82,7 @@ export const createManyRuns = async (runs: Run[]): Promise<Run[]> => {
       return {
         ...run,
         roster: characters.map(
-          (character) =>
-            new mongoose.Schema.Types.ObjectId(character._id) as ObjectId,
+          (character) => new mongoose.Types.ObjectId(character._id),
         ),
       };
     }),

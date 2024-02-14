@@ -2,6 +2,7 @@
 
 import mongoDB from "@/actions/mongodb/mongodb";
 import RunModel from "@/models/Run";
+import mongoose, { ObjectId } from "mongoose";
 
 import {
   countCharactersInRuns,
@@ -80,7 +81,10 @@ export const createManyRuns = async (runs: Run[]): Promise<Run[]> => {
       const characters = await saveRoster(summarizeRoster(run.roster));
       return {
         ...run,
-        roster: characters.map((character) => character._id),
+        roster: characters.map(
+          (character) =>
+            new mongoose.Schema.Types.ObjectId(character._id) as ObjectId,
+        ),
       };
     }),
   )

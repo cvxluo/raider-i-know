@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { ObjectId, Types } from "mongoose";
 
 // this will be the character interface returned from runs, NOT the character api
 export interface Character {
@@ -56,7 +56,7 @@ export interface Run {
 }
 
 export interface RunReducedRoster extends Omit<Run, "roster"> {
-  roster: number[]; // the character ids
+  roster: mongoose.Schema.Types.ObjectId[]; // the character ids
 }
 
 export interface Region {

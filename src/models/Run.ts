@@ -1,7 +1,8 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 const { Schema } = mongoose;
 
+/*
 const DungeonSchema = new Schema({
   id: {
     type: Number,
@@ -12,6 +13,7 @@ const DungeonSchema = new Schema({
     required: true,
   },
 });
+*/
 
 const RunSchema = new Schema({
   season: {
@@ -19,7 +21,16 @@ const RunSchema = new Schema({
     required: true,
   },
   dungeon: {
-    type: DungeonSchema,
+    type: {
+      id: {
+        type: Number,
+        required: true,
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+    },
     required: true,
   },
   keystone_run_id: {
@@ -44,7 +55,7 @@ const RunSchema = new Schema({
   },
   roster: [
     {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Character",
       required: true,
     },

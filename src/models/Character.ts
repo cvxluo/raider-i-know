@@ -2,77 +2,89 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const ClassSchema = new Schema({
-  id: {
-    type: Number,
-    required: true,
+const ClassSchema = new Schema(
+  {
+    id: {
+      type: Number,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+    },
   },
-  name: {
-    type: String,
-    required: true,
-  },
-  slug: {
-    type: String,
-    required: true,
-  },
-});
+  { _id: false },
+);
 
-const RealmSchema = new Schema({
-  id: {
-    type: Number,
-    required: true,
+const RealmSchema = new Schema(
+  {
+    id: {
+      type: Number,
+      required: true,
+    },
+    connected_realm_id: {
+      type: Number,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+    },
+    locale: {
+      type: String,
+      required: true,
+    },
   },
-  connected_realm_id: {
-    type: Number,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  slug: {
-    type: String,
-    required: true,
-  },
-  locale: {
-    type: String,
-    required: true,
-  },
-});
+  { _id: false },
+);
 
-const RaceSchema = new Schema({
-  id: {
-    type: Number,
-    required: true,
+const RaceSchema = new Schema(
+  {
+    id: {
+      type: Number,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+    },
+    faction: {
+      type: String,
+      required: true,
+    },
   },
-  name: {
-    type: String,
-    required: true,
-  },
-  slug: {
-    type: String,
-    required: true,
-  },
-  faction: {
-    type: String,
-    required: true,
-  },
-});
+  { _id: false },
+);
 
-const RegionSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
+const RegionSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+    },
+    short_name: {
+      type: String,
+      required: true,
+    },
   },
-  slug: {
-    type: String,
-    required: true,
-  },
-  short_name: {
-    type: String,
-    required: true,
-  },
-});
+  { _id: false },
+);
 
 const CharacterSchema = new Schema({
   region: {

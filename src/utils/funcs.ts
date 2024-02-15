@@ -1,4 +1,4 @@
-import { Run, Character, RunRaw, CharacterRaw, Affix } from "./types";
+import { Affix, Character, Run, RunRaw } from "./types";
 
 export const summarizeRunDetails = (runDetails: RunRaw) => {
   const season = runDetails.season;
@@ -40,9 +40,9 @@ export const countCharactersInRuns = (
 
   runs.forEach((run) => {
     run.roster.forEach((character) => {
-      const { region, realm, name } = character;
-
-      const characterKey = slugCharacter({ region, realm, name });
+      const characterKey = character.id
+        ? character.id
+        : slugCharacter(character);
 
       if (characters[characterKey]) {
         characters[characterKey]++;
@@ -53,35 +53,6 @@ export const countCharactersInRuns = (
   });
 
   return characters;
-};
-
-export const getCharactersInRun = (run: RunRaw, excludes: Character[] = []) => {
-  return run.roster
-    .map((rosterItem) => {
-      return {
-        region: rosterItem.character.region.name,
-        realm: rosterItem.character.realm.name,
-        name: rosterItem.character.name,
-      };
-    })
-    .filter((character) => {
-      return !excludes.some((exclude) => {
-        return (
-          exclude.region.slug === character.region &&
-          exclude.realm.slug === character.realm &&
-          exclude.name === character.name
-        );
-      });
-    });
-};
-
-export const getCharactersInRuns = (
-  runs: RunRaw[],
-  excludes: Character[] = [],
-) => {
-  return runs.map((run) => {
-    return getCharactersInRun(run, excludes);
-  });
 };
 
 export const getLimitedChars = (

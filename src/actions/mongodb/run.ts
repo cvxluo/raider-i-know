@@ -2,24 +2,12 @@
 
 import mongoDB from "@/actions/mongodb/mongodb";
 import RunModel from "@/models/Run";
-import mongoose, { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 
-import {
-  countCharactersInRuns,
-  filterRunsToLimit,
-  getLimitedChars,
-  slugCharacter,
-  summarizeRunDetails,
-} from "@/utils/funcs";
+import { summarizeRoster, summarizeRunDetails } from "@/utils/funcs";
+import { Character, Run, RunReducedRoster } from "@/utils/types";
 import { getRunDetails } from "../raiderio/mythic_plus/run_details";
-import { createManyCharacters, saveRoster } from "./character";
-import {
-  Character,
-  CharacterMinimal,
-  Run,
-  RunReducedRoster,
-} from "@/utils/types";
-import { summarizeRoster } from "@/utils/funcs";
+import { saveRoster } from "./character";
 
 const LOG_RUN_CREATION = false;
 
@@ -177,146 +165,6 @@ export const getRunsWithCharacter = async (character: Character) => {
   const flattenedRuns = JSON.parse(JSON.stringify(retrievedRuns));
 
   return flattenedRuns;
-};
-
-// returns an array with runs with degrees of separation for a particular character
-// [0 degrees (runs character was in), 1 degree (runs character was in with other characters), 2 degrees, 3 degrees, ...]
-// limit is the minimum number of runs a a character must have with another character to be included in the result
-// need to limit degree and limit aggressively, branching factor is high
-export const getLimitedRunsAtDegree = async (
-  degree: number,
-  character: Character,
-  limit: number,
-  excludes: Character[] = [],
-) => {
-  await mongoDB();
-
-  const degreeRuns: Run[][] = [];
-  const allCharSlugs = [slugCharacter(character)];
-  let charsToSearch = [character];
-
-  for (let i = 0; i <= degree; i++) {
-    const runs = await Promise.all(
-      charsToSearch.map(async (char) => {
-        return await getRunsWithCharacter(char);
-      }),
-    ).then((runs) => {
-      return runs.flat();
-    });
-
-    const charCounts = countCharactersInRuns(runs);
-    const limitedChars = Object.keys(charCounts).filter(
-      (key) => charCounts[key] >= limit,
-    );
-
-    charsToSearch = limitedChars
-      .map((char) => {
-        const [name, realm, region] = char.split("-");
-        const character = {
-          name,
-          realm: {
-            id: 0,
-            connected_realm_id: 0,
-            name: realm,
-            slug: "slug",
-            locale: "",
-          },
-          region: {
-            name: region,
-            slug: "slug",
-            short_name: "",
-          },
-        };
-        return character;
-      })
-      .filter((character) => {
-        return !excludes.some((exclude) => {
-          return (
-            exclude.region.name === character.region.name &&
-            exclude.realm.name === character.realm.name &&
-            exclude.name === character.name
-          );
-        });
-      });
-
-    allCharSlugs.push(
-      ...charsToSearch.map((char) => {
-        return slugCharacter(char);
-      }),
-    );
-
-    degreeRuns[i] = runs.filter((run) => {
-      return !degreeRuns
-        .flat()
-        .map((run) => run.keystone_run_id)
-        .includes(run.keystone_run_id);
-    });
-  }
-
-  return degreeRuns;
-};
-
-/*
- returns 
- [
-  [
-    {
-      character info,
-      parentChar
-    },
-    ...
-  ],
-  [...],
-]
-*/
-export const getCharGraph = async (
-  character: Character,
-  degree: number,
-  limit: number,
-  excludes: Character[] = [],
-) => {
-  const charGraph = [
-    [
-      {
-        character: character,
-        parentCharacter: character,
-      },
-    ],
-  ];
-  let charsToSearch = [character];
-  const allCharsSearched: Character[] = [];
-
-  for (let i = 0; i <= degree; i++) {
-    const characters = await Promise.all(
-      charsToSearch.map(async (parentChar) => {
-        const runs = await getRunsWithCharacter(parentChar);
-        const limitedChars = getLimitedChars(runs, limit, [
-          ...allCharsSearched,
-          parentChar,
-          ...excludes,
-        ]);
-        return limitedChars.map((char) => {
-          return {
-            character: char,
-            parentCharacter: parentChar,
-          };
-        });
-      }),
-    );
-
-    charsToSearch = characters.flat().map((char) => char.character);
-
-    allCharsSearched.push(...charsToSearch);
-
-    charGraph.push(characters.flat());
-  }
-  return charGraph;
-};
-
-export const getRunsAtDegree = async (degree: number, character: Character) => {
-  await mongoDB();
-
-  return await getLimitedRunsAtDegree(degree, character, 0);
 };
 
 export const getAllRuns = async () => {

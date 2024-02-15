@@ -1,13 +1,11 @@
 import {
-  getTopDungeonRuns,
-  getTopRuns,
   saveAllTopRuns,
+  saveTopDungeonRuns,
   saveTopRuns,
 } from "@/actions/mongodb/data_collection/top_runs";
 import { createRun, createRunFromID } from "@/actions/mongodb/run";
 
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
-import { AffixSets } from "./consts";
 
 export const testCreateRun = async () => {
   const testRun = {
@@ -70,13 +68,13 @@ export const testGetRuns = async () => {
   });
 };
 
-export const testGetTopDungeonRuns = async () => {
+export const testsaveTopDungeonRuns = async () => {
   const season = "season-df-3";
   const region = "us";
   const dungeon = "everbloom";
   const affixes = "fortified-incorporeal-sanguine";
 
-  getTopDungeonRuns(season, region, dungeon, affixes).then((res) => {
+  saveTopDungeonRuns(season, region, dungeon, affixes).then((res) => {
     console.log(res);
   });
 };
@@ -86,17 +84,9 @@ export const testGetTopRuns = async () => {
   const region = "us";
   const affixes = "fortified-incorporeal-sanguine";
 
-  getTopRuns(season, region, affixes).then((res) => {
+  saveTopRuns(season, region, affixes).then((res) => {
     console.log(res);
   });
-};
-
-export const testSaveTopRuns = async () => {
-  const season = "season-df-3";
-  const region = "us";
-  const affixes = "fortified-incorporeal-sanguine";
-
-  saveTopRuns(season, region, affixes);
 };
 
 export const testSaveTopAffixes = async () => {

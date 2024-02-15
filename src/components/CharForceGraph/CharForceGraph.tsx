@@ -1,25 +1,13 @@
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  HStack,
-  Input,
-  Select,
-  Button,
-} from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { Realms, Regions } from "@/utils/consts";
+import { Box } from "@chakra-ui/react";
 
-import { ForceGraph2D } from "react-force-graph";
 import { slugCharacter } from "@/utils/funcs";
-import { Character, CharacterNode, Run } from "@/utils/types";
+import { Character, CharacterNode } from "@/utils/types";
+import { ForceGraph2D } from "react-force-graph";
 
 const CharForceGraph = ({
-  degrees,
   mainChar,
   charGraph,
 }: {
-  degrees: Run[][];
   mainChar: Character;
   charGraph: CharacterNode[][];
 }) => {

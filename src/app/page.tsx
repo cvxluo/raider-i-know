@@ -1,10 +1,8 @@
 "use client";
 
-import {
-  getLimitedRunsAtDegree,
-  getRunsWithCharacter,
-  getCharGraph,
-} from "@/actions/mongodb/run";
+import { getRunsWithCharacter } from "@/actions/mongodb/run";
+
+import { getCharGraph } from "@/actions/mongodb/run_graphs";
 
 import dynamic from "next/dynamic";
 const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
@@ -14,9 +12,9 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 import CharacterSelector from "@/components/CharacterSelector";
 import { countCharactersInRuns, filterRunsToLimit } from "@/utils/funcs";
 import { testSaveTopAffixes } from "@/utils/testfuncs";
+import { Character, CharacterNode, Run } from "@/utils/types";
 import { Box, Button, List } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Character, CharacterNode, Run } from "@/utils/types";
 
 export default function Home() {
   const [characterName, setCharacterName] = useState("");
@@ -24,7 +22,6 @@ export default function Home() {
 
   const [runsWithChar, setRunsWithChar] = useState<Run[]>([]);
   const [charCounts, setCharCounts] = useState<{ [key: string]: number }>({});
-  const [limitedRuns, setLimitedRuns] = useState<Run[][]>([]);
   const [mainChar, setMainChar] = useState<Character>({
     name: "",
     region: {
@@ -52,9 +49,6 @@ export default function Home() {
     const limitedRuns = filterRunsToLimit(runs, 30, [charInfo]);
     setRunsWithChar(limitedRuns);
 
-    const limited = await getLimitedRunsAtDegree(1, charInfo, 30);
-    setLimitedRuns(limited);
-
     const charGraph = await getCharGraph(charInfo, 2, 30, [charInfo]);
     setCharGraph(charGraph);
     console.log(charGraph);
@@ -74,11 +68,7 @@ export default function Home() {
       <Button onClick={handleTest}>test</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
 
-      <CharForceGraph
-        degrees={limitedRuns}
-        mainChar={mainChar}
-        charGraph={charGraph}
-      />
+      <CharForceGraph mainChar={mainChar} charGraph={charGraph} />
 
       <List>
         {Object.keys(charCounts).map((char) => {

@@ -35,14 +35,13 @@ export const countCharactersInRuns = (
   [key: string]: number;
 } => {
   const characters: {
-    [key: string]: number;
+    [key: number]: number;
   } = {};
 
   runs.forEach((run) => {
     run.roster.forEach((character) => {
-      const characterKey = character.id
-        ? character.id
-        : slugCharacter(character);
+      // TODO: this assumes character id exists and is a number - might be unknown
+      const characterKey = character.id as number;
 
       if (characters[characterKey]) {
         characters[characterKey]++;
@@ -55,70 +54,39 @@ export const countCharactersInRuns = (
   return characters;
 };
 
+export const getCharactersInRuns = (runs: Run[]) => {
+  const characters: Character[] = [];
+  runs.forEach((run) => {
+    run.roster.forEach((character) => {
+      // TODO: also assumes character id exists
+      if (!characters.some((char) => char.id === character.id)) {
+        characters.push(character);
+      }
+    });
+  });
+  return characters;
+};
+
 export const getLimitedChars = (
   runs: Run[],
   limit: number,
   excludes: Character[] = [],
 ) => {
   const charCounts = countCharactersInRuns(runs);
-  const limitedChars = Object.keys(charCounts).filter(
-    (key) => charCounts[key] >= limit,
-  );
+  const charsInRun = getCharactersInRuns(runs);
 
-  return limitedChars
-    .map((char) => {
-      const [name, realm, region] = char.split("-");
-      const character = {
-        name,
-        realm: {
-          id: 0,
-          connected_realm_id: 0,
-          name: realm,
-          slug: "slug",
-          locale: "",
-        },
-        region: {
-          name: region,
-          slug: "slug",
-          short_name: "",
-        },
-      };
-      return character;
-    })
-    .filter((character) => {
-      return !excludes.some((exclude) => {
-        return (
-          exclude.region.name === character.region.name &&
-          exclude.realm.name === character.realm.name &&
-          exclude.name === character.name
-        );
-      });
-    });
-};
-
-// gives back only runs where a character in the run appears at least limit times
-export const filterRunsToLimit = (
-  runs: Run[],
-  limit: number,
-  excludes: Character[] = [],
-) => {
-  const charCounts = countCharactersInRuns(runs);
-
-  // use excludes to exclude queried character from being counted
-  // slightly clunky - TODO: fix this
-  excludes.map((character) => {
-    const { region, realm, name } = character;
-    const characterKey = slugCharacter({ region, realm, name });
-    charCounts[characterKey] = -1;
+  const limitedChars = charsInRun.filter((char) => {
+    // TODO: also assumes character id exists
+    return charCounts[char.id as number] >= limit;
   });
 
-  return runs.filter((run) => {
-    return run.roster.some((character) => {
-      const { region, realm, name } = character;
-
-      const characterKey = slugCharacter({ region, realm, name });
-
-      return charCounts[characterKey] >= limit;
+  return limitedChars.filter((character) => {
+    return !excludes.some((exclude) => {
+      return (
+        exclude.region.name === character.region.name &&
+        exclude.realm.name === character.realm.name &&
+        exclude.name === character.name
+      );
     });
   });
 };

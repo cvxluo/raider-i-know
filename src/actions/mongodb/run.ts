@@ -2,6 +2,7 @@
 
 import mongoDB from "@/actions/mongodb/mongodb";
 import RunModel from "@/models/Run";
+import CharacterModel from "@/models/Character";
 import mongoose from "mongoose";
 
 import { summarizeRoster, summarizeRunDetails } from "@/utils/funcs";
@@ -9,9 +10,9 @@ import { Character, Run, RunReducedRoster } from "@/utils/types";
 import { getRunDetails } from "../raiderio/mythic_plus/run_details";
 import { saveRoster } from "./character";
 
-const LOG_RUN_CREATION = false;
+const LOG_RUN_CREATION = true;
 
-export const createRun = async (run: Run): Promise<Run> => {
+export const createRun = async (run: Run): Promise<RunReducedRoster> => {
   await mongoDB();
 
   console.log(
@@ -103,6 +104,8 @@ export const createManyRuns = async (runs: Run[]): Promise<Run[]> => {
       throw e;
     });
 
+  if (LOG_RUN_CREATION) console.log(newRuns);
+
   const flattenedRuns = JSON.parse(JSON.stringify(newRuns));
 
   return flattenedRuns;
@@ -121,7 +124,7 @@ export const createRunFromID = async (
   return createRun(summarizedRun);
 };
 
-export const getRun = async (run: Run) => {
+export const getRun = async (run: Run): Promise<RunReducedRoster> => {
   await mongoDB();
 
   const retrievedRun = await RunModel.findOne({
@@ -133,7 +136,9 @@ export const getRun = async (run: Run) => {
   return flattenedRun;
 };
 
-export const getRunFromID = async (keystone_run_id: number) => {
+export const getRunFromID = async (
+  keystone_run_id: number,
+): Promise<RunReducedRoster> => {
   await mongoDB();
 
   const retrievedRun = await RunModel.findOne({
@@ -145,22 +150,50 @@ export const getRunFromID = async (keystone_run_id: number) => {
   return flattenedRun;
 };
 
-export const getRunsWithCharacter = async (character: Character) => {
+export const getRunsWithCharacter = async (
+  character: Character,
+): Promise<RunReducedRoster[]> => {
   await mongoDB();
 
   const region = character.region.name;
   const realm = character.realm.name;
   const name = character.name;
 
+  const retrievedCharacter = (await CharacterModel.findOne({
+    "region.name": region,
+    "realm.name": realm,
+    name: name,
+  }).lean()) as Character;
+
   const retrievedRuns = await RunModel.find({
-    roster: {
-      $elemMatch: {
-        region: region,
-        realm: realm,
-        name: name,
-      },
-    },
+    roster: retrievedCharacter._id,
   }).lean();
+
+  const flattenedRuns = JSON.parse(JSON.stringify(retrievedRuns));
+
+  return flattenedRuns;
+};
+
+export const getPopulatedRunsWithCharacter = async (
+  character: Character,
+): Promise<Run[]> => {
+  await mongoDB();
+
+  const region = character.region.name;
+  const realm = character.realm.name;
+  const name = character.name;
+
+  const retrievedCharacter = (await CharacterModel.findOne({
+    "region.name": region,
+    "realm.name": realm,
+    name: name,
+  }).lean()) as Character;
+
+  const retrievedRuns = await RunModel.find({
+    roster: retrievedCharacter._id,
+  })
+    .populate("roster")
+    .lean();
 
   const flattenedRuns = JSON.parse(JSON.stringify(retrievedRuns));
 

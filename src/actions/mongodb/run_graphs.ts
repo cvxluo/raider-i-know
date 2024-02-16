@@ -1,7 +1,7 @@
 import { getLimitedChars } from "@/utils/funcs";
 import { Character } from "@/utils/types";
 
-import { getRunsWithCharacter } from "./run";
+import { getPopulatedRunsWithCharacter, getRunsWithCharacter } from "./run";
 
 /*
    returns 
@@ -36,12 +36,13 @@ export const getCharGraph = async (
   for (let i = 0; i <= degree; i++) {
     const characters = await Promise.all(
       charsToSearch.map(async (parentChar) => {
-        const runs = await getRunsWithCharacter(parentChar);
+        const runs = await getPopulatedRunsWithCharacter(parentChar);
         const limitedChars = getLimitedChars(runs, limit, [
           ...allCharsSearched,
           parentChar,
           ...excludes,
         ]);
+
         return limitedChars.map((char) => {
           return {
             character: char,

@@ -37,12 +37,13 @@ export const getCharGraph = async (
     const characters = await Promise.all(
       charsToSearch.map(async (parentChar) => {
         const runs = await getPopulatedRunsWithCharacter(parentChar);
+        // this doesn't handle duplicates since its mapping
+        // we remove them later, but there probably is a more elegant solution
         const limitedChars = getLimitedChars(runs, limit, [
           ...allCharsSearched,
           parentChar,
           ...excludes,
         ]);
-
         return limitedChars.map((char) => {
           return {
             character: char,
@@ -56,7 +57,15 @@ export const getCharGraph = async (
 
     allCharsSearched.push(...charsToSearch);
 
-    charGraph.push(characters.flat());
+    charGraph.push(
+      characters.flat().filter((char, index) => {
+        return (
+          characters
+            .flat()
+            .findIndex((c) => c.character.id === char.character.id) === index
+        );
+      }),
+    );
   }
   return charGraph;
 };

@@ -14,6 +14,7 @@ import { testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character, CharacterNode, Run } from "@/utils/types";
 import { Box, Button, List, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { getCharacter } from "@/actions/mongodb/character";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -38,9 +39,17 @@ export default function Home() {
     setLoading(true);
     setMainChar(charInfo);
 
-    console.log(charInfo);
+    const retrievedMainChar = await getCharacter(
+      charInfo.region.name,
+      charInfo.realm.name,
+      charInfo.name,
+    );
 
-    const charGraph = await getCharGraph(charInfo, 2, 30, [charInfo]);
+    console.log(retrievedMainChar);
+
+    const charGraph = await getCharGraph(retrievedMainChar, 2, 30, [
+      retrievedMainChar,
+    ]);
     setCharGraph(charGraph);
     console.log(charGraph);
 

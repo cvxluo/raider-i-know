@@ -93,7 +93,7 @@ export const getLimitedChars = (
 
 // TODO: rename/formalize this func
 export const slugCharacter = (character: Character): string => {
-  return `${character.name}-${character.realm}-${character.region}`;
+  return `${character.name}-${character.realm.name}-${character.region.name}`;
 };
 
 // reduces roster's characters to only relevant info

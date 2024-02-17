@@ -74,8 +74,8 @@ export const getCharacter = async (
   await mongoDB();
 
   const character = await CharacterModel.findOne({
-    region,
-    realm,
+    "region.name": region,
+    "realm.name": realm,
     name,
   }).lean();
 

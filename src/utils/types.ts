@@ -1,10 +1,43 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { ObjectId, Types } from "mongoose";
 
+// this will be the character interface returned from runs, NOT the character api
 export interface Character {
   _id?: Types.ObjectId;
+
+  region: Region;
+  realm: Realm;
+  name: string;
+
+  id?: number;
+  faction?: string;
+  class?: Class;
+  race?: Race;
+}
+
+// frontend generally doens't need whole character objects, so this is a minimal version
+export interface CharacterMinimal {
   region: string;
   realm: string;
   name: string;
+}
+
+export interface Class {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface Race {
+  id: number;
+  name: string;
+  slug: string;
+  faction: string;
+}
+
+export interface Spec {
+  id: number;
+  name: string;
+  slug: string;
 }
 
 export interface Run {
@@ -17,15 +50,27 @@ export interface Run {
   keystone_run_id: number;
   mythic_level: number;
   completed_at: Date;
-  weekly_modifiers: string[];
+  weekly_modifiers: Affix[];
   keystone_team_id: number;
   roster: Character[];
+}
+
+export interface RunReducedRoster extends Omit<Run, "roster"> {
+  roster: mongoose.Types.ObjectId[]; // the character ids
 }
 
 export interface Region {
   name: string;
   slug: string;
   short_name: string;
+}
+
+export interface Realm {
+  id: number;
+  connected_realm_id: number;
+  name: string;
+  slug: string;
+  locale: string;
 }
 
 export interface RunRaw {
@@ -58,15 +103,7 @@ export interface Affix {
 }
 
 export interface CharacterRaw {
-  character: {
-    region: {
-      name: string;
-    };
-    realm: {
-      name: string;
-    };
-    name: string;
-  };
+  character: Character;
 }
 
 export interface CharacterNode {

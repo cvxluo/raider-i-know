@@ -6,24 +6,12 @@ import { Character } from "@/utils/types";
 
 const LOG_CHARACTER_CREATION = false;
 
-export const createCharacter = async (
-  region: string,
-  realm: string,
-  name: string,
-) => {
+export const createCharacter = async (character: Character) => {
   await mongoDB();
 
   const newCharacter = await CharacterModel.findOneAndReplace(
-    {
-      region,
-      realm,
-      name,
-    },
-    {
-      region,
-      realm,
-      name,
-    },
+    character,
+    character,
     {
       new: true,
       upsert: true,
@@ -86,8 +74,8 @@ export const getCharacter = async (
   await mongoDB();
 
   const character = await CharacterModel.findOne({
-    region,
-    realm,
+    "region.name": region,
+    "realm.name": realm,
     name,
   }).lean();
 
@@ -111,12 +99,8 @@ export const saveRoster = async (rosterDetails: Character[]) => {
 
   const newCharacterIDs = await Promise.all(
     rosterDetails.map(async (character) => {
-      const newCharacter = await createCharacter(
-        character.region,
-        character.realm,
-        character.name,
-      );
-      return newCharacter._id;
+      const newCharacter = await createCharacter(character);
+      return newCharacter;
     }),
   ).catch((e) => {
     console.error("Error saving roster in database.");

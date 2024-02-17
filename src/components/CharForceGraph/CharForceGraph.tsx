@@ -1,69 +1,38 @@
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  HStack,
-  Input,
-  Select,
-  Button,
-} from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { Realms, Regions } from "@/utils/consts";
+import { Box } from "@chakra-ui/react";
 
-import { ForceGraph2D } from "react-force-graph";
 import { slugCharacter } from "@/utils/funcs";
-import { Character, CharacterNode, Run } from "@/utils/types";
+import { Character, CharacterNode } from "@/utils/types";
+import { ForceGraph2D } from "react-force-graph";
 
 const CharForceGraph = ({
-  degrees,
   mainChar,
   charGraph,
 }: {
-  degrees: Run[][];
   mainChar: Character;
   charGraph: CharacterNode[][];
 }) => {
-  /*
-  const characters = [
-    {
-      id: slugCharacter(mainChar),
-      name: mainChar.name,
-      fy: 0,
-    },
-  ];
-  
-  for (let i = 0; i < degrees.length; i++) {
-    const layerChars = degrees[i]
-      .map((run) => {
-        return run.roster;
-      })
-      .flat();
-    characters.push(
-      ...layerChars
-        .filter((char) => {
-          return !characters.find((c) => c.id === slugCharacter(char));
-        })
-        .map((char) => {
-          return {
-            id: slugCharacter(char),
-            name: char.name,
-            fy: i * 100 + 1,
-          };
-        }),
-    );
-
-    console.log(characters);
-  }
-  */
+  console.log("CHAR GRAPH", charGraph);
+  console.log(
+    charGraph.map((layer) => {
+      return layer.map((node) => {
+        return node.character;
+      });
+    }),
+  );
+  console.log(
+    charGraph.map((layer) => {
+      return layer.map((node) => {
+        return node.parentCharacter;
+      });
+    }),
+  );
 
   const characters = charGraph
     .map((layer, i) => {
       return layer.map((nodeInfo, j) => {
         return {
-          id: slugCharacter(nodeInfo.character),
+          id: nodeInfo.character.id,
           name: nodeInfo.character.name,
-          fx: j * 10,
-          fy: i * 100 + 1,
         };
       });
     })
@@ -73,14 +42,27 @@ const CharForceGraph = ({
     .map((layer) => {
       return layer.map((nodeInfo) => {
         return {
-          source: slugCharacter(
-            nodeInfo.parentCharacter ? nodeInfo.parentCharacter : mainChar,
-          ),
-          target: slugCharacter(nodeInfo.character),
+          source: nodeInfo.parentCharacter.id,
+          target: nodeInfo.character.id,
         };
       });
     })
     .flat();
+
+  characters[0] = {
+    ...characters[0],
+    fx: 0,
+    fy: 0,
+  } as {
+    id: number;
+    name: string;
+    fx: number;
+    fy: number;
+    nodeLabel: string;
+    nodeColor: string;
+  };
+  console.log(characters);
+  console.log(links);
 
   return (
     <Box>
@@ -88,6 +70,14 @@ const CharForceGraph = ({
         graphData={{
           nodes: characters,
           links: links,
+        }}
+        nodeLabel={(node) => node.name}
+        nodeColor={(node) => {
+          if (node.id === characters[0].id) {
+            return "red";
+          } else {
+            return "blue";
+          }
         }}
       />
     </Box>

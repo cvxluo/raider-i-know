@@ -1,7 +1,6 @@
 import {
-  getTopDungeonRuns,
-  getTopRuns,
   saveAllTopRuns,
+  saveTopDungeonRuns,
   saveTopRuns,
 } from "@/actions/mongodb/data_collection/top_runs";
 import { createRun, createRunFromID } from "@/actions/mongodb/run";
@@ -17,14 +16,32 @@ export const testCreateRun = async () => {
     },
     keystone_run_id: 123456789,
     completed_at: new Date(),
-    weekly_modifiers: ["fortified", "sanguine"],
+    weekly_modifiers: [
+      {
+        id: 10,
+        name: "fortified",
+        description: "description",
+        slug: "fortified",
+      },
+    ],
     mythic_level: 15,
     keystone_team_id: 123456789,
     roster: [
       {
-        region: "us",
-        realm: "azshara",
+        region: {
+          name: "us",
+          slug: "us",
+          short_name: "us",
+        },
+        realm: {
+          id: 123,
+          connected_realm_id: 123,
+          name: "test realm",
+          slug: "test",
+          locale: "en_US",
+        },
         name: "Vexea",
+        faction: "horde",
       },
     ],
   };
@@ -51,13 +68,13 @@ export const testGetRuns = async () => {
   });
 };
 
-export const testGetTopDungeonRuns = async () => {
+export const testsaveTopDungeonRuns = async () => {
   const season = "season-df-3";
   const region = "us";
   const dungeon = "everbloom";
   const affixes = "fortified-incorporeal-sanguine";
 
-  getTopDungeonRuns(season, region, dungeon, affixes).then((res) => {
+  saveTopDungeonRuns(season, region, dungeon, affixes).then((res) => {
     console.log(res);
   });
 };
@@ -67,17 +84,9 @@ export const testGetTopRuns = async () => {
   const region = "us";
   const affixes = "fortified-incorporeal-sanguine";
 
-  getTopRuns(season, region, affixes).then((res) => {
+  saveTopRuns(season, region, affixes).then((res) => {
     console.log(res);
   });
-};
-
-export const testSaveTopRuns = async () => {
-  const season = "season-df-3";
-  const region = "us";
-  const affixes = "fortified-incorporeal-sanguine";
-
-  saveTopRuns(season, region, affixes);
 };
 
 export const testSaveTopAffixes = async () => {

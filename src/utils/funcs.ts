@@ -1,4 +1,4 @@
-import { Run, Character, RunRaw, CharacterRaw, Affix } from "./types";
+import { Affix, Character, Run, RunRaw } from "./types";
 
 export const summarizeRunDetails = (runDetails: RunRaw) => {
   const season = runDetails.season;
@@ -19,9 +19,11 @@ export const summarizeRunDetails = (runDetails: RunRaw) => {
     keystone_run_id,
     mythic_level,
     completed_at: new Date(completed_at),
-    weekly_modifiers: summarizeAffixes(weekly_modifiers),
+    weekly_modifiers,
     keystone_team_id,
-    roster: summarizeRoster(roster),
+    roster: roster.map((rosterItem) => {
+      return rosterItem.character;
+    }),
   };
 
   return summarizedRun;
@@ -33,14 +35,13 @@ export const countCharactersInRuns = (
   [key: string]: number;
 } => {
   const characters: {
-    [key: string]: number;
+    [key: number]: number;
   } = {};
 
   runs.forEach((run) => {
     run.roster.forEach((character) => {
-      const { region, realm, name } = character;
-
-      const characterKey = slugCharacter({ region, realm, name });
+      // TODO: this assumes character id exists and is a number - might be unknown
+      const characterKey = character.id as number;
 
       if (characters[characterKey]) {
         characters[characterKey]++;
@@ -53,33 +54,17 @@ export const countCharactersInRuns = (
   return characters;
 };
 
-export const getCharactersInRun = (run: RunRaw, excludes: Character[] = []) => {
-  return run.roster
-    .map((rosterItem) => {
-      return {
-        region: rosterItem.character.region.name,
-        realm: rosterItem.character.realm.name,
-        name: rosterItem.character.name,
-      };
-    })
-    .filter((character) => {
-      return !excludes.some((exclude) => {
-        return (
-          exclude.region === character.region &&
-          exclude.realm === character.realm &&
-          exclude.name === character.name
-        );
-      });
+export const getCharactersInRuns = (runs: Run[]) => {
+  const characters: Character[] = [];
+  runs.forEach((run) => {
+    run.roster.forEach((character) => {
+      // TODO: also assumes character id exists
+      if (!characters.some((char) => char.id === character.id)) {
+        characters.push(character);
+      }
     });
-};
-
-export const getCharactersInRuns = (
-  runs: RunRaw[],
-  excludes: Character[] = [],
-) => {
-  return runs.map((run) => {
-    return getCharactersInRun(run, excludes);
   });
+  return characters;
 };
 
 export const getLimitedChars = (
@@ -88,66 +73,40 @@ export const getLimitedChars = (
   excludes: Character[] = [],
 ) => {
   const charCounts = countCharactersInRuns(runs);
-  const limitedChars = Object.keys(charCounts).filter(
-    (key) => charCounts[key] >= limit,
-  );
+  const charsInRun = getCharactersInRuns(runs);
 
-  return limitedChars
-    .map((char) => {
-      const [name, realm, region] = char.split("-");
-      const character = { name, realm, region };
-      return character;
-    })
-    .filter((character) => {
-      return !excludes.some((exclude) => {
-        return (
-          exclude.region === character.region &&
-          exclude.realm === character.realm &&
-          exclude.name === character.name
-        );
-      });
-    });
-};
-
-// gives back only runs where a character in the run appears at least limit times
-export const filterRunsToLimit = (
-  runs: Run[],
-  limit: number,
-  excludes: Character[] = [],
-) => {
-  const charCounts = countCharactersInRuns(runs);
-
-  // use excludes to exclude queried character from being counted
-  // slightly clunky - TODO: fix this
-  excludes.map((character) => {
-    const { region, realm, name } = character;
-    const characterKey = slugCharacter({ region, realm, name });
-    charCounts[characterKey] = -1;
+  const limitedChars = charsInRun.filter((char) => {
+    // TODO: also assumes character id exists
+    return charCounts[char.id as number] >= limit;
   });
 
-  return runs.filter((run) => {
-    return run.roster.some((character) => {
-      const { region, realm, name } = character;
-
-      const characterKey = slugCharacter({ region, realm, name });
-
-      return charCounts[characterKey] >= limit;
+  return limitedChars.filter((character) => {
+    return !excludes.some((exclude) => {
+      return (
+        exclude.region.name === character.region.name &&
+        exclude.realm.name === character.realm.name &&
+        exclude.name === character.name
+      );
     });
   });
 };
 
 // TODO: rename/formalize this func
 export const slugCharacter = (character: Character): string => {
-  return `${character.name}-${character.realm}-${character.region}`;
+  return `${character.name}-${character.realm.name}-${character.region.name}`;
 };
 
-// slightly scuffed typing for characters, since this is meant to be used with roster items retrieved from rio
-const summarizeRoster = (roster: CharacterRaw[]) => {
+// reduces roster's characters to only relevant info
+export const summarizeRoster = (roster: Character[]) => {
   return roster.map((rosterItem) => {
     return {
-      region: rosterItem.character.region.name,
-      realm: rosterItem.character.realm.name,
-      name: rosterItem.character.name,
+      region: rosterItem.region,
+      realm: rosterItem.realm,
+      name: rosterItem.name,
+      id: rosterItem.id,
+      faction: rosterItem.faction,
+      class: rosterItem.class,
+      race: rosterItem.race,
     };
   });
 };

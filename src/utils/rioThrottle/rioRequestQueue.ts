@@ -1,7 +1,7 @@
 // https://stackoverflow.com/questions/65850544/rate-limit-the-number-of-request-made-from-react-client-to-api
 // need to look more into error handling when using - sometimes we run into rate limits even with this.
 
-import { Request, RequestReturn } from "./types";
+import { Request, RequestReturn } from "../types";
 
 const LOG_RIO_REQUESTS = true;
 
@@ -21,8 +21,8 @@ class RequestQueue {
   constructor() {
     this.queue = [];
     this.isRequesting = false;
-    this.MAX_REQUESTS = 4; // 300; - lower to prevent 429s
-    this.TIMEOUT = 1 * 1 * 1000; // 1 * 60 * 1000;
+    this.MAX_REQUESTS = 1; // 300; - lower to prevent 429s
+    this.TIMEOUT = 1 * 1 * 2000; // 1 * 60 * 1000;
     this.requestsProcessing = 0;
   }
 
@@ -82,6 +82,8 @@ class RequestQueue {
       item.reject(err);
       this.processRequests();
     }
+
+    console.log("Requests processing: ", this.requestsProcessing);
   }
 }
 

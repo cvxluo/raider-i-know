@@ -2,7 +2,7 @@
 
 import { getRunsWithCharacter } from "@/actions/mongodb/run";
 
-import { getCharGraph } from "@/actions/mongodb/run_graphs";
+import { getCharGraph, getDenseCharGraph } from "@/actions/mongodb/run_graphs";
 
 import dynamic from "next/dynamic";
 const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
@@ -11,7 +11,7 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 
 import CharacterSelector from "@/components/CharacterSelector";
 import { testSaveTopAffixes } from "@/utils/testfuncs";
-import { Character, CharacterNode, Run } from "@/utils/types";
+import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
 import { Box, Button, List, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
@@ -32,7 +32,10 @@ export default function Home() {
       locale: "",
     },
   });
-  const [charGraph, setCharGraph] = useState<CharacterNode[][]>([]);
+  const [charGraph, setCharGraph] = useState<CharacterGraph>({
+    nodes: [],
+    links: [],
+  });
   const [loading, setLoading] = useState(false);
 
   const handleCharSubmit = async (charInfo: Character) => {
@@ -47,7 +50,7 @@ export default function Home() {
 
     console.log(retrievedMainChar);
 
-    const charGraph = await getCharGraph(retrievedMainChar, 2, 30, [
+    const charGraph = await getCharGraph(retrievedMainChar, 2, 15, [
       retrievedMainChar,
     ]);
     setCharGraph(charGraph);

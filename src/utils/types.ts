@@ -111,5 +111,20 @@ export interface CharacterNode {
   parentCharacter: Character;
 }
 
+export interface CharacterGraph {
+  nodes: {
+    id: number;
+    name: string;
+    fx?: number;
+    fy?: number;
+    nodeLabel?: string;
+    nodeColor?: string;
+  }[];
+  links: {
+    source: number;
+    target: number;
+  }[];
+}
+
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;
 export type Request = (...args: any[]) => Promise<RequestReturn>;

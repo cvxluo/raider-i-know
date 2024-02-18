@@ -50,7 +50,7 @@ export default function Home() {
 
     console.log(retrievedMainChar);
 
-    const charGraph = await getCharGraph(retrievedMainChar, 2, 15, [
+    const charGraph = await getDenseCharGraph(retrievedMainChar, 2, 15, [
       retrievedMainChar,
     ]);
     setCharGraph(charGraph);

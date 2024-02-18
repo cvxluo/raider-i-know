@@ -1,5 +1,5 @@
 import { getLimitedChars } from "@/utils/funcs";
-import { Character } from "@/utils/types";
+import { Character, CharacterGraph } from "@/utils/types";
 
 import { getPopulatedRunsWithCharacter, getRunsWithCharacter } from "./run";
 
@@ -123,25 +123,19 @@ export const getDenseCharGraph = async (
         name: character.name,
         fx: 0,
         fy: 0,
+        // layer used to increase size of nodes, not actually a value used by the graph
+        layer: 0,
+        nodeColor: "red",
       },
-    ] as {
-      id: number;
-      name: string;
-      fx?: number;
-      fy?: number;
-    }[],
-    links: [] as {
-      source: number;
-      target: number;
-    }[],
-  };
+    ],
+    links: [],
+  } as CharacterGraph;
   let charsToSearch = [character];
+  let newCharsToSearch: Character[] = [];
   const allCharsSearched: Character[] = [];
 
   for (let i = 0; i <= degree; i++) {
-    console.log(charsToSearch);
     for (let character of charsToSearch) {
-      console.log(charsToSearch);
       const runs = await getPopulatedRunsWithCharacter(character);
 
       const limitedChars = getLimitedChars(runs, limit, [...excludes]);
@@ -149,7 +143,7 @@ export const getDenseCharGraph = async (
       for (let char of limitedChars) {
         if (!allCharsSearched.some((c) => c.id === char.id)) {
           allCharsSearched.push(char);
-          charsToSearch.push(char);
+          newCharsToSearch.push(char);
         }
         charGraph.links.push({
           source: character.id as number,
@@ -161,12 +155,16 @@ export const getDenseCharGraph = async (
     // TODO: this might not be necessary, since we sequentially add to charsToSearch
     charsToSearch = charsToSearch.filter((c) => c.id !== character.id);
 
+    charsToSearch = newCharsToSearch;
+    newCharsToSearch = [];
+
     charGraph.nodes = [
       ...charGraph.nodes,
       ...charsToSearch.map((c) => {
         return {
           id: c.id as number,
           name: c.name,
+          layer: i + 1,
         };
       }),
     ];

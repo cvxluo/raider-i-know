@@ -119,6 +119,8 @@ export interface CharacterGraph {
     fy?: number;
     nodeLabel?: string;
     nodeColor?: string;
+
+    layer?: number;
   }[];
   links: {
     source: number;

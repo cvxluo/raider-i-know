@@ -15,6 +15,7 @@ import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
 import { Box, Button, List, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
+import GraphOptionsSelector from "@/components/GraphOptionsSelector";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -59,19 +60,18 @@ export default function Home() {
     setLoading(false);
   };
 
-  const handleTest = async () => {
-    const res = await testSaveTopAffixes();
-    console.log(res);
-  };
-
   return (
     <Box>
-      <Button onClick={handleTest}>test</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
+      <GraphOptionsSelector />
 
       {loading && <Spinner />}
 
-      <CharForceGraph mainChar={mainChar} charGraph={charGraph} />
+      <CharForceGraph
+        mainChar={mainChar}
+        charGraph={charGraph}
+        graphOptions={{ showLabels: false }}
+      />
     </Box>
   );
 }

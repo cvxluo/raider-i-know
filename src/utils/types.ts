@@ -107,21 +107,18 @@ export interface CharacterRaw {
 }
 
 export interface CharacterNode {
-  character: Character;
-  parentCharacter: Character;
+  id: number;
+  name: string;
+  fx?: number;
+  fy?: number;
+  nodeLabel?: string;
+  nodeColor?: string;
+
+  layer?: number;
 }
 
 export interface CharacterGraph {
-  nodes: {
-    id: number;
-    name: string;
-    fx?: number;
-    fy?: number;
-    nodeLabel?: string;
-    nodeColor?: string;
-
-    layer?: number;
-  }[];
+  nodes: CharacterNode[];
   links: {
     source: number;
     target: number;

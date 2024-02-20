@@ -7,10 +7,24 @@ import { ForceGraph2D } from "react-force-graph";
 const CharForceGraph = ({
   mainChar,
   charGraph,
+  graphOptions,
 }: {
   mainChar: Character;
   charGraph: CharacterGraph;
+  graphOptions: any;
 }) => {
+  const canvasObject = (node: CharacterNode, ctx: CanvasRenderingContext2D) => {
+    const label = node.name;
+    const fontSize = 12;
+    ctx.font = `${fontSize}px Sans-Serif`;
+    const textWidth = ctx.measureText(label).width;
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = node.nodeColor || "black";
+    ctx.fillText(label, node.fx as number, node.fy as number);
+  };
+
   return (
     <Box>
       <ForceGraph2D
@@ -29,6 +43,7 @@ const CharForceGraph = ({
             charGraph.nodes.find((n) => n.id === node.id)?.nodeColor || "blue"
           );
         }}
+        nodeCanvasObject={graphOptions.showLabels ? canvasObject : undefined}
       />
     </Box>
   );

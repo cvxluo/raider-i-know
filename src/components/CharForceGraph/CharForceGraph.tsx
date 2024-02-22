@@ -1,7 +1,12 @@
 import { Box } from "@chakra-ui/react";
 
 import { slugCharacter } from "@/utils/funcs";
-import { Character, CharacterGraph, CharacterNode } from "@/utils/types";
+import {
+  Character,
+  CharacterGraph,
+  CharacterNode,
+  GraphOptions,
+} from "@/utils/types";
 import { ForceGraph2D } from "react-force-graph";
 
 const CharForceGraph = ({
@@ -11,7 +16,7 @@ const CharForceGraph = ({
 }: {
   mainChar: Character;
   charGraph: CharacterGraph;
-  graphOptions: any;
+  graphOptions: GraphOptions;
 }) => {
   const canvasObject = (node: CharacterNode, ctx: CanvasRenderingContext2D) => {
     const label = node.name;

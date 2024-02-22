@@ -125,5 +125,11 @@ export interface CharacterGraph {
   }[];
 }
 
+export interface GraphOptions {
+  showLabels: boolean;
+  degree: number;
+  runLimit: number;
+}
+
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;
 export type Request = (...args: any[]) => Promise<RequestReturn>;

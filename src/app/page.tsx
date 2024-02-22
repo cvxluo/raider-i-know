@@ -39,6 +39,12 @@ export default function Home() {
   });
   const [loading, setLoading] = useState(false);
 
+  const [graphOptions, setGraphOptions] = useState({
+    showLabels: false,
+    degree: 2,
+    runLimit: 15,
+  });
+
   const handleCharSubmit = async (charInfo: Character) => {
     setLoading(true);
     setMainChar(charInfo);
@@ -51,9 +57,12 @@ export default function Home() {
 
     console.log(retrievedMainChar);
 
-    const charGraph = await getDenseCharGraph(retrievedMainChar, 2, 15, [
+    const charGraph = await getDenseCharGraph(
       retrievedMainChar,
-    ]);
+      graphOptions.degree,
+      graphOptions.runLimit,
+      [retrievedMainChar],
+    );
     setCharGraph(charGraph);
     console.log(charGraph);
 
@@ -63,14 +72,17 @@ export default function Home() {
   return (
     <Box>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
-      <GraphOptionsSelector />
+      <GraphOptionsSelector
+        graphOptions={graphOptions}
+        setGraphOptions={setGraphOptions}
+      />
 
       {loading && <Spinner />}
 
       <CharForceGraph
         mainChar={mainChar}
         charGraph={charGraph}
-        graphOptions={{ showLabels: false }}
+        graphOptions={graphOptions}
       />
     </Box>
   );

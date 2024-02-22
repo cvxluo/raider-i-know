@@ -18,7 +18,7 @@ const CharForceGraph = ({
   charGraph: CharacterGraph;
   graphOptions: GraphOptions;
 }) => {
-  const canvasObject = (node: CharacterNode, ctx: CanvasRenderingContext2D) => {
+  const canvasObject = (node: any, ctx: CanvasRenderingContext2D) => {
     const label = node.name;
     const fontSize = 12;
     ctx.font = `${fontSize}px Sans-Serif`;
@@ -27,8 +27,14 @@ const CharForceGraph = ({
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = node.nodeColor || "black";
-    ctx.fillText(label, node.fx as number, node.fy as number);
+    ctx.fillText(label, node.x as number, node.y as number);
   };
+
+  const dagMode = graphOptions.treeMode
+    ? graphOptions.radialMode
+      ? "radialout"
+      : "td"
+    : undefined;
 
   return (
     <Box>
@@ -49,6 +55,7 @@ const CharForceGraph = ({
           );
         }}
         nodeCanvasObject={graphOptions.showLabels ? canvasObject : undefined}
+        dagMode={dagMode}
       />
     </Box>
   );

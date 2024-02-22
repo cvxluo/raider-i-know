@@ -16,6 +16,9 @@ import { getPopulatedRunsWithCharacter, getRunsWithCharacter } from "./run";
     [...],
   ]
   */
+
+// TODO: this currently uses an old parentChar - character relationship
+// rewrite to be like getDenseCharGraph
 export const getCharGraph = async (
   character: Character,
   degree: number,
@@ -30,6 +33,7 @@ export const getCharGraph = async (
       },
     ],
   ];
+
   let charsToSearch = [character];
   const allCharsSearched: Character[] = [];
 
@@ -102,7 +106,8 @@ export const getCharGraph = async (
         };
       });
     })
-    .flat();
+    .flat()
+    .slice(1);
 
   return {
     nodes: characters,

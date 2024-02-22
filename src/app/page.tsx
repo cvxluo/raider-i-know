@@ -43,6 +43,8 @@ export default function Home() {
     showLabels: false,
     degree: 2,
     runLimit: 15,
+    treeMode: false,
+    radialMode: false,
   });
 
   const handleCharSubmit = async (charInfo: Character) => {
@@ -57,14 +59,27 @@ export default function Home() {
 
     console.log(retrievedMainChar);
 
-    const charGraph = await getDenseCharGraph(
-      retrievedMainChar,
-      graphOptions.degree,
-      graphOptions.runLimit,
-      [retrievedMainChar],
-    );
+    let charGraph;
+    if (graphOptions.treeMode) {
+      console.log("tree mode");
+      charGraph = await getCharGraph(
+        retrievedMainChar,
+        graphOptions.degree,
+        graphOptions.runLimit,
+        [retrievedMainChar],
+      );
+    } else {
+      charGraph = await getDenseCharGraph(
+        retrievedMainChar,
+        graphOptions.degree,
+        graphOptions.runLimit,
+        [retrievedMainChar],
+      );
+    }
+
     setCharGraph(charGraph);
     console.log(charGraph);
+    console.log(graphOptions);
 
     setLoading(false);
   };

@@ -1,3 +1,4 @@
+import { GraphOptions } from "@/utils/types";
 import {
   Box,
   FormControl,
@@ -18,18 +19,10 @@ const GraphOptionsSelector = ({
   graphOptions,
   setGraphOptions,
 }: {
-  graphOptions: {
-    showLabels: boolean;
-    degree: number;
-    runLimit: number;
-  };
-  setGraphOptions: (graphOptions: {
-    showLabels: boolean;
-    degree: number;
-    runLimit: number;
-  }) => void;
+  graphOptions: GraphOptions;
+  setGraphOptions: (graphOptions: GraphOptions) => void;
 }) => {
-  const { showLabels, degree, runLimit } = graphOptions;
+  const { showLabels, degree, runLimit, treeMode, radialMode } = graphOptions;
 
   return (
     <Box>
@@ -48,6 +41,39 @@ const GraphOptionsSelector = ({
               setGraphOptions({ ...graphOptions, showLabels: e.target.checked })
             }
           />
+
+          <Tooltip label="Use tree mode for links">
+            <Text>Tree Mode:</Text>
+          </Tooltip>
+          <Switch
+            id="treeMode"
+            colorScheme="teal"
+            size="lg"
+            isChecked={treeMode}
+            onChange={(e) => {
+              // radial mode is only available in tree mode, so we turn it off if tree mode is off
+              setGraphOptions({
+                ...graphOptions,
+                treeMode: e.target.checked,
+                radialMode: e.target.checked ? radialMode : false,
+              });
+            }}
+          />
+
+          <Tooltip label="Changes tree mode to be radial out">
+            <Text>Radial Mode</Text>
+          </Tooltip>
+          <Switch
+            id="radialMode"
+            colorScheme="teal"
+            size="lg"
+            isChecked={radialMode}
+            onChange={(e) =>
+              setGraphOptions({ ...graphOptions, radialMode: e.target.checked })
+            }
+            isDisabled={!treeMode}
+          />
+
           <Tooltip label="Number of degrees of separation">
             <Text>Degree:</Text>
           </Tooltip>

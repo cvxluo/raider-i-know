@@ -129,6 +129,8 @@ export interface GraphOptions {
   showLabels: boolean;
   degree: number;
   runLimit: number;
+  treeMode: boolean;
+  radialMode: boolean;
 }
 
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;

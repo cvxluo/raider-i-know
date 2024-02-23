@@ -16,6 +16,7 @@ import { Box, Button, List, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
+import DataOptionsSelector from "@/components/DataOptionsSelector";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -87,6 +88,10 @@ export default function Home() {
   return (
     <Box>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
+      <DataOptionsSelector
+        graphOptions={graphOptions}
+        setGraphOptions={setGraphOptions}
+      />
       <GraphOptionsSelector
         graphOptions={graphOptions}
         setGraphOptions={setGraphOptions}

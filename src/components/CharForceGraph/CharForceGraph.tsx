@@ -8,6 +8,7 @@ import {
   GraphOptions,
 } from "@/utils/types";
 import { ForceGraph2D } from "react-force-graph";
+import { useRef } from "react";
 
 const CharForceGraph = ({
   mainChar,

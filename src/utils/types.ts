@@ -107,8 +107,30 @@ export interface CharacterRaw {
 }
 
 export interface CharacterNode {
-  character: Character;
-  parentCharacter: Character;
+  id: number;
+  name: string;
+  fx?: number;
+  fy?: number;
+  nodeLabel?: string;
+  nodeColor?: string;
+
+  layer?: number;
+}
+
+export interface CharacterGraph {
+  nodes: CharacterNode[];
+  links: {
+    source: number;
+    target: number;
+  }[];
+}
+
+export interface GraphOptions {
+  showLabels: boolean;
+  degree: number;
+  runLimit: number;
+  treeMode: boolean;
+  radialMode: boolean;
 }
 
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;

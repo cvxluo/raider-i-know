@@ -1,84 +1,63 @@
 import { Box } from "@chakra-ui/react";
 
 import { slugCharacter } from "@/utils/funcs";
-import { Character, CharacterNode } from "@/utils/types";
+import {
+  Character,
+  CharacterGraph,
+  CharacterNode,
+  GraphOptions,
+} from "@/utils/types";
 import { ForceGraph2D } from "react-force-graph";
+import { useRef } from "react";
 
 const CharForceGraph = ({
   mainChar,
   charGraph,
+  graphOptions,
 }: {
   mainChar: Character;
-  charGraph: CharacterNode[][];
+  charGraph: CharacterGraph;
+  graphOptions: GraphOptions;
 }) => {
-  console.log("CHAR GRAPH", charGraph);
-  console.log(
-    charGraph.map((layer) => {
-      return layer.map((node) => {
-        return node.character;
-      });
-    }),
-  );
-  console.log(
-    charGraph.map((layer) => {
-      return layer.map((node) => {
-        return node.parentCharacter;
-      });
-    }),
-  );
+  const canvasObject = (node: any, ctx: CanvasRenderingContext2D) => {
+    const label = node.name;
+    const fontSize = 12;
+    ctx.font = `${fontSize}px Sans-Serif`;
+    const textWidth = ctx.measureText(label).width;
 
-  const characters = charGraph
-    .map((layer, i) => {
-      return layer.map((nodeInfo, j) => {
-        return {
-          id: nodeInfo.character.id,
-          name: nodeInfo.character.name,
-        };
-      });
-    })
-    .flat();
-
-  const links = charGraph
-    .map((layer) => {
-      return layer.map((nodeInfo) => {
-        return {
-          source: nodeInfo.parentCharacter.id,
-          target: nodeInfo.character.id,
-        };
-      });
-    })
-    .flat();
-
-  characters[0] = {
-    ...characters[0],
-    fx: 0,
-    fy: 0,
-  } as {
-    id: number;
-    name: string;
-    fx: number;
-    fy: number;
-    nodeLabel: string;
-    nodeColor: string;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = node.nodeColor || "black";
+    ctx.fillText(label, node.x as number, node.y as number);
   };
-  console.log(characters);
-  console.log(links);
+
+  const dagMode = graphOptions.treeMode
+    ? graphOptions.radialMode
+      ? "radialout"
+      : "td"
+    : undefined;
 
   return (
     <Box>
       <ForceGraph2D
         graphData={{
-          nodes: characters,
-          links: links,
+          nodes: charGraph.nodes,
+          links: charGraph.links,
         }}
         nodeLabel={(node) => node.name}
-        nodeColor={(node) => {
-          if (node.id === characters[0].id) {
-            return "red";
-          } else {
-            return "blue";
-          }
+        nodeVal={(node) => {
+          return (
+            Math.max(...charGraph.nodes.map((char) => char.layer || 5)) -
+            (charGraph.nodes.find((n) => n.id === node.id)?.layer || 1)
+          );
         }}
+        nodeColor={(node) => {
+          return (
+            charGraph.nodes.find((n) => n.id === node.id)?.nodeColor || "blue"
+          );
+        }}
+        nodeCanvasObject={graphOptions.showLabels ? canvasObject : undefined}
+        dagMode={dagMode}
       />
     </Box>
   );

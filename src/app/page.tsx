@@ -10,7 +10,11 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 });
 
 import CharacterSelector from "@/components/CharacterSelector";
-import { testSaveTopAffixes } from "@/utils/testfuncs";
+import {
+  testAllRunsForCharacter,
+  testRunsForCharacter,
+  testSaveTopAffixes,
+} from "@/utils/testfuncs";
 import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
 import { Box, Button, List, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -18,6 +22,10 @@ import { getCharacter } from "@/actions/mongodb/character";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
 import DataOptionsSelector from "@/components/DataOptionsSelector";
 import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
+import {
+  getFullRunsForCharacter,
+  saveRunsForCharacter,
+} from "@/actions/mongodb/data_collection/character_runs";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -87,7 +95,9 @@ export default function Home() {
   };
 
   useEffect(() => {
-    getRunsForCharacter("season-df-3", 135683693, 9028, "all", "all").then(
+    console.log("use effect");
+    // testAllRunsForCharacter(135683693);
+    saveRunsForCharacter("season-df-3", 135683693, 9028, "all", "all").then(
       (res) => {
         console.log(res);
       },

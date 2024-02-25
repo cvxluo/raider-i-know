@@ -59,6 +59,7 @@ export const createRun = async (run: Run): Promise<RunReducedRoster> => {
 export const createManyRuns = async (runs: Run[]): Promise<Run[]> => {
   await mongoDB();
 
+  console.log(runs);
   if (LOG_RUN_CREATION) {
     console.log("Creating", runs.length, "runs in database with ids...");
     console.log(runs.map((run) => run.keystone_run_id));
@@ -136,6 +137,18 @@ export const getRun = async (run: Run): Promise<RunReducedRoster> => {
   return flattenedRun;
 };
 
+export const getRuns = async (runs: Run[]): Promise<RunReducedRoster[]> => {
+  await mongoDB();
+
+  const retrievedRuns = await RunModel.find({
+    keystone_run_id: { $in: runs.map((run) => run.keystone_run_id) },
+  }).lean();
+
+  const flattenedRuns = JSON.parse(JSON.stringify(retrievedRuns));
+
+  return flattenedRuns;
+};
+
 export const getRunFromID = async (
   keystone_run_id: number,
 ): Promise<RunReducedRoster> => {
@@ -148,6 +161,20 @@ export const getRunFromID = async (
   const flattenedRun = JSON.parse(JSON.stringify(retrievedRun));
 
   return flattenedRun;
+};
+
+export const getRunsFromIDs = async (
+  keystone_run_ids: number[],
+): Promise<RunReducedRoster[]> => {
+  await mongoDB();
+
+  const retrievedRuns = await RunModel.find({
+    keystone_run_id: { $in: keystone_run_ids },
+  }).lean();
+
+  const flattenedRuns = JSON.parse(JSON.stringify(retrievedRuns));
+
+  return flattenedRuns;
 };
 
 export const getRunsWithCharacter = async (

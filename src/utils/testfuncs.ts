@@ -4,8 +4,10 @@ import {
   saveTopRuns,
 } from "@/actions/mongodb/data_collection/top_runs";
 import { createRun, createRunFromID } from "@/actions/mongodb/run";
-
+import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
+import { AffixSets, DungeonIds } from "./consts";
+import { Run, RunSummary } from "./types";
 
 export const testCreateRun = async () => {
   const testRun = {
@@ -95,4 +97,40 @@ export const testSaveTopAffixes = async () => {
   const affixes = "fortified-incorporeal-sanguine";
 
   saveAllTopRuns(season, region);
+};
+
+export const testRunsForCharacter = async (characterId: number) => {
+  const season = "season-df-3";
+  const dungeonId = 9028;
+  const affixes = "all";
+  const date = "all";
+
+  getRunsForCharacter(season, characterId, dungeonId, affixes, date).then(
+    (res) => {
+      console.log(res);
+    },
+  );
+};
+
+export const testAllRunsForCharacter = async (characterId: number) => {
+  const season = "season-df-3";
+  const date = "all";
+
+  // note that runsFromCharacter doesn't return real runs
+  const runs: RunSummary[] = [];
+
+  DungeonIds.forEach((dungeonId) => {
+    AffixSets.forEach((affixSet) => {
+      const affixes = affixSet.join("-");
+      getRunsForCharacter(season, characterId, dungeonId, affixes, date).then(
+        (res) => {
+          runs.push(...res.runs.map((run) => run.summary));
+          console.log(res);
+          console.log(runs);
+        },
+      );
+    });
+  });
+
+  return runs;
 };

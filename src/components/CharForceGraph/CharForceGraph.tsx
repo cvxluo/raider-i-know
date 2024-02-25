@@ -46,8 +46,9 @@ const CharForceGraph = ({
         }}
         nodeLabel={(node) => node.name}
         nodeVal={(node) => {
+          console.log(charGraph.nodes.map((char) => char.layer || 0));
           return (
-            Math.max(...charGraph.nodes.map((char) => char.layer || 5)) -
+            Math.max(...charGraph.nodes.map((char) => char.layer || 0)) -
             (charGraph.nodes.find((n) => n.id === node.id)?.layer || 1)
           );
         }}

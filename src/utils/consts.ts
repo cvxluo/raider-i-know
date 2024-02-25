@@ -282,6 +282,17 @@ export const Dungeons: string[] = [
   "waycrest-manor",
 ];
 
+export const DungeonIds: number[] = [
+  9028, // atal
+  7805, // brh
+  1000010, // doti fall
+  1000011, // doti rise
+  7673, // dht
+  7109, // everbloom
+  4738, // throne
+  9424, // waycrest
+];
+
 export const AffixSets: string[][] = [
   ["Fortified", "Incorporeal", "Sanguine"],
   ["Tyrannical", "Entangling", "Bursting"],

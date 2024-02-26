@@ -56,10 +56,9 @@ export const createRun = async (run: Run): Promise<RunReducedRoster> => {
 
 // https://stackoverflow.com/questions/39988848/trying-to-do-a-bulk-upsert-with-mongoose-whats-the-cleanest-way-to-do-this
 // bulk upsert
-export const createManyRuns = async (runs: Run[]): Promise<Run[]> => {
+export const createManyRuns = async (runs: Run[]) => {
   await mongoDB();
 
-  console.log(runs);
   if (LOG_RUN_CREATION) {
     console.log("Creating", runs.length, "runs in database with ids...");
     console.log(runs.map((run) => run.keystone_run_id));

@@ -13,6 +13,7 @@ import CharacterSelector from "@/components/CharacterSelector";
 import {
   testAllRunsForCharacter,
   testRunsForCharacter,
+  testSaveAllRunsForCharacter,
   testSaveTopAffixes,
 } from "@/utils/testfuncs";
 import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
@@ -24,8 +25,10 @@ import DataOptionsSelector from "@/components/DataOptionsSelector";
 import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
 import {
   getFullRunsForCharacter,
+  saveAllRunsForCharacter,
   saveRunsForCharacter,
 } from "@/actions/mongodb/data_collection/character_runs";
+import { DungeonIds } from "@/utils/consts";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -94,18 +97,18 @@ export default function Home() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    console.log("use effect");
+  const handleTest = async () => {
     // testAllRunsForCharacter(135683693);
-    saveRunsForCharacter("season-df-3", 135683693, 9028, "all", "all").then(
-      (res) => {
-        console.log(res);
-      },
-    );
-  }, []);
+    // testSaveAllRunsForCharacter(135683693);
+
+    DungeonIds.forEach((dungeonId) => {
+      testRunsForCharacter(135683693, dungeonId);
+    });
+  };
 
   return (
     <Box>
+      <Button onClick={handleTest}>Test Save </Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
       <DataOptionsSelector
         graphOptions={graphOptions}

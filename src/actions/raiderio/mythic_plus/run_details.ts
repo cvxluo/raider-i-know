@@ -2,11 +2,22 @@
 
 import urls from "@/utils/urls";
 
-export const getRunDetails = async (season: string, id: number) => {
+const LOG_RUN_DETAILS = true;
+
+export const getRunDetails = async (req: { season: string; id: number }) => {
   const params = new URLSearchParams({
-    season,
-    id: id.toString(),
+    season: req.season,
+    id: req.id.toString(),
   });
+
+  if (LOG_RUN_DETAILS)
+    console.log(
+      "URL: " +
+        urls.raiderio.baseURL +
+        urls.raiderio.mythic_plus.run_details +
+        "?" +
+        params,
+    );
 
   return fetch(
     urls.raiderio.baseURL +

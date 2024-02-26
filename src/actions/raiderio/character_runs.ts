@@ -24,9 +24,12 @@ export const getRunsForCharacter = async (
     date: date,
   });
 
+  /*
   console.log(
     "URL: " + "https://raider.io/api/characters/mythic-plus-runs?" + params,
   );
+  */
+
   return fetch(
     // special url
     "https://raider.io/api/characters/mythic-plus-runs?" + params,

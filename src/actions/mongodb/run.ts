@@ -117,7 +117,7 @@ export const createRunFromID = async (
 ) => {
   await mongoDB();
 
-  const runFromID = await getRunDetails(season, keystone_run_id);
+  const runFromID = await getRunDetails({ season, id: keystone_run_id });
 
   const summarizedRun = summarizeRunDetails(runFromID);
 

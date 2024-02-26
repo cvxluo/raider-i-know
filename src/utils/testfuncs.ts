@@ -8,7 +8,10 @@ import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
 import { AffixSets, DungeonIds } from "./consts";
 import { Run, RunSummary } from "./types";
-import { saveAllRunsForCharacter } from "@/actions/mongodb/data_collection/character_runs";
+import {
+  saveAllRunsForCharacter,
+  saveDungeonRunsForCharacter,
+} from "@/actions/mongodb/data_collection/character_runs";
 
 export const testCreateRun = async () => {
   const testRun = {
@@ -136,6 +139,14 @@ export const testAllRunsForCharacter = async (characterId: number) => {
   });
 
   return runs;
+};
+
+export const testSaveDungeonRunsForCharacter = async (characterId: number) => {
+  const season = "season-df-3";
+
+  saveDungeonRunsForCharacter(season, characterId).then((res) => {
+    console.log(res);
+  });
 };
 
 export const testSaveAllRunsForCharacter = async (characterId: number) => {

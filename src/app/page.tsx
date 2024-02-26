@@ -14,6 +14,7 @@ import {
   testAllRunsForCharacter,
   testRunsForCharacter,
   testSaveAllRunsForCharacter,
+  testSaveDungeonRunsForCharacter,
   testSaveTopAffixes,
 } from "@/utils/testfuncs";
 import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
@@ -100,10 +101,7 @@ export default function Home() {
   const handleTest = async () => {
     // testAllRunsForCharacter(135683693);
     // testSaveAllRunsForCharacter(135683693);
-
-    DungeonIds.forEach((dungeonId) => {
-      testRunsForCharacter(135683693, dungeonId);
-    });
+    testSaveDungeonRunsForCharacter(135683693);
   };
 
   return (

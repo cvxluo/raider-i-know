@@ -30,6 +30,7 @@ import {
   saveRunsForCharacter,
 } from "@/actions/mongodb/data_collection/character_runs";
 import { DungeonIds } from "@/utils/consts";
+import { getRunsForAllCharacters } from "@/actions/mongodb/data_collection/character_trawling";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -101,7 +102,8 @@ export default function Home() {
   const handleTest = async () => {
     // testAllRunsForCharacter(135683693);
     // testSaveAllRunsForCharacter(135683693);
-    testSaveDungeonRunsForCharacter(135683693);
+    // testSaveDungeonRunsForCharacter(135683693);
+    await getRunsForAllCharacters();
   };
 
   return (

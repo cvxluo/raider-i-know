@@ -69,7 +69,6 @@ export const saveDungeonRunsForCharacter = async (
 ) => {
   const runs = await Promise.all(
     DungeonIds.map((dungeonId) => {
-      console.log("dungeonId: " + dungeonId);
       return getFullRunsForCharacter(
         season,
         characterId,
@@ -79,7 +78,6 @@ export const saveDungeonRunsForCharacter = async (
       );
     }),
   );
-  console.log(runs);
   const cleanRuns = runs.flat().map(summarizeRunDetails);
 
   const responses = [];

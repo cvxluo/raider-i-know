@@ -21,7 +21,11 @@ export const getFullRunsForCharacter = async (
     dungeonId,
     affixes,
     date,
-  );
+  ).catch((err) => {
+    console.log("Error in retrieving runs for character:");
+    console.log(err);
+    return { runs: [] };
+  });
 
   const runIds = runSummaries.runs.map((run) => run.summary.keystone_run_id);
 

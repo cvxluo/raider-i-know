@@ -25,10 +25,21 @@ export const getFullRunsForCharacter = async (
 
   const runIds = runSummaries.runs.map((run) => run.summary.keystone_run_id);
 
-  // TODO: error handling for this - assume returning runraw
-  const runs = (await Promise.all(
+  // TODO: error handling for this is messy - can return either a RunRaw or an error
+  // this propagates from issues with the rio throttle, with statuses being fulfilled despite
+  // the actual request failing
+  const runs = (await Promise.allSettled(
     runIds.map((id) => useRIOThrottle(getRunDetails, { season, id })),
-  )) as RunRaw[];
+  ).then((res) => {
+    return res
+      .map((r) => {
+        if (r.status === "fulfilled") {
+          return r.value;
+        }
+        return null;
+      })
+      .filter((r) => !(r as any).error);
+  })) as RunRaw[];
 
   return runs;
 };

@@ -2,11 +2,17 @@
 
 import CharacterModel from "@/models/Character";
 import mongodb from "../mongodb";
-import { saveDungeonRunsForCharacter } from "./character_runs";
+import {
+  saveDungeonRunsForCharacter,
+  saveLimitedDungeonRunsForCharacter,
+} from "./character_runs";
 
 const LOG_CHARACTER_TRAWLING = true;
 
-export const getRunsForAllCharacters = async (startIndex = 0) => {
+export const getRunsForAllCharacters = async (
+  startIndex = 0,
+  key_level_limit = 0,
+) => {
   await mongodb();
 
   const totalCharacters = await CharacterModel.countDocuments({});
@@ -28,7 +34,11 @@ export const getRunsForAllCharacters = async (startIndex = 0) => {
 
     const res = await Promise.all(
       page.map(async (character) => {
-        await saveDungeonRunsForCharacter("season-df-3", character.id);
+        await saveLimitedDungeonRunsForCharacter(
+          "season-df-3",
+          character.id,
+          key_level_limit,
+        );
       }),
     );
   }

@@ -106,9 +106,14 @@ export default function Home() {
     await getRunsForAllCharacters();
   };
 
+  const handleTestSaveLimited = async () => {
+    await getRunsForAllCharacters(0, 20);
+  };
+
   return (
     <Box>
       <Button onClick={handleTest}>Test Save </Button>
+      <Button onClick={handleTestSaveLimited}>Test Save Limited</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
       <DataOptionsSelector
         graphOptions={graphOptions}

@@ -14,6 +14,7 @@ export const getFullRunsForCharacter = async (
   dungeonId: number,
   affixes: string,
   date: string,
+  key_level_limit = 0,
 ) => {
   const runSummaries = await getRunsForCharacter(
     season,
@@ -22,13 +23,15 @@ export const getFullRunsForCharacter = async (
     affixes,
     date,
   );
-  // TODO: error checking here is also questionable -
+  // TODO: error checking here is also questionable
   if ("error" in runSummaries) {
     console.log("ERROR", runSummaries.error);
     return [];
   }
 
-  const runIds = runSummaries.runs.map((run) => run.summary.keystone_run_id);
+  const runIds = runSummaries.runs
+    .filter((run) => run.summary.mythic_level >= key_level_limit)
+    .map((run) => run.summary.keystone_run_id);
 
   // TODO: error handling for this is messy - can return either a RunRaw or an error
   // this propagates from issues with the rio throttle, with statuses being fulfilled despite
@@ -91,6 +94,36 @@ export const saveDungeonRunsForCharacter = async (
         dungeonId,
         "all",
         "all",
+      );
+    }),
+  );
+  const cleanRuns = runs.flat().map(summarizeRunDetails);
+
+  const responses = [];
+
+  const s = 10;
+  for (let i = 0; i < cleanRuns.length; i += s) {
+    const res = await createManyRuns(cleanRuns.slice(i, i + s));
+    responses.push(res);
+  }
+
+  return responses;
+};
+
+export const saveLimitedDungeonRunsForCharacter = async (
+  season: string,
+  characterId: number,
+  key_level_limit: number,
+) => {
+  const runs = await Promise.all(
+    DungeonIds.map((dungeonId) => {
+      return getFullRunsForCharacter(
+        season,
+        characterId,
+        dungeonId,
+        "all",
+        "all",
+        key_level_limit,
       );
     }),
   );

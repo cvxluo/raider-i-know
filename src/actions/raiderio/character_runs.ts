@@ -8,14 +8,18 @@ export const getRunsForCharacter = async (
   dungeonId: number,
   affixes: string,
   date: string,
-): Promise<{
-  runs: {
-    // doesn't return full run details - will need to send another request if needing run object
-    summary: RunSummary;
-    score: number;
-  }[];
-  ui: any;
-}> => {
+): Promise<
+  | {
+      runs: {
+        summary: RunSummary;
+        score: number;
+      }[];
+      ui: any;
+    }
+  | {
+      error: any;
+    }
+> => {
   const params = new URLSearchParams({
     season: season,
     characterId: characterId.toString(),

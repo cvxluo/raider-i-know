@@ -130,6 +130,10 @@ export const testAllRunsForCharacter = async (characterId: number) => {
       const affixes = affixSet.join("-");
       getRunsForCharacter(season, characterId, dungeonId, affixes, date).then(
         (res) => {
+          if ("error" in res) {
+            console.log(res);
+            return;
+          }
           runs.push(...res.runs.map((run) => run.summary));
           console.log(res);
           console.log(runs);

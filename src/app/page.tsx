@@ -10,13 +10,27 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 });
 
 import CharacterSelector from "@/components/CharacterSelector";
-import { testSaveTopAffixes } from "@/utils/testfuncs";
+import {
+  testAllRunsForCharacter,
+  testRunsForCharacter,
+  testSaveAllRunsForCharacter,
+  testSaveDungeonRunsForCharacter,
+  testSaveTopAffixes,
+} from "@/utils/testfuncs";
 import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
 import { Box, Button, List, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
 import DataOptionsSelector from "@/components/DataOptionsSelector";
+import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
+import {
+  getFullRunsForCharacter,
+  saveAllRunsForCharacter,
+  saveRunsForCharacter,
+} from "@/actions/mongodb/data_collection/character_runs";
+import { DungeonIds } from "@/utils/consts";
+import { getRunsForAllCharacters } from "@/actions/mongodb/data_collection/character_trawling";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -44,8 +58,8 @@ export default function Home() {
     showLabels: false,
     degree: 2,
     runLimit: 15,
-    treeMode: false,
-    radialMode: false,
+    treeMode: true,
+    radialMode: true,
   });
 
   const handleCharSubmit = async (charInfo: Character) => {
@@ -85,8 +99,21 @@ export default function Home() {
     setLoading(false);
   };
 
+  const handleTest = async () => {
+    // testAllRunsForCharacter(135683693);
+    // testSaveAllRunsForCharacter(135683693);
+    // testSaveDungeonRunsForCharacter(135683693);
+    await getRunsForAllCharacters();
+  };
+
+  const handleTestSaveLimited = async () => {
+    await getRunsForAllCharacters(0, 20);
+  };
+
   return (
     <Box>
+      <Button onClick={handleTest}>Test Save </Button>
+      <Button onClick={handleTestSaveLimited}>Test Save Limited</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
       <DataOptionsSelector
         graphOptions={graphOptions}

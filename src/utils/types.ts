@@ -59,6 +59,16 @@ export interface RunReducedRoster extends Omit<Run, "roster"> {
   roster: mongoose.Types.ObjectId[]; // the character ids
 }
 
+export interface RunSummary extends Partial<Run> {
+  completed_at: Date;
+  dungeon: {
+    name: string;
+    id: number;
+  };
+  keystone_run_id: number;
+  mythic_level: number;
+}
+
 export interface Region {
   name: string;
   slug: string;

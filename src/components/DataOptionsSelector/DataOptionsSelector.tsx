@@ -1,6 +1,7 @@
 import {
   Box,
   FormControl,
+  FormHelperText,
   FormLabel,
   HStack,
   NumberDecrementStepper,
@@ -91,6 +92,7 @@ const DataOptionsSelector = ({
             }}
           />
         </HStack>
+        <FormHelperText>Requires a reload to take effect</FormHelperText>
       </FormControl>
     </Box>
   );

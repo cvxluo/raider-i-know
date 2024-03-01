@@ -58,10 +58,14 @@ export const purgeRuns = async (key_level_limit = 0) => {
   return deleteRuns;
 };
 
-export const purgeCharacters = async () => {
+export const purgeCharacters = async (key_level_limit = 0) => {
   await mongodb();
 
-  const charactersInRuns = (await RunModel.find({}).lean())
+  const charactersInRuns = (
+    await RunModel.find({
+      mythic_level: { $gte: key_level_limit },
+    }).lean()
+  )
     .map((run) => run.roster)
     .flat();
 

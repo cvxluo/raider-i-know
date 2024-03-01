@@ -21,8 +21,8 @@ class RequestQueue {
   constructor() {
     this.queue = [];
     this.isRequesting = false;
-    this.MAX_REQUESTS = 1; // 300; - lower to prevent 429s
-    this.TIMEOUT = 2 * 1 * 1000; // 1 * 60 * 1000;
+    this.MAX_REQUESTS = 4; // 300; - lower to prevent 429s
+    this.TIMEOUT = 1 * 1 * 1000; // 1 * 60 * 1000;
     this.requestsProcessing = 0;
   }
 

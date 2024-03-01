@@ -6,6 +6,8 @@ import {
   saveDungeonRunsForCharacter,
   saveLimitedDungeonRunsForCharacter,
 } from "./character_runs";
+import RunModel from "@/models/Run";
+import { run } from "node:test";
 
 const LOG_CHARACTER_TRAWLING = true;
 
@@ -42,4 +44,41 @@ export const getRunsForAllCharacters = async (
       }),
     );
   }
+};
+
+export const purgeRuns = async (key_level_limit = 0) => {
+  await mongodb();
+
+  const deleteRuns = RunModel.deleteMany({
+    mythic_level: { $lt: key_level_limit },
+  }).catch((err) => {
+    console.error(err);
+  });
+
+  return deleteRuns;
+};
+
+export const purgeCharacters = async () => {
+  await mongodb();
+
+  const charactersInRuns = (await RunModel.find({}).lean())
+    .map((run) => run.roster)
+    .flat();
+
+  console.log("Characters in runs: ", charactersInRuns);
+
+  const deleteCharacters = [];
+  for (let i = 0; i < charactersInRuns.length; i += 1000) {
+    const deletedBatch = await CharacterModel.deleteMany({
+      _id: { $in: charactersInRuns.slice(i, i + 1000) },
+    }).catch((err) => {
+      console.error(err);
+    });
+
+    console.log(i, "of", charactersInRuns.length, "characters purged");
+
+    deleteCharacters.push(deletedBatch);
+  }
+
+  return deleteCharacters;
 };

@@ -30,7 +30,11 @@ import {
   saveRunsForCharacter,
 } from "@/actions/mongodb/data_collection/character_runs";
 import { DungeonIds } from "@/utils/consts";
-import { getRunsForAllCharacters } from "@/actions/mongodb/data_collection/character_trawling";
+import {
+  getRunsForAllCharacters,
+  purgeCharacters,
+  purgeRuns,
+} from "@/actions/mongodb/data_collection/character_trawling";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -110,10 +114,27 @@ export default function Home() {
     await getRunsForAllCharacters(0, 20);
   };
 
+  const handleDeleteRuns = async () => {
+    const purgeResult = await purgeRuns(20);
+    console.log(purgeResult);
+  };
+
+  const handleDeleteChars = async () => {
+    const purgeResult = await purgeCharacters();
+    console.log(purgeResult);
+  };
+
+  const handleSaveTopRuns = async () => {
+    await testSaveTopAffixes();
+  };
+
   return (
     <Box>
       <Button onClick={handleTest}>Test Save </Button>
       <Button onClick={handleTestSaveLimited}>Test Save Limited</Button>
+      <Button onClick={handleDeleteRuns}>Delete Runs</Button>
+      <Button onClick={handleDeleteChars}>Delete Characters</Button>
+      <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
       <DataOptionsSelector
         graphOptions={graphOptions}

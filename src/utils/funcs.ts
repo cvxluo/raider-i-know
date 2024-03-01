@@ -19,7 +19,7 @@ export const summarizeRunDetails = (runDetails: RunRaw) => {
     keystone_run_id,
     mythic_level,
     completed_at: new Date(completed_at),
-    weekly_modifiers,
+    weekly_modifiers: summarizeAffixes(weekly_modifiers),
     keystone_team_id,
     roster: roster.map((rosterItem) => {
       return rosterItem.character;

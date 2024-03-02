@@ -50,7 +50,7 @@ export interface Run {
   keystone_run_id: number;
   mythic_level: number;
   completed_at: Date;
-  weekly_modifiers: Affix[];
+  weekly_modifiers: string[];
   keystone_team_id: number;
   roster: Character[];
 }

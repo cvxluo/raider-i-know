@@ -30,7 +30,11 @@ import {
   saveRunsForCharacter,
 } from "@/actions/mongodb/data_collection/character_runs";
 import { DungeonIds } from "@/utils/consts";
-import { getRunsForAllCharacters } from "@/actions/mongodb/data_collection/character_trawling";
+import {
+  getRunsForAllCharacters,
+  purgeCharacters,
+  purgeRuns,
+} from "@/actions/mongodb/data_collection/character_trawling";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -99,21 +103,35 @@ export default function Home() {
     setLoading(false);
   };
 
-  const handleTest = async () => {
-    // testAllRunsForCharacter(135683693);
-    // testSaveAllRunsForCharacter(135683693);
-    // testSaveDungeonRunsForCharacter(135683693);
-    await getRunsForAllCharacters();
+  const handleTestSaveLimited = async () => {
+    await getRunsForAllCharacters(0, 25);
   };
 
-  const handleTestSaveLimited = async () => {
+  const handleTestSaveLessLimited = async () => {
     await getRunsForAllCharacters(0, 20);
+  };
+
+  const handleDeleteRuns = async () => {
+    const purgeResult = await purgeRuns(20);
+    console.log(purgeResult);
+  };
+
+  const handleDeleteChars = async () => {
+    const purgeResult = await purgeCharacters();
+    console.log(purgeResult);
+  };
+
+  const handleSaveTopRuns = async () => {
+    await testSaveTopAffixes();
   };
 
   return (
     <Box>
-      <Button onClick={handleTest}>Test Save </Button>
-      <Button onClick={handleTestSaveLimited}>Test Save Limited</Button>
+      <Button onClick={handleTestSaveLimited}>Test Save Runs 25+</Button>
+      <Button onClick={handleTestSaveLessLimited}>Test Save Runs 20+</Button>
+      <Button onClick={handleDeleteRuns}>Delete Runs</Button>
+      <Button onClick={handleDeleteChars}>Delete Characters</Button>
+      <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
       <DataOptionsSelector
         graphOptions={graphOptions}

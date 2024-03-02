@@ -22,14 +22,7 @@ export const testCreateRun = async () => {
     },
     keystone_run_id: 123456789,
     completed_at: new Date(),
-    weekly_modifiers: [
-      {
-        id: 10,
-        name: "fortified",
-        description: "description",
-        slug: "fortified",
-      },
-    ],
+    weekly_modifiers: ["fortified", "incorporeal", "sanguine"],
     mythic_level: 15,
     keystone_team_id: 123456789,
     roster: [

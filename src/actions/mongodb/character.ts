@@ -20,6 +20,7 @@ export const createCharacter = async (character: Character) => {
     .lean()
     .catch((e) => {
       console.error("Error creating character in database.");
+      console.log(e);
       throw e;
     });
 

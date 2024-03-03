@@ -1,35 +1,18 @@
 "use client";
 
-import { getRunsWithCharacter } from "@/actions/mongodb/run";
-
-import { getCharGraph, getDenseCharGraph } from "@/actions/mongodb/run_graphs";
-
 import dynamic from "next/dynamic";
 const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
   ssr: false,
 });
 
 import CharacterSelector from "@/components/CharacterSelector";
-import {
-  testAllRunsForCharacter,
-  testRunsForCharacter,
-  testSaveAllRunsForCharacter,
-  testSaveDungeonRunsForCharacter,
-  testSaveTopAffixes,
-} from "@/utils/testfuncs";
-import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
-import { Box, Button, List, Spinner } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { testSaveTopAffixes } from "@/utils/testfuncs";
+import { Character, CharacterGraph } from "@/utils/types";
+import { Box, Button, Spinner } from "@chakra-ui/react";
+import { useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
 import DataOptionsSelector from "@/components/DataOptionsSelector";
-import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
-import {
-  getFullRunsForCharacter,
-  saveAllRunsForCharacter,
-  saveRunsForCharacter,
-} from "@/actions/mongodb/data_collection/character_runs";
-import { DungeonIds } from "@/utils/consts";
 import {
   getRunsForAllCharacters,
   purgeCharacters,
@@ -52,11 +35,8 @@ export default function Home() {
       locale: "",
     },
   });
-  const [charGraph, setCharGraph] = useState<CharacterGraph>({
-    nodes: [],
-    links: [],
-  });
-  const [loading, setLoading] = useState(false);
+
+  const loadButtons = false;
 
   const [graphOptions, setGraphOptions] = useState({
     showLabels: false,
@@ -67,7 +47,6 @@ export default function Home() {
   });
 
   const handleCharSubmit = async (charInfo: Character) => {
-    setLoading(true);
     setMainChar(charInfo);
 
     const retrievedMainChar = await getCharacter(
@@ -77,30 +56,6 @@ export default function Home() {
     );
 
     console.log(retrievedMainChar);
-
-    let charGraph;
-    if (graphOptions.treeMode) {
-      console.log("tree mode");
-      charGraph = await getCharGraph(
-        retrievedMainChar,
-        graphOptions.degree,
-        graphOptions.runLimit,
-        [retrievedMainChar],
-      );
-    } else {
-      charGraph = await getDenseCharGraph(
-        retrievedMainChar,
-        graphOptions.degree,
-        graphOptions.runLimit,
-        [retrievedMainChar],
-      );
-    }
-
-    setCharGraph(charGraph);
-    console.log(charGraph);
-    console.log(graphOptions);
-
-    setLoading(false);
   };
 
   const handleTestSaveLimited = async () => {
@@ -127,11 +82,17 @@ export default function Home() {
 
   return (
     <Box>
-      <Button onClick={handleTestSaveLimited}>Test Save Runs 25+</Button>
-      <Button onClick={handleTestSaveLessLimited}>Test Save Runs 20+</Button>
-      <Button onClick={handleDeleteRuns}>Delete Runs</Button>
-      <Button onClick={handleDeleteChars}>Delete Characters</Button>
-      <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
+      {loadButtons && (
+        <Box>
+          <Button onClick={handleTestSaveLimited}>Test Save Runs 25+</Button>
+          <Button onClick={handleTestSaveLessLimited}>
+            Test Save Runs 20+
+          </Button>
+          <Button onClick={handleDeleteRuns}>Delete Runs</Button>
+          <Button onClick={handleDeleteChars}>Delete Characters</Button>
+          <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
+        </Box>
+      )}
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
       <DataOptionsSelector
         graphOptions={graphOptions}
@@ -142,13 +103,7 @@ export default function Home() {
         setGraphOptions={setGraphOptions}
       />
 
-      {loading && <Spinner />}
-
-      <CharForceGraph
-        mainChar={mainChar}
-        charGraph={charGraph}
-        graphOptions={graphOptions}
-      />
+      <CharForceGraph mainChar={mainChar} graphOptions={graphOptions} />
     </Box>
   );
 }

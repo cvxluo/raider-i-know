@@ -1,24 +1,51 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Spinner } from "@chakra-ui/react";
 
-import { slugCharacter } from "@/utils/funcs";
-import {
-  Character,
-  CharacterGraph,
-  CharacterNode,
-  GraphOptions,
-} from "@/utils/types";
+import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
 import { ForceGraph2D } from "react-force-graph";
-import { useRef } from "react";
+import { useEffect, useState } from "react";
+
+import { getCharGraph, getDenseCharGraph } from "@/actions/mongodb/run_graphs";
 
 const CharForceGraph = ({
   mainChar,
-  charGraph,
   graphOptions,
 }: {
   mainChar: Character;
-  charGraph: CharacterGraph;
   graphOptions: GraphOptions;
 }) => {
+  const [charGraph, setCharGraph] = useState<CharacterGraph>({
+    nodes: [],
+    links: [],
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    console.log(mainChar);
+    setLoading(true);
+
+    if (mainChar.name === "") {
+      return;
+    }
+
+    if (graphOptions.treeMode) {
+      console.log("tree mode");
+      getCharGraph(mainChar, graphOptions.degree, graphOptions.runLimit, [
+        mainChar,
+      ]).then((graph) => {
+        setCharGraph(graph);
+        setLoading(false);
+      });
+    } else {
+      getDenseCharGraph(mainChar, graphOptions.degree, graphOptions.runLimit, [
+        mainChar,
+      ]).then((graph) => {
+        setCharGraph(graph);
+        setLoading(false);
+      });
+    }
+  }, [mainChar]);
+
   const canvasObject = (node: any, ctx: CanvasRenderingContext2D) => {
     const label = node.name;
     const fontSize = 12;
@@ -39,6 +66,7 @@ const CharForceGraph = ({
 
   return (
     <Box>
+      {loading && <Spinner />}
       <ForceGraph2D
         graphData={{
           nodes: charGraph.nodes,
@@ -46,7 +74,6 @@ const CharForceGraph = ({
         }}
         nodeLabel={(node) => node.name}
         nodeVal={(node) => {
-          console.log(charGraph.nodes.map((char) => char.layer || 0));
           return (
             Math.max(...charGraph.nodes.map((char) => char.layer || 0)) -
             (charGraph.nodes.find((n) => n.id === node.id)?.layer || 1)

@@ -47,15 +47,11 @@ export default function Home() {
   });
 
   const handleCharSubmit = async (charInfo: Character) => {
-    setMainChar(charInfo);
-
-    const retrievedMainChar = await getCharacter(
-      charInfo.region.name,
-      charInfo.realm.name,
-      charInfo.name,
+    getCharacter(charInfo.region.name, charInfo.realm.name, charInfo.name).then(
+      (char) => {
+        setMainChar(char);
+      },
     );
-
-    console.log(retrievedMainChar);
   };
 
   const handleTestSaveLimited = async () => {

@@ -1,4 +1,17 @@
-import { Box, Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Spinner,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Text,
+} from "@chakra-ui/react";
 
 import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
 import { ForceGraph2D } from "react-force-graph";
@@ -13,6 +26,9 @@ const CharForceGraph = ({
   mainChar: Character;
   graphOptions: GraphOptions;
 }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedNode, setSelectedNode] = useState<Character | null>(null);
+
   const [charGraph, setCharGraph] = useState<CharacterGraph>({
     nodes: [],
     links: [],
@@ -22,11 +38,12 @@ const CharForceGraph = ({
 
   useEffect(() => {
     console.log(mainChar);
-    setLoading(true);
 
     if (mainChar.name === "") {
       return;
     }
+
+    setLoading(true);
 
     if (graphOptions.treeMode) {
       console.log("tree mode");
@@ -67,6 +84,7 @@ const CharForceGraph = ({
   return (
     <Box>
       {loading && <Spinner />}
+      <Button onClick={() => onOpen()}>Test modal</Button>
       <ForceGraph2D
         graphData={{
           nodes: charGraph.nodes,
@@ -86,7 +104,33 @@ const CharForceGraph = ({
         }}
         nodeCanvasObject={graphOptions.showLabels ? canvasObject : undefined}
         dagMode={dagMode}
+        onNodeClick={(node) => {
+          setSelectedNode(node);
+          onOpen();
+          console.log(node);
+          console.log(charGraph);
+        }}
       />
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            {selectedNode ? selectedNode.name : "Character not found"}
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>test</Text>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button variant="ghost">Secondary Action</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

@@ -132,6 +132,7 @@ export interface CharacterGraph {
   links: {
     source: number;
     target: number;
+    numRuns?: number;
   }[];
 }
 

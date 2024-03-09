@@ -17,7 +17,11 @@ import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
 import { ForceGraph2D } from "react-force-graph";
 import { useEffect, useState } from "react";
 
-import { getCharGraph, getDenseCharGraph } from "@/actions/mongodb/run_graphs";
+import {
+  appendNextLayer,
+  getCharGraph,
+  getDenseCharGraph,
+} from "@/actions/mongodb/run_graphs";
 
 const CharForceGraph = ({
   mainChar,

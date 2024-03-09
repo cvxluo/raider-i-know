@@ -31,8 +31,9 @@ export const summarizeRunDetails = (runDetails: RunRaw) => {
 
 export const countCharactersInRuns = (
   runs: Run[],
+  excludes: Character[] = [],
 ): {
-  [key: string]: number;
+  [key: number]: number;
 } => {
   const characters: {
     [key: number]: number;
@@ -54,6 +55,7 @@ export const countCharactersInRuns = (
   return characters;
 };
 
+// TODO: probably a mapping function that can do this faster
 export const getCharactersInRuns = (runs: Run[]) => {
   const characters: Character[] = [];
   runs.forEach((run) => {

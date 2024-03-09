@@ -1,4 +1,8 @@
-import { getLimitedChars } from "@/utils/funcs";
+import {
+  countCharactersInRuns,
+  getCharactersInRuns,
+  getLimitedChars,
+} from "@/utils/funcs";
 import { Character, CharacterGraph, Run } from "@/utils/types";
 
 import { getPopulatedRunsWithCharacter, getRunsWithCharacter } from "./run";
@@ -191,4 +195,46 @@ export const getGraphData = async (
   }
 
   return { characters, runs, layerChars };
+};
+
+// start from [[mainChar]]
+// add [[mainChar], [all adjacent chars]]
+export const appendNextLayer = async (
+  layers: Character[][],
+  linkCounts: { [key: number]: { [key: number]: number } },
+  runs: { [key: number]: Run[] },
+  degree = -1,
+  excludes: Character[] = [],
+) => {
+  const d = degree === -1 ? layers.length - 1 : degree;
+  const nextLayer: Character[] = [];
+  const previousCharacters = layers.flat();
+  layers[d].forEach((prevLayerChar) => {
+    linkCounts[prevLayerChar.id as number] = {};
+  });
+
+  for (let character of layers[d]) {
+    const charRuns = await getPopulatedRunsWithCharacter(character);
+    const newChars = getCharactersInRuns(charRuns);
+    const newCharCounts = countCharactersInRuns(charRuns, excludes);
+
+    runs[character.id as number] = charRuns;
+
+    nextLayer.push(
+      ...newChars.filter((char) => {
+        // TODO: consider lookup table? this might become expensive with enough characters
+        return (
+          previousCharacters.every((c) => c.id !== char.id) &&
+          nextLayer.every((c) => c.id !== char.id)
+        );
+      }),
+    );
+
+    Object.keys(newCharCounts).forEach((charId) => {
+      const count = newCharCounts[parseInt(charId)];
+      linkCounts[character.id as number][parseInt(charId)] = count;
+    });
+  }
+
+  layers.push(nextLayer);
 };

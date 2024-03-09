@@ -6,7 +6,7 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 });
 
 import CharacterSelector from "@/components/CharacterSelector";
-import { testSaveTopAffixes } from "@/utils/testfuncs";
+import { testAppendingLayer, testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character, CharacterGraph } from "@/utils/types";
 import { Box, Button, Spinner } from "@chakra-ui/react";
 import { useState } from "react";
@@ -76,6 +76,10 @@ export default function Home() {
     await testSaveTopAffixes();
   };
 
+  const handleTestLayers = async () => {
+    await testAppendingLayer(mainChar);
+  };
+
   return (
     <Box>
       {loadButtons && (
@@ -89,6 +93,7 @@ export default function Home() {
           <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
         </Box>
       )}
+      <Button onClick={handleTestLayers}>Test Layers</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
       <DataOptionsSelector
         graphOptions={graphOptions}

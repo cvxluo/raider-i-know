@@ -16,12 +16,15 @@ import {
 import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
 import { ForceGraph2D } from "react-force-graph";
 import { useEffect, useState } from "react";
+import { Run } from "@/utils/types";
 
 import {
   appendNextLayer,
   getCharGraph,
   getDenseCharGraph,
+  graphDataToForceGraph,
 } from "@/actions/mongodb/run_graphs";
+import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
 
 const CharForceGraph = ({
   mainChar,
@@ -33,6 +36,15 @@ const CharForceGraph = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedNode, setSelectedNode] = useState<Character | null>(null);
 
+  const [graphInfo, setGraphInfo] = useState<{
+    layers: Character[][];
+    linkCounts: { [key: number]: { [key: number]: number } };
+    runs: { [key: number]: Run[] };
+  }>({
+    layers: [],
+    linkCounts: {},
+    runs: {},
+  });
   const [charGraph, setCharGraph] = useState<CharacterGraph>({
     nodes: [],
     links: [],
@@ -49,6 +61,7 @@ const CharForceGraph = ({
 
     setLoading(true);
 
+    /*
     if (graphOptions.treeMode) {
       console.log("tree mode");
       getCharGraph(mainChar, graphOptions.degree, graphOptions.runLimit, [
@@ -65,7 +78,42 @@ const CharForceGraph = ({
         setLoading(false);
       });
     }
+    */
+
+    retrieveGraphData(mainChar).then(() => {
+      setLoading(false);
+    });
   }, [mainChar]);
+
+  const retrieveGraphData = async (char: Character) => {
+    const layers = [[char]];
+    const linkCounts: {
+      [key: number]: { [key: number]: number };
+    } = {};
+    linkCounts[char.id as number] = {};
+    const charId = char.id as number;
+    const runs: { [key: number]: Run[] } = {};
+    runs[charId] = await getPopulatedRunsWithCharacter(char);
+    for (let i = 0; i < graphOptions.degree; i++) {
+      await appendNextLayer(layers, linkCounts, runs);
+      // TODO: technically an antipattern, as the objects in state are not supposed to be mutable,
+      // and we are mutating them each time we appendNextLayer - maybe better approach is to use getNextLayer directly?
+      setGraphInfo({ layers, linkCounts, runs });
+    }
+  };
+
+  // get graph from info
+  useEffect(() => {
+    const graph = graphDataToForceGraph(
+      graphInfo.layers,
+      graphInfo.linkCounts,
+      graphInfo.runs,
+      !graphOptions.treeMode,
+      graphOptions.runLimit,
+      graphOptions.degree,
+    );
+    setCharGraph(graph);
+  }, [graphInfo, graphOptions]);
 
   const canvasObject = (node: any, ctx: CanvasRenderingContext2D) => {
     const label = node.name;
@@ -84,6 +132,8 @@ const CharForceGraph = ({
       ? "radialout"
       : "td"
     : undefined;
+
+  console.log(charGraph);
 
   return (
     <Box>

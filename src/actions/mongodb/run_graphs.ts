@@ -197,9 +197,9 @@ export const getGraphData = async (
   return { characters, runs, layerChars };
 };
 
-// start from [[mainChar]]
+// start from [[mainChar]], with all the runs of mainChar, and an empty mainChar link array
 // add [[mainChar], [all adjacent chars]]
-export const appendNextLayer = async (
+export const getNextLayer = async (
   layers: Character[][],
   linkCounts: { [key: number]: { [key: number]: number } },
   runs: { [key: number]: Run[] },
@@ -208,33 +208,140 @@ export const appendNextLayer = async (
 ) => {
   const d = degree === -1 ? layers.length - 1 : degree;
   const nextLayer: Character[] = [];
+  const nextLinks: { [key: number]: { [key: number]: number } } = {};
+  const nextRuns: { [key: number]: Run[] } = {};
   const previousCharacters = layers.flat();
-  layers[d].forEach((prevLayerChar) => {
-    linkCounts[prevLayerChar.id as number] = {};
-  });
 
   for (let character of layers[d]) {
-    const charRuns = await getPopulatedRunsWithCharacter(character);
-    const newChars = getCharactersInRuns(charRuns);
-    const newCharCounts = countCharactersInRuns(charRuns, excludes);
-
-    runs[character.id as number] = charRuns;
-
-    nextLayer.push(
-      ...newChars.filter((char) => {
-        // TODO: consider lookup table? this might become expensive with enough characters
-        return (
-          previousCharacters.every((c) => c.id !== char.id) &&
-          nextLayer.every((c) => c.id !== char.id)
-        );
-      }),
-    );
-
-    Object.keys(newCharCounts).forEach((charId) => {
-      const count = newCharCounts[parseInt(charId)];
-      linkCounts[character.id as number][parseInt(charId)] = count;
+    const charRuns = runs[character.id as number];
+    // const charRuns = await getPopulatedRunsWithCharacter(character);
+    const charCounts = countCharactersInRuns(charRuns, excludes);
+    const newChars = getCharactersInRuns(charRuns).filter((char) => {
+      // filter here to exclude characters already in the graph
+      // TODO: we limit the minimum number of runs to 15 since its the current minimum - but should be adjustable
+      return (
+        previousCharacters.every((c) => c.id !== char.id) &&
+        charCounts[char.id as number] >= 15 &&
+        char.id !== character.id
+      );
     });
+
+    nextLayer.push(...newChars);
+
+    // TODO: was concerned about rate limiting issues if using map, so we proceed sequentially
+    for (let newChar of newChars) {
+      const newCharRuns = await getPopulatedRunsWithCharacter(newChar);
+      nextRuns[newChar.id as number] = newCharRuns;
+
+      nextLinks[newChar.id as number] = {};
+      previousCharacters.push(newChar);
+
+      const newCharCounts = countCharactersInRuns(newCharRuns);
+      // TODO: countCharactersInRuns should be refactored to work with excludes
+      delete newCharCounts[newChar.id as number];
+
+      const connectionsInGraph = previousCharacters.filter(
+        (char) => newCharCounts[char.id as number] > 0,
+      );
+      // note we use bottom up links - higher degree node links to lower degree node
+      connectionsInGraph.forEach((char) => {
+        nextLinks[newChar.id as number][char.id as number] =
+          newCharCounts[char.id as number];
+      });
+    }
   }
 
-  layers.push(nextLayer);
+  return { nextLayer, nextLinks, nextRuns };
+};
+
+export const appendNextLayer = async (
+  layers: Character[][],
+  linkCounts: { [key: number]: { [key: number]: number } },
+  runs: { [key: number]: Run[] },
+  degree = -1,
+  excludes: Character[] = [],
+) => {
+  const nextLayerData = await getNextLayer(
+    layers,
+    linkCounts,
+    runs,
+    degree,
+    excludes,
+  );
+
+  layers.push(nextLayerData.nextLayer);
+  Object.keys(nextLayerData.nextLinks).forEach((source) => {
+    linkCounts[parseInt(source)] = nextLayerData.nextLinks[parseInt(source)];
+  });
+  Object.keys(nextLayerData.nextRuns).forEach((charId) => {
+    runs[parseInt(charId)] = nextLayerData.nextRuns[parseInt(charId)];
+  });
+};
+
+export const graphDataToForceGraph = (
+  layers: Character[][],
+  linkCounts: { [key: number]: { [key: number]: number } },
+  runs: { [key: number]: Run[] },
+  dense = false,
+  limit = 15,
+  degree = -1,
+) => {
+  const nodes = layers
+    .map((layer, i) => {
+      return layer.map((char) => {
+        return {
+          id: char.id as number,
+          name: char.name,
+          layer: i,
+        };
+      });
+    })
+    .flat();
+
+  let links: { source: number; target: number; numRuns?: number }[] = [];
+  if (dense) {
+    // TODO: doesn't account for limit
+    links = Object.keys(linkCounts)
+      .map((source) => {
+        return Object.keys(linkCounts[parseInt(source)]).map((target) => {
+          return {
+            source: parseInt(source),
+            target: parseInt(target),
+            numRuns: linkCounts[parseInt(source)][parseInt(target)],
+          };
+        });
+      })
+      .flat();
+  } else {
+    // to get the tree version, we prioritize high count nodes for each link
+    links = [];
+
+    // going bottom up - each node in a layer is connected to the highest count node in the layer above
+    for (let i = layers.length - 1; i > 0; i--) {
+      for (let source of layers[i]) {
+        const sourceId = source.id as number;
+        const targetLayer = layers[i - 1];
+        const sourceConnections = targetLayer.filter(
+          (target) => linkCounts[sourceId][target.id as number] > 0,
+        );
+        console.log(targetLayer);
+        console.log(sourceConnections);
+        console.log(linkCounts);
+        const target = sourceConnections.reduce((a, b) => {
+          return linkCounts[b.id as number][sourceId] >
+            linkCounts[a.id as number][sourceId]
+            ? b
+            : a;
+        });
+        links.push({
+          // TODO: slight misnaming, we want this to be true since we use radial out mode
+          target: sourceId,
+          source: target.id as number,
+          numRuns: linkCounts[target.id as number][sourceId],
+        });
+      }
+    }
+  }
+
+  return { nodes, links } as CharacterGraph;
 };

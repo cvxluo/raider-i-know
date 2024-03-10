@@ -3,7 +3,11 @@ import {
   saveTopDungeonRuns,
   saveTopRuns,
 } from "@/actions/mongodb/data_collection/top_runs";
-import { createRun, createRunFromID } from "@/actions/mongodb/run";
+import {
+  createRun,
+  createRunFromID,
+  getPopulatedRunsWithCharacter,
+} from "@/actions/mongodb/run";
 import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
 import { AffixSets, DungeonIds } from "./consts";
@@ -157,8 +161,21 @@ export const testSaveAllRunsForCharacter = async (characterId: number) => {
 
 export const testAppendingLayer = async (char: Character) => {
   const testLayers = [[char]];
-  const links = {};
-  const runs = {};
+  const mainCharRuns = await getPopulatedRunsWithCharacter(char);
+  const links: {
+    [key: number]: { [key: number]: number };
+  } = {};
+  links[char.id as number] = {};
+  const charId = char.id as number;
+  const runs: { [key: number]: Run[] } = {};
+  runs[charId] = mainCharRuns;
+  console.log("MAIN", mainCharRuns);
+  await appendNextLayer(testLayers, links, runs);
+
+  console.log(testLayers);
+  console.log(links);
+  console.log(runs);
+
   await appendNextLayer(testLayers, links, runs);
 
   console.log(testLayers);

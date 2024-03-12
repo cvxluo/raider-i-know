@@ -83,9 +83,25 @@ const CharForceGraph = ({
     retrieveGraphData(mainChar).then(() => {
       setLoading(false);
     });
-  }, [mainChar]);
+  }, [mainChar, graphOptions.degree]);
 
   const retrieveGraphData = async (char: Character) => {
+    // check if we already have all the graph data needed
+    if (graphOptions.degree < graphInfo.layers.length) {
+      return;
+    }
+    // if we do not have all the graph data, but already retrieved some, use that as a basis
+    if (graphInfo.layers.length !== 0) {
+      const layers = graphInfo.layers;
+      const linkCounts = graphInfo.linkCounts;
+      const runs = graphInfo.runs;
+      for (let i = graphInfo.layers.length; i <= graphOptions.degree; i++) {
+        await appendNextLayer(layers, linkCounts, runs);
+        setGraphInfo({ layers, linkCounts, runs });
+      }
+      return;
+    }
+    // otherwise, start from scratch
     const layers = [[char]];
     const linkCounts: {
       [key: number]: { [key: number]: number };

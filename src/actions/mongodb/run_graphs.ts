@@ -261,6 +261,7 @@ export const appendNextLayer = async (
   degree = -1,
   excludes: Character[] = [],
 ) => {
+  const d = degree === -1 ? layers.length - 1 : degree;
   const nextLayerData = await getNextLayer(
     layers,
     linkCounts,
@@ -286,7 +287,12 @@ export const graphDataToForceGraph = (
   limit = 15,
   degree = -1,
 ) => {
-  const nodes = layers
+  const d = degree === -1 ? layers.length - 1 : degree;
+  const degreeLayers = layers.slice(0, d + 1);
+  if (degreeLayers.length === 0) {
+    return { nodes: [], links: [] } as CharacterGraph;
+  }
+  const nodes = degreeLayers
     .map((layer, i) => {
       return layer.map((char) => {
         return {
@@ -311,37 +317,59 @@ export const graphDataToForceGraph = (
           };
         });
       })
-      .flat();
+      .flat()
+      .filter((link) => {
+        return (
+          nodes.some((node) => node.id === link.source) &&
+          nodes.some((node) => node.id === link.target && link.numRuns >= limit)
+        );
+      });
   } else {
     // to get the tree version, we prioritize high count nodes for each link
     links = [];
 
+    // reverse bfs-like solution - has issues with lingering components
+    // caused by us wanting highest count links, but bfs not guaranteeing that the highest count link is found first
     // going bottom up - each node in a layer is connected to the highest count node in the layer above
-    for (let i = layers.length - 1; i > 0; i--) {
-      for (let source of layers[i]) {
+    for (let i = degreeLayers.length - 1; i > 0; i--) {
+      for (let source of degreeLayers[i]) {
         const sourceId = source.id as number;
-        const targetLayer = layers[i - 1];
+        const targetLayer = degreeLayers[i - 1];
         const sourceConnections = targetLayer.filter(
           (target) => linkCounts[sourceId][target.id as number] > 0,
         );
-        console.log(targetLayer);
-        console.log(sourceConnections);
-        console.log(linkCounts);
         const target = sourceConnections.reduce((a, b) => {
           return linkCounts[b.id as number][sourceId] >
             linkCounts[a.id as number][sourceId]
             ? b
             : a;
         });
-        links.push({
-          // TODO: slight misnaming, we want this to be true since we use radial out mode
-          target: sourceId,
-          source: target.id as number,
-          numRuns: linkCounts[target.id as number][sourceId],
-        });
+
+        // note tree mode has different limit rules, since we want to show the highest count links
+        // we don't filter a link if a node it connects to has another link, as that would leave an orphaned component
+        // idea is that every link we find here is part of the tree - however, we can remove low count leaf nodes
+        // so, at every point, we can remove a low count leaf IF it is a leaf - no other links to it
+        if (
+          linkCounts[sourceId][target.id as number] >= limit ||
+          links.map((link) => link.source).includes(sourceId)
+        ) {
+          links.push({
+            // TODO: slight misnaming, we want this to be true since we use radial out mode
+            target: sourceId,
+            source: target.id as number,
+            numRuns: linkCounts[sourceId][target.id as number],
+          });
+        }
       }
     }
   }
 
-  return { nodes, links } as CharacterGraph;
+  // remove all nodes that are not connected to any links
+  const filteredNodes = nodes.filter((node) => {
+    return links.some(
+      (link) => link.source === node.id || link.target === node.id,
+    );
+  });
+
+  return { nodes: filteredNodes, links } as CharacterGraph;
 };

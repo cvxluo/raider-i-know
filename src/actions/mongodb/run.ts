@@ -226,6 +226,28 @@ export const getPopulatedRunsWithCharacter = async (
   return flattenedRuns;
 };
 
+export const getPopulatedRunsWithCharacters = async (
+  characters: Character[],
+): Promise<Run[]> => {
+  await mongoDB();
+
+  const retrievedCharacters = await CharacterModel.find({
+    "region.name": { $in: characters.map((char) => char.region.name) },
+    "realm.name": { $in: characters.map((char) => char.realm.name) },
+    name: { $in: characters.map((char) => char.name) },
+  }).lean();
+
+  const retrievedRuns = await RunModel.find({
+    roster: { $in: retrievedCharacters.map((char) => char._id) },
+  })
+    .populate("roster")
+    .lean();
+
+  const flattenedRuns = JSON.parse(JSON.stringify(retrievedRuns));
+
+  return flattenedRuns;
+};
+
 export const getAllRuns = async () => {
   await mongoDB();
 

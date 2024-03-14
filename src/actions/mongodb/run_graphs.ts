@@ -5,7 +5,11 @@ import {
 } from "@/utils/funcs";
 import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
 
-import { getPopulatedRunsWithCharacter, getRunsWithCharacter } from "./run";
+import {
+  getPopulatedRunsWithCharacter,
+  getPopulatedRunsWithCharacters,
+  getRunsWithCharacter,
+} from "./run";
 import next from "next";
 import { ClassColors } from "@/utils/consts";
 
@@ -217,6 +221,7 @@ export const getNextLayer = async (
   const previousCharacters = layers.flat();
 
   for (let character of layers[d]) {
+    // TODO: consider greater parallellization here by getting all the populated runs for all characters at once
     const charRuns = runs[character.id as number];
     // const charRuns = await getPopulatedRunsWithCharacter(character);
     const charCounts = countCharactersInRuns(charRuns, excludes);
@@ -234,33 +239,36 @@ export const getNextLayer = async (
     previousCharacters.push(...newChars);
 
     // TODO: concerned about rate limiting issues if using map
-    await Promise.all(
-      newChars.map(async (newChar) => {
-        const newCharRuns = await getPopulatedRunsWithCharacter(newChar);
-        nextRuns[newChar.id as number] = newCharRuns;
+    const allNewCharRuns = await getPopulatedRunsWithCharacters(newChars);
 
-        nextLinks[newChar.id as number] = {};
+    newChars.forEach((newChar) => {
+      const newCharRuns = allNewCharRuns.filter((run) =>
+        run.roster.map((char) => char.id).includes(newChar.id as number),
+      );
 
-        const newCharCounts = countCharactersInRuns(newCharRuns);
-        // TODO: countCharactersInRuns should be refactored to work with excludes
-        delete newCharCounts[newChar.id as number];
+      nextRuns[newChar.id as number] = newCharRuns;
 
-        const connectionsInGraph = previousCharacters.filter(
-          (char) => newCharCounts[char.id as number] > 0,
-        );
-        // note we use two way links
-        connectionsInGraph.forEach((char) => {
-          nextLinks[newChar.id as number][char.id as number] =
-            newCharCounts[char.id as number];
+      nextLinks[newChar.id as number] = {};
 
-          if (!nextLinks[char.id as number]) {
-            nextLinks[char.id as number] = {};
-          }
-          nextLinks[char.id as number][newChar.id as number] =
-            newCharCounts[char.id as number];
-        });
-      }),
-    );
+      const newCharCounts = countCharactersInRuns(newCharRuns);
+      // TODO: countCharactersInRuns should be refactored to work with excludes
+      delete newCharCounts[newChar.id as number];
+
+      const connectionsInGraph = previousCharacters.filter(
+        (char) => newCharCounts[char.id as number] > 0,
+      );
+      // note we use two way links
+      connectionsInGraph.forEach((char) => {
+        nextLinks[newChar.id as number][char.id as number] =
+          newCharCounts[char.id as number];
+
+        if (!nextLinks[char.id as number]) {
+          nextLinks[char.id as number] = {};
+        }
+        nextLinks[char.id as number][newChar.id as number] =
+          newCharCounts[char.id as number];
+      });
+    });
   }
 
   return { nextLayer, nextLinks, nextRuns };

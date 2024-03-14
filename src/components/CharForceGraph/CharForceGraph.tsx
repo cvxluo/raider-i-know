@@ -233,7 +233,7 @@ const CharForceGraph = ({
                   })
                 }
               </UnorderedList>
-              <Text as="b">Most Frequent Dungeons Runs:</Text>
+              <Text as="b"># Runs Per Dungeon:</Text>
               <br />
               <UnorderedList>
                 {

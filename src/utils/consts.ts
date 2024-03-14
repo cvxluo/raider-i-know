@@ -293,6 +293,17 @@ export const DungeonIds: number[] = [
   9424, // waycrest
 ];
 
+export const DungeonIdToName: { [key: number]: string } = {
+  9028: "Atal'Dazar",
+  7805: "Black Rook Hold",
+  1000010: "Galakrond's Fall",
+  1000011: "Murozond's Rise",
+  7673: "Darkheart Thicket",
+  7109: "Everbloom",
+  4738: "Throne of the Tides",
+  9424: "Waycrest Manor",
+};
+
 export const AffixSets: string[][] = [
   ["Fortified", "Incorporeal", "Sanguine"],
   ["Tyrannical", "Entangling", "Bursting"],
@@ -305,3 +316,19 @@ export const AffixSets: string[][] = [
   ["Fortified", "Storming", "Bursting"],
   ["Tyrannical", "Afflicted", "Bolstering"],
 ];
+
+export const ClassColors: { [key: string]: string } = {
+  "Death Knight": "#C41F3B",
+  "Demon Hunter": "#A330C9",
+  Druid: "#FF7D0A",
+  Hunter: "#ABD473",
+  Mage: "#40C7EB",
+  Monk: "#00FF96",
+  Paladin: "#F58CBA",
+  // "Priest": "#FFFFFF",
+  Priest: "#808080",
+  Rogue: "#FFF569",
+  Shaman: "#0070DE",
+  Warlock: "#8787ED",
+  Warrior: "#C79C6E",
+};

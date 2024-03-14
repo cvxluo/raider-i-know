@@ -8,7 +8,7 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 import CharacterSelector from "@/components/CharacterSelector";
 import { testAppendingLayer, testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character, CharacterGraph } from "@/utils/types";
-import { Box, Button, Spinner } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Button, Spinner } from "@chakra-ui/react";
 import { useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
@@ -46,10 +46,18 @@ export default function Home() {
     radialMode: true,
   });
 
+  const [charError, setCharError] = useState(false);
+
   const handleCharSubmit = async (charInfo: Character) => {
     getCharacter(charInfo.region.name, charInfo.realm.name, charInfo.name).then(
       (char) => {
-        setMainChar(char);
+        if (char === null) {
+          setCharError(true);
+          return;
+        } else {
+          setMainChar(char);
+          setCharError(false);
+        }
       },
     );
   };
@@ -76,10 +84,6 @@ export default function Home() {
     await testSaveTopAffixes();
   };
 
-  const handleTestLayers = async () => {
-    await testAppendingLayer(mainChar);
-  };
-
   return (
     <Box>
       {loadButtons && (
@@ -93,8 +97,13 @@ export default function Home() {
           <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
         </Box>
       )}
-      <Button onClick={handleTestLayers}>Test Layers</Button>
       <CharacterSelector handleCharSubmit={handleCharSubmit} />
+      {charError && (
+        <Alert status="error">
+          <AlertIcon />
+          Character not found
+        </Alert>
+      )}
       <DataOptionsSelector
         graphOptions={graphOptions}
         setGraphOptions={setGraphOptions}

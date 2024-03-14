@@ -92,7 +92,6 @@ const DataOptionsSelector = ({
             }}
           />
         </HStack>
-        <FormHelperText>Requires a reload to take effect</FormHelperText>
       </FormControl>
     </Box>
   );

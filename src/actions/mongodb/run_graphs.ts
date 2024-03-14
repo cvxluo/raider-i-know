@@ -227,28 +227,30 @@ export const getNextLayer = async (
     });
 
     nextLayer.push(...newChars);
+    previousCharacters.push(...newChars);
 
-    // TODO: was concerned about rate limiting issues if using map, so we proceed sequentially
-    for (let newChar of newChars) {
-      const newCharRuns = await getPopulatedRunsWithCharacter(newChar);
-      nextRuns[newChar.id as number] = newCharRuns;
+    // TODO: concerned about rate limiting issues if using map
+    await Promise.all(
+      newChars.map(async (newChar) => {
+        const newCharRuns = await getPopulatedRunsWithCharacter(newChar);
+        nextRuns[newChar.id as number] = newCharRuns;
 
-      nextLinks[newChar.id as number] = {};
-      previousCharacters.push(newChar);
+        nextLinks[newChar.id as number] = {};
 
-      const newCharCounts = countCharactersInRuns(newCharRuns);
-      // TODO: countCharactersInRuns should be refactored to work with excludes
-      delete newCharCounts[newChar.id as number];
+        const newCharCounts = countCharactersInRuns(newCharRuns);
+        // TODO: countCharactersInRuns should be refactored to work with excludes
+        delete newCharCounts[newChar.id as number];
 
-      const connectionsInGraph = previousCharacters.filter(
-        (char) => newCharCounts[char.id as number] > 0,
-      );
-      // note we use bottom up links - higher degree node links to lower degree node
-      connectionsInGraph.forEach((char) => {
-        nextLinks[newChar.id as number][char.id as number] =
-          newCharCounts[char.id as number];
-      });
-    }
+        const connectionsInGraph = previousCharacters.filter(
+          (char) => newCharCounts[char.id as number] > 0,
+        );
+        // note we use bottom up links - higher degree node links to lower degree node
+        connectionsInGraph.forEach((char) => {
+          nextLinks[newChar.id as number][char.id as number] =
+            newCharCounts[char.id as number];
+        });
+      }),
+    );
   }
 
   return { nextLayer, nextLinks, nextRuns };

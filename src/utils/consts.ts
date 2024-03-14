@@ -293,6 +293,17 @@ export const DungeonIds: number[] = [
   9424, // waycrest
 ];
 
+export const DungeonIdToName: { [key: number]: string } = {
+  9028: "Atal'Dazar",
+  7805: "Black Rook Hold",
+  1000010: "Galakrond's Fall",
+  1000011: "Murozond's Rise",
+  7673: "Darkheart Thicket",
+  7109: "Everbloom",
+  4738: "Throne of the Tides",
+  9424: "Waycrest Manor",
+};
+
 export const AffixSets: string[][] = [
   ["Fortified", "Incorporeal", "Sanguine"],
   ["Tyrannical", "Entangling", "Bursting"],

@@ -11,6 +11,9 @@ import {
   ModalFooter,
   Button,
   Text,
+  List,
+  ListItem,
+  UnorderedList,
 } from "@chakra-ui/react";
 
 import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
@@ -25,6 +28,7 @@ import {
   graphDataToForceGraph,
 } from "@/actions/mongodb/run_graphs";
 import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
+import { DungeonIdToName, DungeonIds } from "@/utils/consts";
 
 const CharForceGraph = ({
   mainChar,
@@ -87,11 +91,17 @@ const CharForceGraph = ({
 
   const retrieveGraphData = async (char: Character) => {
     // check if we already have all the graph data needed
-    if (graphOptions.degree < graphInfo.layers.length) {
+    if (
+      graphOptions.degree < graphInfo.layers.length &&
+      graphInfo.layers[0][0].id === char.id
+    ) {
       return;
     }
     // if we do not have all the graph data, but already retrieved some, use that as a basis
-    if (graphInfo.layers.length !== 0) {
+    if (
+      graphInfo.layers.length !== 0 &&
+      graphInfo.layers[0][0].id === char.id
+    ) {
       const layers = graphInfo.layers;
       const linkCounts = graphInfo.linkCounts;
       const runs = graphInfo.runs;
@@ -154,7 +164,6 @@ const CharForceGraph = ({
   return (
     <Box>
       {loading && <Spinner />}
-      <Button onClick={() => onOpen()}>Test modal</Button>
       <ForceGraph2D
         graphData={{
           nodes: charGraph.nodes,
@@ -189,9 +198,31 @@ const CharForceGraph = ({
             {selectedNode ? selectedNode.name : "Character not found"}
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
-            <Text>test</Text>
-          </ModalBody>
+          {selectedNode && graphInfo.runs && (
+            <ModalBody>
+              <Text>
+                Number of runs in database:{" "}
+                {graphInfo.runs[selectedNode.id as number].length}
+              </Text>
+              <UnorderedList>
+                {
+                  // shows how many runs for each dungeon
+                  DungeonIds.map((dungeonId) => {
+                    return (
+                      <ListItem key={dungeonId}>
+                        {DungeonIdToName[dungeonId]}:{" "}
+                        {
+                          graphInfo.runs[selectedNode.id as number].filter(
+                            (run) => run.dungeon.id === dungeonId,
+                          ).length
+                        }
+                      </ListItem>
+                    );
+                  })
+                }
+              </UnorderedList>
+            </ModalBody>
+          )}
 
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>

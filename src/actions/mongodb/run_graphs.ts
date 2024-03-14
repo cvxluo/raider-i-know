@@ -3,9 +3,11 @@ import {
   getCharactersInRuns,
   getLimitedChars,
 } from "@/utils/funcs";
-import { Character, CharacterGraph, Run } from "@/utils/types";
+import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
 
 import { getPopulatedRunsWithCharacter, getRunsWithCharacter } from "./run";
+import next from "next";
+import { ClassColors } from "@/utils/consts";
 
 /*
    returns 
@@ -208,7 +210,9 @@ export const getNextLayer = async (
 ) => {
   const d = degree === -1 ? layers.length - 1 : degree;
   const nextLayer: Character[] = [];
-  const nextLinks: { [key: number]: { [key: number]: number } } = {};
+  const nextLinks: { [key: number]: { [key: number]: number } } = {
+    ...linkCounts,
+  };
   const nextRuns: { [key: number]: Run[] } = {};
   const previousCharacters = layers.flat();
 
@@ -244,9 +248,15 @@ export const getNextLayer = async (
         const connectionsInGraph = previousCharacters.filter(
           (char) => newCharCounts[char.id as number] > 0,
         );
-        // note we use bottom up links - higher degree node links to lower degree node
+        // note we use two way links
         connectionsInGraph.forEach((char) => {
           nextLinks[newChar.id as number][char.id as number] =
+            newCharCounts[char.id as number];
+
+          if (!nextLinks[char.id as number]) {
+            nextLinks[char.id as number] = {};
+          }
+          nextLinks[char.id as number][newChar.id as number] =
             newCharCounts[char.id as number];
         });
       }),
@@ -301,14 +311,16 @@ export const graphDataToForceGraph = (
           id: char.id as number,
           name: char.name,
           layer: i,
+          nodeColor: char.class ? ClassColors[char.class.name] : "blue",
         };
       });
     })
-    .flat();
+    .flat() as CharacterNode[];
+
+  nodes[0]["nodeColor"] = "red";
 
   let links: { source: number; target: number; numRuns?: number }[] = [];
   if (dense) {
-    // TODO: doesn't account for limit
     links = Object.keys(linkCounts)
       .map((source) => {
         return Object.keys(linkCounts[parseInt(source)]).map((target) => {

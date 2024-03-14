@@ -160,6 +160,25 @@ const CharForceGraph = ({
     : undefined;
 
   console.log(charGraph);
+  /*
+  backgroundColor="#101020"
+  linkColor={() => 'rgba(255,255,255,0.2)'}
+  linkDirectionalParticles={2}
+  linkDirectionalParticleWidth={2}
+  */
+
+  const mostPlayedWith = (char: Character, n = 5) => {
+    const linkCounts = graphInfo.linkCounts[char.id as number];
+    if (!linkCounts) {
+      return [];
+    }
+    return Object.entries(linkCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, n)
+      .map(([id, count]) => {
+        return graphInfo.layers.flat().find((c) => c.id === parseInt(id))?.name;
+      });
+  };
 
   return (
     <Box>
@@ -184,10 +203,9 @@ const CharForceGraph = ({
         nodeCanvasObject={graphOptions.showLabels ? canvasObject : undefined}
         dagMode={dagMode}
         onNodeClick={(node) => {
+          // TODO: consider using onNodeHover to prevent graph moving on click
           setSelectedNode(node);
           onOpen();
-          console.log(node);
-          console.log(charGraph);
         }}
       />
 
@@ -200,10 +218,23 @@ const CharForceGraph = ({
           <ModalCloseButton />
           {selectedNode && graphInfo.runs && (
             <ModalBody>
-              <Text>
+              <Text as="b">
                 Number of runs in database:{" "}
                 {graphInfo.runs[selectedNode.id as number].length}
               </Text>
+              <br />
+              <Text as="b">Most Frequently Played With:</Text>
+              <br />
+              <UnorderedList>
+                {
+                  // shows most played with characters
+                  mostPlayedWith(selectedNode as Character).map((char) => {
+                    return <ListItem key={char}>{char}</ListItem>;
+                  })
+                }
+              </UnorderedList>
+              <Text as="b">Most Frequent Dungeons Runs:</Text>
+              <br />
               <UnorderedList>
                 {
                   // shows how many runs for each dungeon

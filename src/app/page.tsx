@@ -18,6 +18,7 @@ import {
   purgeCharacters,
   purgeRuns,
 } from "@/actions/mongodb/data_collection/character_trawling";
+import NavBar from "@/components/NavBar";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -86,6 +87,7 @@ export default function Home() {
 
   return (
     <Box>
+      <NavBar />
       {loadButtons && (
         <Box>
           <Button onClick={handleTestSaveLimited}>Test Save Runs 25+</Button>

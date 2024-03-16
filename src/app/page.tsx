@@ -87,7 +87,6 @@ export default function Home() {
 
   return (
     <Box>
-      <NavBar />
       {loadButtons && (
         <Box>
           <Button onClick={handleTestSaveLimited}>Test Save Runs 25+</Button>

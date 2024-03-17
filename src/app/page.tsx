@@ -18,7 +18,11 @@ import {
   purgeCharacters,
   purgeRuns,
 } from "@/actions/mongodb/data_collection/character_trawling";
-import NavBar from "@/components/NavBar";
+import { getClassCounts } from "@/actions/mongodb/aggregations/character_stats";
+import {
+  getDungeonCounts,
+  getRunLevels,
+} from "@/actions/mongodb/aggregations/run_stats";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -37,7 +41,7 @@ export default function Home() {
     },
   });
 
-  const loadButtons = false;
+  const loadButtons = true;
 
   const [graphOptions, setGraphOptions] = useState({
     showLabels: false,
@@ -85,10 +89,16 @@ export default function Home() {
     await testSaveTopAffixes();
   };
 
+  const test = async () => {
+    const result = await getRunLevels();
+    console.log(result);
+  };
+
   return (
     <Box>
       {loadButtons && (
         <Box>
+          <Button onClick={test}>Test</Button>
           <Button onClick={handleTestSaveLimited}>Test Save Runs 25+</Button>
           <Button onClick={handleTestSaveLessLimited}>
             Test Save Runs 20+

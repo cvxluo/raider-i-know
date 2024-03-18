@@ -1,6 +1,7 @@
 "use server";
 
 import mongodb from "@/actions/mongodb/mongodb";
+import CharacterModel from "@/models/Character";
 import RunModel from "@/models/Run";
 
 export const getDungeonCounts: {
@@ -82,6 +83,30 @@ export const getRunCountByWeek = async () => {
       $sort: {
         _id: 1,
       },
+    },
+  ]);
+
+  return result;
+};
+
+export const getCharacterClassCount = async () => {
+  await mongodb();
+
+  const result = RunModel.aggregate([
+    {
+      $sortByCount: "$character.class",
+    },
+  ]);
+
+  return result;
+};
+
+export const getCharacterServerCount = async () => {
+  await mongodb();
+
+  const result = CharacterModel.aggregate([
+    {
+      $sortByCount: "$realm.name",
     },
   ]);
 

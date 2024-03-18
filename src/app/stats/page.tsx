@@ -1,13 +1,17 @@
 "use client";
 
-import { Box, Text, Flex } from "@chakra-ui/react";
-import Chart from "react-apexcharts";
+import { Box, Text, Flex, Grid } from "@chakra-ui/react";
+import dynamic from "next/dynamic";
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 import { useEffect, useState } from "react";
 import {
   getDungeonCounts,
   getRunLevels,
   getRunCountByWeek,
+  getCharacterServerCount,
 } from "@/actions/mongodb/aggregations/run_stats";
+import { getClassCounts } from "@/actions/mongodb/aggregations/character_stats";
+import { ClassColors } from "@/utils/consts";
 
 const DungeonCountChart = () => {
   const [dungeonCountData, setDungeonCountData] = useState<
@@ -40,7 +44,6 @@ const DungeonCountChart = () => {
         },
       ]}
       type="bar"
-      width="500"
     />
   );
 };
@@ -75,12 +78,11 @@ const RunLevelChart = () => {
         },
       ]}
       type="bar"
-      width="500"
     />
   );
 };
 
-const RunCountByWeek = () => {
+const RunCountByWeekChart = () => {
   const [runCountByWeek, setRunCountByWeek] = useState<
     {
       _id: Date;
@@ -113,7 +115,87 @@ const RunCountByWeek = () => {
         },
       ]}
       type="bar"
-      width="500"
+    />
+  );
+};
+
+const CharacterClassCountChart = () => {
+  const [classCounts, setClassCounts] = useState<
+    {
+      _id: string;
+      count: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    getClassCounts().then((data) => {
+      setClassCounts(data);
+    });
+  }, []);
+
+  const classColorMapping = classCounts.map((charClass) => {
+    return ClassColors[charClass._id];
+  });
+
+  return (
+    <Chart
+      options={{
+        chart: {
+          type: "bar",
+        },
+        xaxis: {
+          categories: classCounts.map((charClass) => charClass._id),
+        },
+        colors: classColorMapping,
+        plotOptions: {
+          bar: {
+            horizontal: true,
+            distributed: true,
+          },
+        },
+      }}
+      series={[
+        {
+          name: "Classes",
+          data: classCounts.map((charClass) => charClass.count),
+        },
+      ]}
+      type="bar"
+    />
+  );
+};
+
+const CharacterServerCountChart = () => {
+  const [serverCounts, setServerCounts] = useState<
+    {
+      _id: string;
+      count: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    getCharacterServerCount().then((data) => {
+      setServerCounts(data);
+    });
+  }, []);
+
+  return (
+    <Chart
+      options={{
+        chart: {
+          type: "bar",
+        },
+        xaxis: {
+          categories: serverCounts.map((server) => server._id),
+        },
+      }}
+      series={[
+        {
+          name: "Servers",
+          data: serverCounts.map((server) => server.count),
+        },
+      ]}
+      type="bar"
     />
   );
 };
@@ -121,11 +203,13 @@ const RunCountByWeek = () => {
 // TODO: consider SSR for this page
 const StatsPage = () => {
   return (
-    <Flex>
+    <Grid templateColumns="repeat(2, 1fr)" gap={10} p={10}>
       <DungeonCountChart />
       <RunLevelChart />
-      <RunCountByWeek />
-    </Flex>
+      <RunCountByWeekChart />
+      <CharacterClassCountChart />
+      <CharacterServerCountChart />
+    </Grid>
   );
 };
 

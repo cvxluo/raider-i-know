@@ -44,6 +44,8 @@ const DungeonCountChart = () => {
         },
       ]}
       type="bar"
+      width={"100%"}
+      height={400}
     />
   );
 };
@@ -78,6 +80,8 @@ const RunLevelChart = () => {
         },
       ]}
       type="bar"
+      width={"100%"}
+      height={400}
     />
   );
 };
@@ -115,6 +119,8 @@ const RunCountByWeekChart = () => {
         },
       ]}
       type="bar"
+      width={"100%"}
+      height={400}
     />
   );
 };
@@ -161,6 +167,8 @@ const CharacterClassCountChart = () => {
         },
       ]}
       type="bar"
+      width={"100%"}
+      height={400}
     />
   );
 };
@@ -196,6 +204,8 @@ const CharacterServerCountChart = () => {
         },
       ]}
       type="bar"
+      width={"100%"}
+      height={400}
     />
   );
 };

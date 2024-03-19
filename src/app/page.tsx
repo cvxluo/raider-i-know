@@ -8,7 +8,7 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 import CharacterSelector from "@/components/CharacterSelector";
 import { testAppendingLayer, testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character, CharacterGraph } from "@/utils/types";
-import { Alert, AlertIcon, Box, Button, Spinner } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Button, Flex } from "@chakra-ui/react";
 import { useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
@@ -41,7 +41,7 @@ export default function Home() {
     },
   });
 
-  const loadButtons = true;
+  const loadButtons = false;
 
   const [graphOptions, setGraphOptions] = useState({
     showLabels: false,
@@ -108,22 +108,27 @@ export default function Home() {
           <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
         </Box>
       )}
-      <CharacterSelector handleCharSubmit={handleCharSubmit} />
-      {charError && (
-        <Alert status="error">
-          <AlertIcon />
-          Character not found
-        </Alert>
-      )}
-      <DataOptionsSelector
-        graphOptions={graphOptions}
-        setGraphOptions={setGraphOptions}
-      />
-      <GraphOptionsSelector
-        graphOptions={graphOptions}
-        setGraphOptions={setGraphOptions}
-      />
+      <Box maxW="6xl" mx="auto" py={4}>
+        <CharacterSelector handleCharSubmit={handleCharSubmit} />
+        {charError && (
+          <Alert status="error">
+            <AlertIcon />
+            Character not found
+          </Alert>
+        )}
+        <br />
 
+        <DataOptionsSelector
+          graphOptions={graphOptions}
+          setGraphOptions={setGraphOptions}
+        />
+        <br />
+
+        <GraphOptionsSelector
+          graphOptions={graphOptions}
+          setGraphOptions={setGraphOptions}
+        />
+      </Box>
       <CharForceGraph mainChar={mainChar} graphOptions={graphOptions} />
     </Box>
   );

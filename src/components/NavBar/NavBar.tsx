@@ -10,8 +10,8 @@ const Links = [
 const NavLink = ({ text, href }: { text: string; href: string }) => {
   return (
     <Link href={href}>
-      <Box _hover={{ bg: "gray.300" }} rounded={"md"}>
-        <Text fontSize="xl" fontWeight="md" color="black" p={2} pt={3}>
+      <Box _hover={{ bg: "gray.300" }} rounded={"md"} ml={2}>
+        <Text fontSize="xl" fontWeight="md" color="black" p={1}>
           {text}
         </Text>
       </Box>
@@ -28,8 +28,8 @@ const NavBar = () => {
       alignItems="center"
       p={1}
     >
-      <Flex>
-        <Text fontSize="2xl" fontWeight="bold" color="black" p={2}>
+      <Flex p={2}>
+        <Text fontSize="2xl" fontWeight="bold" color="black" pl={2} pr={2}>
           Raider I Know
         </Text>
         {Links.map((link) => (

@@ -207,6 +207,7 @@ const CharForceGraph = ({
           setSelectedNode(node);
           onOpen();
         }}
+        height={window.innerHeight * 0.6}
       />
 
       <Modal isOpen={isOpen} onClose={onClose}>

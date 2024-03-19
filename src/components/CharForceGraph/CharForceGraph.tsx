@@ -65,25 +65,6 @@ const CharForceGraph = ({
 
     setLoading(true);
 
-    /*
-    if (graphOptions.treeMode) {
-      console.log("tree mode");
-      getCharGraph(mainChar, graphOptions.degree, graphOptions.runLimit, [
-        mainChar,
-      ]).then((graph) => {
-        setCharGraph(graph);
-        setLoading(false);
-      });
-    } else {
-      getDenseCharGraph(mainChar, graphOptions.degree, graphOptions.runLimit, [
-        mainChar,
-      ]).then((graph) => {
-        setCharGraph(graph);
-        setLoading(false);
-      });
-    }
-    */
-
     retrieveGraphData(mainChar).then(() => {
       setLoading(false);
     });
@@ -181,7 +162,13 @@ const CharForceGraph = ({
   };
 
   return (
-    <Box>
+    <Box
+      w="100%"
+      h="100%"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+    >
       {loading && <Spinner />}
       <ForceGraph2D
         graphData={{

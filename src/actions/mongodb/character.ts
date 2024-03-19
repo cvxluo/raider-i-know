@@ -85,6 +85,18 @@ export const getCharacter = async (
   return flattenedCharacter;
 };
 
+export const getCharacterByRIOID = async (id: number) => {
+  await mongoDB();
+
+  const character = await CharacterModel.findOne({
+    id,
+  }).lean();
+
+  const flattenedCharacter = JSON.parse(JSON.stringify(character));
+
+  return flattenedCharacter;
+};
+
 export const getAllCharacters = async () => {
   await mongoDB();
 

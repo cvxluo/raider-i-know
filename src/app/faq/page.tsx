@@ -18,9 +18,9 @@ const FAQPage = () => {
         </Heading>
         <Text>
           Because of storage limitations, only top (usually 25+) runs from the
-          season are tracked. Unfortunately, I can&apos;t guarentee that a
-          particular run or character will show up, but if you believe some bug
-          or error is occuring, do reach out.
+          season are tracked. Additionally, server transfers or name changes may
+          affect the your runs. If you believe some bug or error is occuring,
+          contact me at vexvex on Discord.
         </Text>
         <br />
 

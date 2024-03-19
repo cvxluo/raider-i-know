@@ -8,7 +8,14 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 import CharacterSelector from "@/components/CharacterSelector";
 import { testAppendingLayer, testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character, CharacterGraph } from "@/utils/types";
-import { Alert, AlertIcon, Box, Button, Flex } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  Flex,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
@@ -23,6 +30,8 @@ import {
   getDungeonCounts,
   getRunLevels,
 } from "@/actions/mongodb/aggregations/run_stats";
+import { QuestionIcon } from "@chakra-ui/icons";
+import Link from "next/link";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -113,7 +122,11 @@ export default function Home() {
         {charError && (
           <Alert status="error">
             <AlertIcon />
-            Character not found
+
+            <AlertTitle>Character not found</AlertTitle>
+            <Link href="/faq">
+              <QuestionIcon />
+            </Link>
           </Alert>
         )}
         <br />

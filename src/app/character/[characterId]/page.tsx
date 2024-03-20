@@ -1,63 +1,20 @@
 "use client";
-import { getCharacter, getCharacterByRIOID } from "@/actions/mongodb/character";
+import { getCharacterByRIOID } from "@/actions/mongodb/character";
 import { getRunsWithCharacter } from "@/actions/mongodb/run";
-import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
-import { Character, Run, RunReducedRoster } from "@/utils/types";
+import { Character, RunReducedRoster } from "@/utils/types";
 // note that since this page uses apex charts, this can't be a server component
 
-import { Link, Skeleton, Spacer } from "@chakra-ui/react";
+import { Skeleton } from "@chakra-ui/react";
 import { Box, Heading, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-import dynamic from "next/dynamic";
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
-
-const DungeonCountChart = ({ runs }: { runs: RunReducedRoster[] }) => {
-  const dungeonNames = runs.reduce((acc, run) => {
-    if (!acc.includes(run.dungeon.name)) {
-      acc.push(run.dungeon.name);
-    }
-    return acc;
-  }, [] as string[]);
-
-  const dungeonCountData = runs.reduce(
-    (acc, run) => {
-      acc[run.dungeon.name] = acc[run.dungeon.name]
-        ? acc[run.dungeon.name] + 1
-        : 1;
-      return acc;
-    },
-    {} as { [key: string]: number },
-  );
-
-  return (
-    <Chart
-      options={{
-        chart: {
-          type: "bar",
-        },
-        xaxis: {
-          categories: dungeonNames,
-        },
-      }}
-      series={[
-        {
-          name: "Dungeons",
-          data: dungeonNames.map((name) => dungeonCountData[name]),
-        },
-      ]}
-      type="bar"
-      width={"100%"}
-      height={400}
-    />
-  );
-};
+import DungeonCountChart from "@/components/CharacterInfoGraphs/DungeonCountChart";
 
 const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
   const characterId = params.characterId;
   const [character, setCharacter] = useState<Character | null>(null);
-  const [characterRuns, setCharacterRuns] = useState<RunReducedRoster[] | null>(
-    null,
+  const [characterRuns, setCharacterRuns] = useState<RunReducedRoster[] | []>(
+    [],
   );
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
@@ -84,7 +41,7 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
       <Heading>
         {character ? character.name : <Skeleton>Loading</Skeleton>}
       </Heading>
-      <Heading size="md">{characterId}</Heading>
+      <Heading size="md">ID: {characterId}</Heading>
       <Skeleton isLoaded={isLoaded}>
         <Box
           mt={4}
@@ -95,7 +52,8 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
           boxShadow="md"
         >
           <Heading size="md">Runs</Heading>
-          <DungeonCountChart runs={characterRuns || []} />
+          <Text>Total Runs in Database: {characterRuns.length}</Text>
+          <DungeonCountChart runs={characterRuns} />
         </Box>
       </Skeleton>
     </Box>

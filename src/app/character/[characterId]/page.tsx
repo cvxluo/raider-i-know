@@ -1,7 +1,10 @@
 "use client";
 import { getCharacterByRIOID } from "@/actions/mongodb/character";
-import { getRunsWithCharacter } from "@/actions/mongodb/run";
-import { Character, RunReducedRoster } from "@/utils/types";
+import {
+  getPopulatedRunsWithCharacter,
+  getRunsWithCharacter,
+} from "@/actions/mongodb/run";
+import { Character, Run, RunReducedRoster } from "@/utils/types";
 // note that since this page uses apex charts, this can't be a server component
 
 import { Skeleton } from "@chakra-ui/react";
@@ -9,13 +12,12 @@ import { Box, Heading, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 import DungeonCountChart from "@/components/CharacterInfoGraphs/DungeonCountChart";
+import FrequentlyPlayedWithTree from "@/components/CharacterInfoGraphs/FrequentlyPlayedWithTree";
 
 const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
   const characterId = params.characterId;
   const [character, setCharacter] = useState<Character | null>(null);
-  const [characterRuns, setCharacterRuns] = useState<RunReducedRoster[] | []>(
-    [],
-  );
+  const [characterRuns, setCharacterRuns] = useState<Run[] | []>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
 
@@ -28,7 +30,7 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
       }
       setCharacter(char);
 
-      getRunsWithCharacter(char).then((runs) => {
+      getPopulatedRunsWithCharacter(char).then((runs) => {
         setCharacterRuns(runs);
         setIsLoaded(true);
         console.log(runs);
@@ -54,6 +56,8 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
           <Heading size="md">Runs</Heading>
           <Text>Total Runs in Database: {characterRuns.length}</Text>
           <DungeonCountChart runs={characterRuns} />
+          <Heading size="md">Frequently Played With</Heading>
+          <FrequentlyPlayedWithTree runs={characterRuns} />
         </Box>
       </Skeleton>
     </Box>

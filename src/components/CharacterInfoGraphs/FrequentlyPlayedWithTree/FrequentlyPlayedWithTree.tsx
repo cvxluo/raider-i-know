@@ -16,7 +16,7 @@ import dynamic from "next/dynamic";
 import RunLevelRangeSlider from "../RunLevelRangeSlider";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-const DungeonCountChart = ({ runs }: { runs: Run[] }) => {
+const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
   const [dungeonCountSliderValue, setDungeonCountSliderValue] = useState([
     0, 100,
   ]);
@@ -32,21 +32,23 @@ const DungeonCountChart = ({ runs }: { runs: Run[] }) => {
     setMaxLevel(Math.max(...runs.map((run) => run.mythic_level)));
   }, [runs]);
 
-  const dungeonNames = runs
+  // TODO: consider using getLimitedPlayers for this
+  const playerNames = runs
     .filter(
       (run) =>
         run.mythic_level >= dungeonCountSliderValue[0] &&
         run.mythic_level <= dungeonCountSliderValue[1],
     )
     .reduce((acc, run) => {
-      if (!acc.includes(run.dungeon.name)) {
-        acc.push(run.dungeon.name);
-      }
+      run.roster.forEach((player) => {
+        if (!acc.includes(player.name)) {
+          acc.push(player.name);
+        }
+      });
       return acc;
-    }, [] as string[])
-    .sort();
+    }, [] as string[]);
 
-  const dungeonCountData = runs
+  const playerCountData = runs
     .filter(
       (run) =>
         run.mythic_level >= dungeonCountSliderValue[0] &&
@@ -54,12 +56,12 @@ const DungeonCountChart = ({ runs }: { runs: Run[] }) => {
     )
     .reduce(
       (acc, run) => {
-        acc[run.dungeon.name] = acc[run.dungeon.name]
-          ? acc[run.dungeon.name] + 1
-          : 1;
+        run.roster.forEach((player) => {
+          acc[player.name] = acc[player.name] ? acc[player.name] + 1 : 1;
+        });
         return acc;
       },
-      {} as { [key: string]: number },
+      {} as Record<string, number>,
     );
 
   return (
@@ -84,19 +86,20 @@ const DungeonCountChart = ({ runs }: { runs: Run[] }) => {
         <Chart
           options={{
             chart: {
-              type: "bar",
-            },
-            xaxis: {
-              categories: dungeonNames,
+              type: "treemap",
             },
           }}
           series={[
             {
-              name: "Dungeons",
-              data: dungeonNames.map((name) => dungeonCountData[name]),
+              data: Object.entries(playerCountData)
+                .map(([name, count]) => ({
+                  x: name,
+                  y: count,
+                }))
+                .sort((a, b) => b.y - a.y),
             },
           ]}
-          type="bar"
+          type="treemap"
           width={"100%"}
           height={400}
         />
@@ -105,4 +108,4 @@ const DungeonCountChart = ({ runs }: { runs: Run[] }) => {
   );
 };
 
-export default DungeonCountChart;
+export default FrequentlyPlayedWithTree;

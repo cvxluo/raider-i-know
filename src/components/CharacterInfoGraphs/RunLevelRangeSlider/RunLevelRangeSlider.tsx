@@ -20,7 +20,6 @@ const RunLevelRangeSlider = ({
   minLevel: number;
   maxLevel: number;
 }) => {
-  console.log(range);
   return (
     <Box>
       <RangeSlider

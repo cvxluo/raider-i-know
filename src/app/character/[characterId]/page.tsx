@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 
 import DungeonCountChart from "@/components/CharacterInfoGraphs/DungeonCountChart";
 import FrequentlyPlayedWithTree from "@/components/CharacterInfoGraphs/FrequentlyPlayedWithTree";
+import RunLevelPie from "@/components/CharacterInfoGraphs/RunLevelPie";
 
 const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
   const characterId = params.characterId;
@@ -56,8 +57,12 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
           <Heading size="md">Runs</Heading>
           <Text>Total Runs in Database: {characterRuns.length}</Text>
           <DungeonCountChart runs={characterRuns} />
+
           <Heading size="md">Frequently Played With</Heading>
           <FrequentlyPlayedWithTree runs={characterRuns} />
+
+          <Heading size="md">Key Levels</Heading>
+          <RunLevelPie runs={characterRuns} />
         </Box>
       </Skeleton>
     </Box>

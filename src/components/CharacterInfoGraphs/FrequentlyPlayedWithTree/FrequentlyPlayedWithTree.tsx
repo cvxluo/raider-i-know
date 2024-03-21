@@ -28,8 +28,10 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
       Math.min(...runs.map((run) => run.mythic_level)),
       Math.max(...runs.map((run) => run.mythic_level)),
     ]);
-    setMinLevel(Math.min(...runs.map((run) => run.mythic_level)));
-    setMaxLevel(Math.max(...runs.map((run) => run.mythic_level)));
+    if (runs.length !== 0) {
+      setMinLevel(Math.min(...runs.map((run) => run.mythic_level)));
+      setMaxLevel(Math.max(...runs.map((run) => run.mythic_level)));
+    }
   }, [runs]);
 
   // TODO: consider using getLimitedPlayers for this
@@ -76,6 +78,7 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
           ).length
         }
       </Text>
+      <Text>Number of unique characters played with: {playerNames.length}</Text>
       <Box mt={4} p={4}>
         <RunLevelRangeSlider
           range={dungeonCountSliderValue}

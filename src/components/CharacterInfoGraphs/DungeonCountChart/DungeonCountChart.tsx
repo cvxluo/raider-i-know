@@ -28,8 +28,10 @@ const DungeonCountChart = ({ runs }: { runs: Run[] }) => {
       Math.min(...runs.map((run) => run.mythic_level)),
       Math.max(...runs.map((run) => run.mythic_level)),
     ]);
-    setMinLevel(Math.min(...runs.map((run) => run.mythic_level)));
-    setMaxLevel(Math.max(...runs.map((run) => run.mythic_level)));
+    if (runs.length !== 0) {
+      setMinLevel(Math.min(...runs.map((run) => run.mythic_level)));
+      setMaxLevel(Math.max(...runs.map((run) => run.mythic_level)));
+    }
   }, [runs]);
 
   const dungeonNames = runs

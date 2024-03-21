@@ -29,6 +29,7 @@ import {
 } from "@/actions/mongodb/run_graphs";
 import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
 import { DungeonIdToName, DungeonIds } from "@/utils/consts";
+import { useRouter } from "next/navigation";
 
 const CharForceGraph = ({
   mainChar,
@@ -55,6 +56,8 @@ const CharForceGraph = ({
   });
 
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     console.log(mainChar);
@@ -247,7 +250,14 @@ const CharForceGraph = ({
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant="ghost">Secondary Action</Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (selectedNode) router.push(`/character/${selectedNode.id}`);
+              }}
+            >
+              More Info
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

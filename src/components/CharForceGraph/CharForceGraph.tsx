@@ -29,6 +29,7 @@ import {
 } from "@/actions/mongodb/run_graphs";
 import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
 import { DungeonIdToName, DungeonIds } from "@/utils/consts";
+import { useRouter } from "next/navigation";
 
 const CharForceGraph = ({
   mainChar,
@@ -56,6 +57,8 @@ const CharForceGraph = ({
 
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
+
   useEffect(() => {
     console.log(mainChar);
 
@@ -64,25 +67,6 @@ const CharForceGraph = ({
     }
 
     setLoading(true);
-
-    /*
-    if (graphOptions.treeMode) {
-      console.log("tree mode");
-      getCharGraph(mainChar, graphOptions.degree, graphOptions.runLimit, [
-        mainChar,
-      ]).then((graph) => {
-        setCharGraph(graph);
-        setLoading(false);
-      });
-    } else {
-      getDenseCharGraph(mainChar, graphOptions.degree, graphOptions.runLimit, [
-        mainChar,
-      ]).then((graph) => {
-        setCharGraph(graph);
-        setLoading(false);
-      });
-    }
-    */
 
     retrieveGraphData(mainChar).then(() => {
       setLoading(false);
@@ -181,7 +165,13 @@ const CharForceGraph = ({
   };
 
   return (
-    <Box>
+    <Box
+      w="100%"
+      h="100%"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+    >
       {loading && <Spinner />}
       <ForceGraph2D
         graphData={{
@@ -207,6 +197,7 @@ const CharForceGraph = ({
           setSelectedNode(node);
           onOpen();
         }}
+        height={window.innerHeight * 0.6}
       />
 
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -259,7 +250,14 @@ const CharForceGraph = ({
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant="ghost">Secondary Action</Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (selectedNode) router.push(`/character/${selectedNode.id}`);
+              }}
+            >
+              More Info
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

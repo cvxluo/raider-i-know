@@ -8,7 +8,14 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
 import CharacterSelector from "@/components/CharacterSelector";
 import { testAppendingLayer, testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character, CharacterGraph } from "@/utils/types";
-import { Alert, AlertIcon, Box, Button, Spinner } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  Flex,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
@@ -18,6 +25,13 @@ import {
   purgeCharacters,
   purgeRuns,
 } from "@/actions/mongodb/data_collection/character_trawling";
+import { getClassCounts } from "@/actions/mongodb/aggregations/character_stats";
+import {
+  getDungeonCounts,
+  getRunLevels,
+} from "@/actions/mongodb/aggregations/run_stats";
+import { QuestionIcon } from "@chakra-ui/icons";
+import Link from "next/link";
 
 export default function Home() {
   const [mainChar, setMainChar] = useState<Character>({
@@ -84,10 +98,16 @@ export default function Home() {
     await testSaveTopAffixes();
   };
 
+  const test = async () => {
+    const result = await getRunLevels();
+    console.log(result);
+  };
+
   return (
     <Box>
       {loadButtons && (
         <Box>
+          <Button onClick={test}>Test</Button>
           <Button onClick={handleTestSaveLimited}>Test Save Runs 25+</Button>
           <Button onClick={handleTestSaveLessLimited}>
             Test Save Runs 20+
@@ -97,22 +117,31 @@ export default function Home() {
           <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
         </Box>
       )}
-      <CharacterSelector handleCharSubmit={handleCharSubmit} />
-      {charError && (
-        <Alert status="error">
-          <AlertIcon />
-          Character not found
-        </Alert>
-      )}
-      <DataOptionsSelector
-        graphOptions={graphOptions}
-        setGraphOptions={setGraphOptions}
-      />
-      <GraphOptionsSelector
-        graphOptions={graphOptions}
-        setGraphOptions={setGraphOptions}
-      />
+      <Box maxW="6xl" mx="auto" py={4}>
+        <CharacterSelector handleCharSubmit={handleCharSubmit} />
+        {charError && (
+          <Alert status="error">
+            <AlertIcon />
 
+            <AlertTitle>Character not found</AlertTitle>
+            <Link href="/faq">
+              <QuestionIcon />
+            </Link>
+          </Alert>
+        )}
+        <br />
+
+        <DataOptionsSelector
+          graphOptions={graphOptions}
+          setGraphOptions={setGraphOptions}
+        />
+        <br />
+
+        <GraphOptionsSelector
+          graphOptions={graphOptions}
+          setGraphOptions={setGraphOptions}
+        />
+      </Box>
       <CharForceGraph mainChar={mainChar} graphOptions={graphOptions} />
     </Box>
   );

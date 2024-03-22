@@ -36,7 +36,12 @@ const CharacterSelector = ({
           <Input
             placeholder="Character Name"
             value={charInfo.name}
-            onChange={(e) => setCharInfo({ ...charInfo, name: e.target.value })}
+            onChange={(e) => {
+              const nameCapitalized =
+                e.target.value.charAt(0).toUpperCase() +
+                e.target.value.slice(1).toLowerCase();
+              setCharInfo({ ...charInfo, name: nameCapitalized });
+            }}
             isRequired
             isInvalid={isError}
           />

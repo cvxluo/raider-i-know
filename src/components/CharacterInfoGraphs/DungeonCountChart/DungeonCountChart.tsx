@@ -91,6 +91,7 @@ const DungeonCountChart = ({ runs }: { runs: Run[] }) => {
             xaxis: {
               categories: dungeonNames,
             },
+            title: { text: "Runs per dungeon" },
           }}
           series={[
             {

@@ -36,6 +36,8 @@ const DungeonCountChart = () => {
         xaxis: {
           categories: dungeonCountData.map((dungeon) => dungeon._id),
         },
+        dataLabels: { enabled: false },
+        title: { text: "Runs per dungeon" },
       }}
       series={[
         {
@@ -72,10 +74,12 @@ const RunLevelChart = () => {
         xaxis: {
           categories: runLevelData.map((level) => level._id),
         },
+        dataLabels: { enabled: false },
+        title: { text: "Runs per key Level" },
       }}
       series={[
         {
-          name: "Mythic Levels",
+          name: "Key Levels",
           data: runLevelData.map((level) => level.count),
         },
       ]}
@@ -104,13 +108,15 @@ const RunCountByWeekChart = () => {
     <Chart
       options={{
         chart: {
-          type: "bar",
+          type: "line",
         },
         xaxis: {
           categories: runCountByWeek.map(
             (week) => week._id.toISOString().split("T")[0],
           ),
         },
+        dataLabels: { enabled: false },
+        title: { text: "Runs per week" },
       }}
       series={[
         {
@@ -118,7 +124,7 @@ const RunCountByWeekChart = () => {
           data: runCountByWeek.map((week) => week.count),
         },
       ]}
-      type="bar"
+      type="line"
       width={"100%"}
       height={400}
     />
@@ -159,6 +165,7 @@ const CharacterClassCountChart = () => {
             distributed: true,
           },
         },
+        title: { text: "Occurences of classes across runs" },
       }}
       series={[
         {
@@ -183,7 +190,7 @@ const CharacterServerCountChart = () => {
 
   useEffect(() => {
     getCharacterServerCount().then((data) => {
-      setServerCounts(data);
+      setServerCounts(data.filter((server) => server.count > 500));
     });
   }, []);
 
@@ -195,6 +202,10 @@ const CharacterServerCountChart = () => {
         },
         xaxis: {
           categories: serverCounts.map((server) => server._id),
+        },
+        dataLabels: { enabled: false },
+        title: {
+          text: "Number of unique characters on servers (w/ >500 characters)",
         },
       }}
       series={[
@@ -213,13 +224,19 @@ const CharacterServerCountChart = () => {
 // TODO: consider SSR for this page
 const StatsPage = () => {
   return (
-    <Grid templateColumns="repeat(2, 1fr)" gap={10} p={10}>
-      <DungeonCountChart />
-      <RunLevelChart />
-      <RunCountByWeekChart />
-      <CharacterClassCountChart />
-      <CharacterServerCountChart />
-    </Grid>
+    <Box p={10}>
+      <Text>
+        Please note that these statistics are not reflective of all M+ runs -
+        only the ones stored in the database.
+      </Text>
+      <Grid templateColumns="repeat(2, 1fr)" gap={10} p={10}>
+        <DungeonCountChart />
+        <RunLevelChart />
+        <RunCountByWeekChart />
+        <CharacterClassCountChart />
+        <CharacterServerCountChart />
+      </Grid>
+    </Box>
   );
 };
 

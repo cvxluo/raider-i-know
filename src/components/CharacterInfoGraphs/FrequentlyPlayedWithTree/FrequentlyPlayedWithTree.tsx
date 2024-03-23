@@ -8,12 +8,19 @@ import {
   RangeSliderFilledTrack,
   RangeSliderThumb,
   RangeSliderMark,
+  NumberInput,
+  NumberInputField,
+  NumberIncrementStepper,
+  NumberInputStepper,
+  NumberDecrementStepper,
+  Tooltip,
 } from "@chakra-ui/react";
 import { Box, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 import dynamic from "next/dynamic";
 import RunLevelRangeSlider from "../RunLevelRangeSlider";
+import { getLimitedChars } from "@/utils/funcs";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
@@ -22,6 +29,8 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
   ]);
   const [minLevel, setMinLevel] = useState(0);
   const [maxLevel, setMaxLevel] = useState(100);
+
+  const [runLimit, setRunLimit] = useState(15);
 
   useEffect(() => {
     setDungeonCountSliderValue([
@@ -35,20 +44,14 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
   }, [runs]);
 
   // TODO: consider using getLimitedPlayers for this
-  const playerNames = runs
-    .filter(
+  const playerNames = getLimitedChars(
+    runs.filter(
       (run) =>
         run.mythic_level >= dungeonCountSliderValue[0] &&
         run.mythic_level <= dungeonCountSliderValue[1],
-    )
-    .reduce((acc, run) => {
-      run.roster.forEach((player) => {
-        if (!acc.includes(player.name)) {
-          acc.push(player.name);
-        }
-      });
-      return acc;
-    }, [] as string[]);
+    ),
+    runLimit,
+  ).map((char) => char.name);
 
   const playerCountData = runs
     .filter(
@@ -66,6 +69,21 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
       {} as Record<string, number>,
     );
 
+  const limitedPlayerCountData = Object.entries(playerCountData)
+    .filter(([name, count]) => playerNames.includes(name))
+    .reduce(
+      // TODO: this reduction is only necessary to keep playerCountData and
+      // limitedPlayerCountData in the same format - probably remove
+      (acc, [name, count]) => {
+        acc[name] = count;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+  console.log(playerCountData);
+  console.log(limitedPlayerCountData);
+
   return (
     <Box>
       <Text>
@@ -78,7 +96,7 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
           ).length
         }
       </Text>
-      <Text>Number of unique characters played with: {playerNames.length}</Text>
+      <Text>Number of unique characters: {playerNames.length}</Text>
       <Box mt={4} p={4}>
         <RunLevelRangeSlider
           range={dungeonCountSliderValue}
@@ -86,15 +104,36 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
           minLevel={minLevel}
           maxLevel={maxLevel}
         />
+        <Tooltip label="Minimum number of runs for a character to be included">
+          <Text fontSize="sm" display="inline" mr={2}>
+            Run Limit:
+          </Text>
+        </Tooltip>
+        <NumberInput
+          width={"10%"}
+          defaultValue={15}
+          min={0}
+          value={runLimit}
+          onChange={(value) => setRunLimit(parseInt(value || "0"))}
+        >
+          <NumberInputField />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
         <Chart
           options={{
             chart: {
               type: "treemap",
             },
+            title: {
+              text: "Adjacent character breakdown by number of runs",
+            },
           }}
           series={[
             {
-              data: Object.entries(playerCountData)
+              data: Object.entries(limitedPlayerCountData)
                 .map(([name, count]) => ({
                   x: name,
                   y: count,

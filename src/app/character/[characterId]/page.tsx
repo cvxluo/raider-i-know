@@ -54,6 +54,10 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
           overflow="hidden"
           boxShadow="md"
         >
+          <Text>
+            Please note that these statistics are not reflective of all M+ runs
+            - only the ones stored in the database.
+          </Text>
           <Heading size="md">Runs</Heading>
           <Text>Total Runs in Database: {characterRuns.length}</Text>
           <DungeonCountChart runs={characterRuns} />

@@ -49,7 +49,21 @@ const CharForceGraph = ({
     if (!graph) return;
 
     graph.d3Force("charge").strength(graphOptions.nodeForceStrength);
-    graph.d3Force("link").distance(graphOptions.linkDistance);
+    // if runBasedLinks is true, we set the distance based on the number of runs between characters
+    if (graphOptions.runBasedLinks) {
+      graph.d3Force("link").distance((link: any) => {
+        // TODO: hard coded 200 - if a link has more than 200 runs, we set to 0.1 of the default distance
+        // could be more adaptable here
+        console.log(
+          Math.max((100 - link.numRuns) / 100, 0.1) * graphOptions.linkDistance,
+        );
+        return (
+          Math.max((100 - link.numRuns) / 100, 0.1) * graphOptions.linkDistance
+        );
+      });
+    } else {
+      graph.d3Force("link").distance(graphOptions.linkDistance);
+    }
   }, [graphRef, graphOptions.nodeForceStrength, graphOptions.linkDistance]);
 
   const [graphInfo, setGraphInfo] = useState<{

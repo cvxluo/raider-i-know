@@ -144,6 +144,7 @@ export interface GraphOptions {
   radialMode: boolean;
   nodeForceStrength: number;
   linkDistance: number;
+  runBasedLinks: boolean;
 }
 
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;

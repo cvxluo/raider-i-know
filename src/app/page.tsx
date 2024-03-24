@@ -9,12 +9,14 @@ import CharacterSelector from "@/components/CharacterSelector";
 import { testAppendingLayer, testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character, CharacterGraph } from "@/utils/types";
 import {
+  Accordion,
   Alert,
   AlertIcon,
   AlertTitle,
   Box,
   Button,
   Flex,
+  Spacer,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { getCharacter } from "@/actions/mongodb/character";
@@ -60,6 +62,7 @@ export default function Home() {
     radialMode: true,
     nodeForceStrength: -100,
     linkDistance: 30,
+    runBasedLinks: false,
   });
 
   const [charError, setCharError] = useState(false);
@@ -131,14 +134,13 @@ export default function Home() {
             </Link>
           </Alert>
         )}
-        <br />
+        <Spacer height="10px" />
 
         <DataOptionsSelector
           graphOptions={graphOptions}
           setGraphOptions={setGraphOptions}
         />
-        <br />
-
+        <Spacer height="10px" />
         <GraphOptionsSelector
           graphOptions={graphOptions}
           setGraphOptions={setGraphOptions}

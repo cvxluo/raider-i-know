@@ -44,6 +44,7 @@ const CharacterSelector = ({
             }}
             isRequired
             isInvalid={isError}
+            width="40%"
           />
           <Select
             value={charInfo.realm.name}
@@ -55,7 +56,7 @@ const CharacterSelector = ({
                 ) as Realm,
               })
             }
-            width={600}
+            width="20%"
           >
             {Realms.map((realm, index) => (
               <option key={index} value={realm.name}>
@@ -73,7 +74,7 @@ const CharacterSelector = ({
                 ) as Region,
               })
             }
-            width={1200}
+            width="25%"
           >
             {Regions.map((region, index) => (
               <option key={index} value={region.name}>
@@ -83,7 +84,7 @@ const CharacterSelector = ({
           </Select>
           <Button
             colorScheme="teal"
-            width={400}
+            width="15%"
             onClick={() => {
               if (charInfo.name === "") {
                 setIsError(true);

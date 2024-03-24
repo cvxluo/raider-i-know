@@ -26,6 +26,7 @@ const FAQPage = () => {
 
         <Heading size="md">Where is the data from?</Heading>
         <Text>
+          All data is from{" "}
           <Link href="https://raider.io/" isExternal color="teal.500">
             Raider IO
           </Link>{" "}
@@ -33,6 +34,7 @@ const FAQPage = () => {
           <Link href="https://raider.io/api" isExternal color="teal.500">
             RIO API
           </Link>
+          .
         </Text>
         <br />
 
@@ -57,8 +59,8 @@ const FAQPage = () => {
 
         <Heading size="md">Contact</Heading>
         <Text>
-          Built by Vexea-Azshara (vexvex on Discord). Feel free to reach out
-          with any feedback or questions!
+          This website was built by Vexea-Azshara (vexvex on Discord). Feel free
+          to reach out with any feedback or questions!
         </Text>
       </Box>
     </Box>

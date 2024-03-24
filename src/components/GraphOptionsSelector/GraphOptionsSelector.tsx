@@ -20,8 +20,14 @@ const GraphOptionsSelector = ({
   graphOptions: GraphOptions;
   setGraphOptions: (graphOptions: GraphOptions) => void;
 }) => {
-  const { showLabels, treeMode, radialMode, nodeForceStrength, linkDistance } =
-    graphOptions;
+  const {
+    showLabels,
+    treeMode,
+    radialMode,
+    nodeForceStrength,
+    linkDistance,
+    runBasedLinks,
+  } = graphOptions;
 
   return (
     <Box>
@@ -34,7 +40,6 @@ const GraphOptionsSelector = ({
           <Switch
             id="showLabels"
             colorScheme="teal"
-            size="lg"
             isChecked={showLabels}
             onChange={(e) =>
               setGraphOptions({ ...graphOptions, showLabels: e.target.checked })
@@ -42,17 +47,30 @@ const GraphOptionsSelector = ({
           />
 
           <Tooltip label="Changes tree mode to be radial out">
-            <Text>Radial Mode</Text>
+            <Text>Radial Mode:</Text>
           </Tooltip>
           <Switch
             id="radialMode"
             colorScheme="teal"
-            size="lg"
             isChecked={radialMode}
             onChange={(e) =>
               setGraphOptions({ ...graphOptions, radialMode: e.target.checked })
             }
             isDisabled={!treeMode}
+          />
+          <Tooltip label="Calculate node distance based on number of runs between characters">
+            <Text>Run-based Links:</Text>
+          </Tooltip>
+          <Switch
+            id="treeMode"
+            colorScheme="teal"
+            isChecked={runBasedLinks}
+            onChange={(e) =>
+              setGraphOptions({
+                ...graphOptions,
+                runBasedLinks: e.target.checked,
+              })
+            }
           />
           <Box>
             <Tooltip label="Changes how spread nodes are from each other">
@@ -64,7 +82,7 @@ const GraphOptionsSelector = ({
               aria-label="slider-node-distance"
               defaultValue={100}
               min={0}
-              max={500}
+              max={200}
               step={1}
               onChange={(value) =>
                 setGraphOptions({ ...graphOptions, nodeForceStrength: -value })
@@ -86,7 +104,7 @@ const GraphOptionsSelector = ({
               aria-label="slider-node-distance"
               defaultValue={30}
               min={0}
-              max={200}
+              max={60}
               step={5}
               onChange={(value) =>
                 setGraphOptions({ ...graphOptions, linkDistance: value })

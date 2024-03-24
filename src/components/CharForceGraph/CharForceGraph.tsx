@@ -18,7 +18,7 @@ import {
 
 import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
 import { ForceGraph2D } from "react-force-graph";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Run } from "@/utils/types";
 
 import {
@@ -41,6 +41,16 @@ const CharForceGraph = ({
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedNode, setSelectedNode] = useState<Character | null>(null);
+
+  const graphRef = useRef<any>();
+
+  useEffect(() => {
+    const graph = graphRef.current;
+    if (!graph) return;
+
+    graph.d3Force("charge").strength(graphOptions.nodeForceStrength);
+    graph.d3Force("link").distance(graphOptions.linkDistance);
+  }, [graphRef, graphOptions.nodeForceStrength, graphOptions.linkDistance]);
 
   const [graphInfo, setGraphInfo] = useState<{
     layers: Character[][];
@@ -244,20 +254,8 @@ const CharForceGraph = ({
       flexDirection="column"
       alignItems="center"
     >
-      {loading && (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          w="100%"
-          h="100%"
-        >
-          <Text>{loadingMessage}</Text>
-          <Spinner />
-        </Box>
-      )}
       <ForceGraph2D
+        ref={graphRef}
         graphData={{
           nodes: charGraph.nodes,
           links: charGraph.links,
@@ -281,8 +279,22 @@ const CharForceGraph = ({
           setSelectedNode(node);
           onOpen();
         }}
-        height={window.innerHeight * 0.6}
+        height={window.innerHeight * 0.5}
       />
+
+      {loading && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          w="100%"
+          h="100%"
+        >
+          <Text>{loadingMessage}</Text>
+          <Spinner />
+        </Box>
+      )}
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

@@ -3,7 +3,7 @@ import { Box, Heading, Text } from "@chakra-ui/react";
 
 const FAQPage = () => {
   return (
-    <Box maxW="6xl" mx="auto" py={4}>
+    <Box maxW="6xl" mx="auto" p={4}>
       <Heading>FAQ</Heading>
       <Box
         mt={4}

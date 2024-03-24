@@ -40,7 +40,7 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
   }, []);
 
   return (
-    <Box maxW="6xl" mx="auto" py={4}>
+    <Box maxW="6xl" mx="auto" p={4}>
       <Heading>
         {character ? character.name : <Skeleton>Loading</Skeleton>}
       </Heading>

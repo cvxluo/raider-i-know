@@ -58,6 +58,8 @@ export default function Home() {
     runLimit: 15,
     treeMode: true,
     radialMode: true,
+    nodeForceStrength: -100,
+    linkDistance: 30,
   });
 
   const [charError, setCharError] = useState(false);
@@ -117,7 +119,7 @@ export default function Home() {
           <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
         </Box>
       )}
-      <Box maxW="6xl" mx="auto" py={4} px={{ base: 4, md: 8 }}>
+      <Box maxW="6xl" mx="auto" p={4}>
         <CharacterSelector handleCharSubmit={handleCharSubmit} />
         {charError && (
           <Alert status="error">

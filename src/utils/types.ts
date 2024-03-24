@@ -142,6 +142,8 @@ export interface GraphOptions {
   runLimit: number;
   treeMode: boolean;
   radialMode: boolean;
+  nodeForceStrength: number;
+  linkDistance: number;
 }
 
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;

@@ -281,7 +281,7 @@ export const appendNextLayer = async (
   degree = -1,
   excludes: Character[] = [],
 ) => {
-  const d = degree === -1 ? layers.length - 1 : degree;
+  const d = degree === -1 ? layers.length : degree;
   const nextLayerData = await getNextLayer(
     layers,
     linkCounts,

@@ -117,7 +117,7 @@ export default function Home() {
           <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
         </Box>
       )}
-      <Box maxW="6xl" mx="auto" py={4}>
+      <Box maxW="6xl" mx="auto" py={4} px={{ base: 4, md: 8 }}>
         <CharacterSelector handleCharSubmit={handleCharSubmit} />
         {charError && (
           <Alert status="error">

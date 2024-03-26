@@ -205,6 +205,8 @@ export const getGraphData = async (
 
 // start from [[mainChar]], with all the runs of mainChar, and an empty mainChar link array
 // add [[mainChar], [all adjacent chars]]
+// this works by first call func -> find all characters connected to the last layer
+// -> get all their runs -> process -> return them as the last layer -> repeat
 export const getNextLayer = async (
   layers: Character[][],
   linkCounts: { [key: number]: { [key: number]: number } },
@@ -220,56 +222,64 @@ export const getNextLayer = async (
   const nextRuns: { [key: number]: Run[] } = {};
   const previousCharacters = layers.flat();
 
-  for (let character of layers[d]) {
-    // TODO: consider greater parallellization here by getting all the populated runs for all characters at once
-    const charRuns = runs[character.id as number];
-    // const charRuns = await getPopulatedRunsWithCharacter(character);
-    const charCounts = countCharactersInRuns(charRuns, excludes);
-    const newChars = getCharactersInRuns(charRuns).filter((char) => {
-      // filter here to exclude characters already in the graph
-      // TODO: we limit the minimum number of runs to 15 since its the current minimum - but should be adjustable
-      return (
-        previousCharacters.every((c) => c.id !== char.id) &&
-        charCounts[char.id as number] >= 15 &&
-        char.id !== character.id
-      );
-    });
+  const layerChars = layers[d];
+  const layerRuns = layerChars.map((char) => runs[char.id as number]).flat();
+  const charCounts = countCharactersInRuns(layerRuns, excludes);
+  const newChars = getCharactersInRuns(layerRuns).filter((char) => {
+    return (
+      previousCharacters.every((c) => c.id !== char.id) &&
+      charCounts[char.id as number] >= 15 &&
+      char.id !== layerChars[0].id
+    );
+  });
 
-    nextLayer.push(...newChars);
-    previousCharacters.push(...newChars);
+  nextLayer.push(...newChars);
+  previousCharacters.push(...newChars);
 
-    // TODO: concerned about rate limiting issues if using map
-    const allNewCharRuns = await getPopulatedRunsWithCharacters(newChars);
-
-    newChars.forEach((newChar) => {
-      const newCharRuns = allNewCharRuns.filter((run) =>
-        run.roster.map((char) => char.id).includes(newChar.id as number),
-      );
-
-      nextRuns[newChar.id as number] = newCharRuns;
-
-      nextLinks[newChar.id as number] = {};
-
-      const newCharCounts = countCharactersInRuns(newCharRuns);
-      // TODO: countCharactersInRuns should be refactored to work with excludes
-      delete newCharCounts[newChar.id as number];
-
-      const connectionsInGraph = previousCharacters.filter(
-        (char) => newCharCounts[char.id as number] > 0,
-      );
-      // note we use two way links
-      connectionsInGraph.forEach((char) => {
-        nextLinks[newChar.id as number][char.id as number] =
-          newCharCounts[char.id as number];
-
-        if (!nextLinks[char.id as number]) {
-          nextLinks[char.id as number] = {};
+  // get all runs for new characters
+  const allNewCharRequests = newChars
+    .reduce(
+      (acc, char) => {
+        acc[acc.length - 1].push(char);
+        if (acc[acc.length - 1].length === 300) {
+          acc.push([]);
         }
-        nextLinks[char.id as number][newChar.id as number] =
-          newCharCounts[char.id as number];
-      });
+        return acc;
+      },
+      [[]] as Character[][],
+    )
+    .map((chars) => getPopulatedRunsWithCharacters(chars));
+
+  const allNewCharRuns = (await Promise.all(allNewCharRequests)).flat();
+  // getPopulatedRunsWithCharacters(newChars);
+
+  newChars.map((newChar) => {
+    const newCharRuns = allNewCharRuns.filter((run) =>
+      run.roster.map((char) => char.id).includes(newChar.id as number),
+    );
+
+    nextRuns[newChar.id as number] = newCharRuns;
+
+    nextLinks[newChar.id as number] = {};
+
+    const newCharCounts = countCharactersInRuns(newCharRuns);
+    delete newCharCounts[newChar.id as number];
+
+    const connectionsInGraph = previousCharacters.filter(
+      (char) => newCharCounts[char.id as number] > 0,
+    );
+
+    connectionsInGraph.map((char) => {
+      nextLinks[newChar.id as number][char.id as number] =
+        newCharCounts[char.id as number];
+
+      if (!nextLinks[char.id as number]) {
+        nextLinks[char.id as number] = {};
+      }
+      nextLinks[char.id as number][newChar.id as number] =
+        newCharCounts[char.id as number];
     });
-  }
+  });
 
   return { nextLayer, nextLinks, nextRuns };
 };
@@ -297,101 +307,4 @@ export const appendNextLayer = async (
   Object.keys(nextLayerData.nextRuns).forEach((charId) => {
     runs[parseInt(charId)] = nextLayerData.nextRuns[parseInt(charId)];
   });
-};
-
-export const graphDataToForceGraph = (
-  layers: Character[][],
-  linkCounts: { [key: number]: { [key: number]: number } },
-  runs: { [key: number]: Run[] },
-  dense = false,
-  limit = 15,
-  degree = -1,
-) => {
-  const d = degree === -1 ? layers.length - 1 : degree;
-  const degreeLayers = layers.slice(0, d + 1);
-  if (degreeLayers.length === 0) {
-    return { nodes: [], links: [] } as CharacterGraph;
-  }
-  const nodes = degreeLayers
-    .map((layer, i) => {
-      return layer.map((char) => {
-        return {
-          id: char.id as number,
-          name: char.name,
-          layer: i,
-          nodeColor: char.class ? ClassColors[char.class.name] : "blue",
-        };
-      });
-    })
-    .flat() as CharacterNode[];
-
-  nodes[0]["nodeColor"] = "red";
-
-  let links: { source: number; target: number; numRuns?: number }[] = [];
-  if (dense) {
-    links = Object.keys(linkCounts)
-      .map((source) => {
-        return Object.keys(linkCounts[parseInt(source)]).map((target) => {
-          return {
-            source: parseInt(source),
-            target: parseInt(target),
-            numRuns: linkCounts[parseInt(source)][parseInt(target)],
-          };
-        });
-      })
-      .flat()
-      .filter((link) => {
-        return (
-          nodes.some((node) => node.id === link.source) &&
-          nodes.some((node) => node.id === link.target && link.numRuns >= limit)
-        );
-      });
-  } else {
-    // to get the tree version, we prioritize high count nodes for each link
-    links = [];
-
-    // reverse bfs-like solution - has issues with lingering components
-    // caused by us wanting highest count links, but bfs not guaranteeing that the highest count link is found first
-    // going bottom up - each node in a layer is connected to the highest count node in the layer above
-    for (let i = degreeLayers.length - 1; i > 0; i--) {
-      for (let source of degreeLayers[i]) {
-        const sourceId = source.id as number;
-        const targetLayer = degreeLayers[i - 1];
-        const sourceConnections = targetLayer.filter(
-          (target) => linkCounts[sourceId][target.id as number] > 0,
-        );
-        const target = sourceConnections.reduce((a, b) => {
-          return linkCounts[b.id as number][sourceId] >
-            linkCounts[a.id as number][sourceId]
-            ? b
-            : a;
-        });
-
-        // note tree mode has different limit rules, since we want to show the highest count links
-        // we don't filter a link if a node it connects to has another link, as that would leave an orphaned component
-        // idea is that every link we find here is part of the tree - however, we can remove low count leaf nodes
-        // so, at every point, we can remove a low count leaf IF it is a leaf - no other links to it
-        if (
-          linkCounts[sourceId][target.id as number] >= limit ||
-          links.map((link) => link.source).includes(sourceId)
-        ) {
-          links.push({
-            // TODO: slight misnaming, we want this to be true since we use radial out mode
-            target: sourceId,
-            source: target.id as number,
-            numRuns: linkCounts[sourceId][target.id as number],
-          });
-        }
-      }
-    }
-  }
-
-  // remove all nodes that are not connected to any links
-  const filteredNodes = nodes.filter((node) => {
-    return links.some(
-      (link) => link.source === node.id || link.target === node.id,
-    );
-  });
-
-  return { nodes: filteredNodes, links } as CharacterGraph;
 };

@@ -26,11 +26,13 @@ import {
   getCharGraph,
   getDenseCharGraph,
   getNextLayer,
-  graphDataToForceGraph,
 } from "@/actions/mongodb/run_graphs";
+import { graphDataToForceGraph } from "./GraphDataProcessing";
 import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
 import { DungeonIdToName, DungeonIds } from "@/utils/consts";
 import { useRouter } from "next/navigation";
+
+var lastRequest = 0;
 
 const CharForceGraph = ({
   mainChar,
@@ -54,9 +56,6 @@ const CharForceGraph = ({
       graph.d3Force("link").distance((link: any) => {
         // TODO: hard coded 200 - if a link has more than 200 runs, we set to 0.1 of the default distance
         // could be more adaptable here
-        console.log(
-          Math.max((100 - link.numRuns) / 100, 0.1) * graphOptions.linkDistance,
-        );
         return (
           Math.max((100 - link.numRuns) / 100, 0.1) * graphOptions.linkDistance
         );
@@ -83,24 +82,6 @@ const CharForceGraph = ({
   const [loading, setLoading] = useState(false);
   // note that loading message is not necessarily completely accurate, since it updates async
   const [loadingMessage, setLoadingMessage] = useState<string>("");
-  var lastRequest = {
-    character: {
-      name: "",
-      region: {
-        name: "",
-        slug: "",
-        short_name: "",
-      },
-      realm: {
-        id: 0,
-        name: "",
-        slug: "",
-        connected_realm_id: 0,
-        locale: "",
-      },
-    },
-    degree: 0,
-  };
 
   const router = useRouter();
 
@@ -114,28 +95,30 @@ const CharForceGraph = ({
     }
 
     setLoading(true);
-    lastRequest = { character: mainChar, degree: graphOptions.degree };
+    lastRequest++;
     setLoadingMessage(
       `Loading graph for ${mainChar.name}-${mainChar.realm.name} (${graphOptions.degree})`,
     );
 
-    retrieveGraphData(mainChar, graphOptions.degree).then(() => {
-      // multiple requests can be inflight - we only stop loading if the LAST request is done,
-      // determined if retrievingChar is null, since it is set to null at the end of the last completed request
-      setLoading(false);
-    });
+    retrieveGraphData(mainChar, graphOptions.degree, lastRequest).then(
+      (res) => {
+        // multiple requests can be inflight - we only stop loading if the LAST request is done,
+        setLoading(res.stillLoading);
+      },
+    );
   }, [mainChar, graphOptions.degree]);
 
   const retrieveGraphData = async (
     char: Character,
     degreeToRetrieve: number,
+    reqNum: number,
   ) => {
     // check if we already have all the graph data needed
     if (
       degreeToRetrieve < graphInfo.layers.length &&
       graphInfo.layers[0][0].id === char.id
     ) {
-      return;
+      return { stillLoading: false };
     }
     // if we do not have all the graph data, but already retrieved some, use that as a basis
     // note that if the character id is different, we always skip this and start from scratch
@@ -148,6 +131,7 @@ const CharForceGraph = ({
       layers = graphInfo.layers;
       const linkCounts = graphInfo.linkCounts;
       const runs = graphInfo.runs;
+
       for (let i = graphInfo.layers.length; i <= degreeToRetrieve; i++) {
         const nextLayerData = await getNextLayer(
           layers,
@@ -165,16 +149,13 @@ const CharForceGraph = ({
         });
 
         // TODO: hacky race condition check
-        if (
-          lastRequest.character.name !== char.name ||
-          lastRequest.degree !== degreeToRetrieve
-        ) {
-          return;
+        if (lastRequest !== reqNum) {
+          return { stillLoading: true };
         }
 
         setGraphInfo({ layers, linkCounts, runs });
       }
-      return;
+      return { stillLoading: false };
     }
     // otherwise, start from scratch
     layers = [[char]];
@@ -198,19 +179,19 @@ const CharForceGraph = ({
       });
 
       // TODO: hacky race condition check - if, between the time we started retrieving and now, the mainChar has changed, stop
-      if (
-        lastRequest.character.name !== char.name ||
-        lastRequest.degree !== degreeToRetrieve
-      ) {
-        return;
+      if (lastRequest !== reqNum) {
+        return { stillLoading: true };
       }
 
       setGraphInfo({ layers, linkCounts, runs });
     }
+
+    return { stillLoading: false };
   };
 
   // get graph from info
   useEffect(() => {
+    console.log("Graph Info", graphInfo);
     const graph = graphDataToForceGraph(
       graphInfo.layers,
       graphInfo.linkCounts,
@@ -219,6 +200,7 @@ const CharForceGraph = ({
       graphOptions.runLimit,
       graphOptions.degree,
     );
+    console.log("Graph data", graph);
     setCharGraph(graph);
   }, [graphInfo, graphOptions]);
 

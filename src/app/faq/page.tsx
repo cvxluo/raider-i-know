@@ -46,7 +46,7 @@ const FAQPage = () => {
 
         <Heading size="md">Code?</Heading>
         <Text>
-          Open sourced here:{" "}
+          Open sourced here, contributions welcome:{" "}
           <Link
             href="https://github.com/cvxluo/raider-i-know"
             isExternal

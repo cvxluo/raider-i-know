@@ -232,7 +232,8 @@ export const getPopulatedRunsWithCharacters = async (
   await mongoDB();
 
   const retrievedCharacters = await CharacterModel.find({
-    "region.name": { $in: characters.map((char) => char.region.name) },
+    // TODO: europe region
+    // "region.name": { $in: characters.map((char) => char.region.name) },
     "realm.name": { $in: characters.map((char) => char.realm.name) },
     name: { $in: characters.map((char) => char.name) },
   }).lean();

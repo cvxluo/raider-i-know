@@ -240,9 +240,9 @@ export const getNextLayer = async (
   const allNewCharRequests = newChars
     .reduce(
       (acc, char) => {
-        // batch requests to 100 characters to prevent payload size errors
+        // batch requests to 5 characters to prevent payload size errors
         acc[acc.length - 1].push(char);
-        if (acc[acc.length - 1].length === 20) {
+        if (acc[acc.length - 1].length === 5) {
           acc.push([]);
         }
         return acc;

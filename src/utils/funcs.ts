@@ -55,18 +55,21 @@ export const countCharactersInRuns = (
   return characters;
 };
 
-// TODO: probably a mapping function that can do this faster
 export const getCharactersInRuns = (runs: Run[]) => {
-  const characters: Character[] = [];
-  runs.forEach((run) => {
-    run.roster.forEach((character) => {
-      // TODO: also assumes character id exists
-      if (!characters.some((char) => char.id === character.id)) {
-        characters.push(character);
-      }
-    });
+  const characters = runs
+    .map((run) => {
+      return run.roster;
+    })
+    .flat();
+  // assume id exists
+  console.log("Number of characters in runs: ", characters.length);
+  const charIds = characters.map((char) => char.id);
+  const uniqueCharacters = characters.filter((char, index) => {
+    return !charIds.includes(char.id, index + 1);
   });
-  return characters;
+  console.log("Number of unique characters in runs: ", uniqueCharacters.length);
+
+  return uniqueCharacters;
 };
 
 export const getLimitedChars = (

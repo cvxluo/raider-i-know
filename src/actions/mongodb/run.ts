@@ -231,17 +231,23 @@ export const getPopulatedRunsWithCharacters = async (
 ): Promise<Run[]> => {
   await mongoDB();
 
-  const retrievedCharacters = await CharacterModel.find({
-    // TODO: europe region
-    // "region.name": { $in: characters.map((char) => char.region.name) },
-    "realm.name": { $in: characters.map((char) => char.realm.name) },
-    name: { $in: characters.map((char) => char.name) },
-  }).lean();
+  const retrievedCharacterIds = await CharacterModel.find(
+    {
+      // TODO: europe region
+      // "region.name": { $in: characters.map((char) => char.region.name) },
+      "realm.name": { $in: characters.map((char) => char.realm.name) },
+      name: { $in: characters.map((char) => char.name) },
+    },
+    "_id",
+  );
 
-  const retrievedRuns = await RunModel.find({
-    roster: { $in: retrievedCharacters.map((char) => char._id) },
-  })
-    .populate("roster")
+  const retrievedRuns = await RunModel.find(
+    {
+      roster: { $in: retrievedCharacterIds },
+    },
+    "roster dungeon.id -_id",
+  )
+    .populate("roster", "name realm.name region.name class.name id -_id")
     .lean();
 
   const flattenedRuns = JSON.parse(JSON.stringify(retrievedRuns));

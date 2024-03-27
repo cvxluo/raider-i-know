@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // TODO: restrict some level of request to prevent abuse
   try {
     await mongodb();
 
@@ -40,7 +41,12 @@ export async function POST(req: NextRequest) {
       .populate("roster", "name realm.name region.name class.name id -_id")
       .lean();
 
-    console.log(retrievedRuns);
+    console.log(
+      "Retrieved # of runs:",
+      retrievedRuns.length,
+      "for # of characters:",
+      characters.length,
+    );
 
     const runs = JSON.parse(JSON.stringify(retrievedRuns));
 

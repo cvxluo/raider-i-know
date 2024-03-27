@@ -12,6 +12,7 @@ import {
 } from "./run";
 import next from "next";
 import { ClassColors } from "@/utils/consts";
+import urls from "@/utils/urls";
 
 /*
    returns 
@@ -263,7 +264,7 @@ export const getNextLayer = async (
   // const allNewCharRuns = (await Promise.all(allNewCharRequests)).flat();
 
   const allNewCharRuns: Run[] = await fetch(
-    "http://localhost:3000/api/character/getRunsWithCharacters",
+    urls.baseURL + "/api/character/getRunsWithCharacters",
     {
       method: "POST",
       body: JSON.stringify({ characters: newChars }),

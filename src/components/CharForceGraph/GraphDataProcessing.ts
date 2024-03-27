@@ -11,7 +11,6 @@ export const graphDataToForceGraph = (
   limit = 15,
   degree = -1,
 ) => {
-  console.log("Converting graph data to force graph");
   const d = degree === -1 ? layers.length - 1 : degree;
   const degreeLayers = layers.slice(0, d + 1);
   if (degreeLayers.length === 0) {
@@ -65,6 +64,12 @@ export const graphDataToForceGraph = (
         const sourceConnections = targetLayer.filter(
           (target) => linkCounts[sourceId][target.id as number] > 0,
         );
+        // TODO: this handles cases where somehow, a node has no connections
+        // this shouldn't happen unless there are no nodes in the graph
+        // mostly comes up in fetch errors, etc.
+        if (sourceConnections.length === 0) {
+          continue;
+        }
         const target = sourceConnections.reduce((a, b) => {
           return linkCounts[b.id as number][sourceId] >
             linkCounts[a.id as number][sourceId]

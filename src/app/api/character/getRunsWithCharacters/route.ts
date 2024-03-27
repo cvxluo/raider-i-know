@@ -6,17 +6,33 @@ import RunModel from "@/models/Run";
 import CharacterModel from "@/models/Character";
 import { Character } from "@/utils/types";
 
+// limit of 1000 characters per request
 export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+  // TODO: consider validation
   const { characters } = await req.json();
 
   if (!characters) {
-    return new NextResponse(null, {
-      status: 400,
-    });
+    return NextResponse.json(
+      { error: "No characters provided." },
+      {
+        status: 400,
+      },
+    );
   }
 
-  // TODO: restrict some level of request to prevent abuse
+  if (characters.length > 1000) {
+    return NextResponse.json(
+      {
+        error:
+          "Too many characters in a single request - consider splitting up your requests.",
+      },
+      {
+        status: 400,
+      },
+    );
+  }
+
   try {
     await mongodb();
 
@@ -36,7 +52,7 @@ export async function POST(req: NextRequest) {
       {
         roster: { $in: retrievedCharacterIds },
       },
-      "roster dungeon.id -_id",
+      "roster dungeon.id keystone_run_id -_id",
     )
       .populate("roster", "name realm.name region.name class.name id -_id")
       .lean();

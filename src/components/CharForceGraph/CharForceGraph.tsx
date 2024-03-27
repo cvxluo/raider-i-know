@@ -26,7 +26,7 @@ import {
   getCharGraph,
   getDenseCharGraph,
   getNextLayer,
-} from "@/actions/mongodb/run_graphs";
+} from "@/components/CharForceGraph/run_graphs";
 import { graphDataToForceGraph } from "./GraphDataProcessing";
 import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
 import { DungeonIdToName, DungeonIds } from "@/utils/consts";

@@ -9,7 +9,7 @@ import {
   getPopulatedRunsWithCharacter,
   getPopulatedRunsWithCharacters,
   getRunsWithCharacter,
-} from "./run";
+} from "@/actions/mongodb/run";
 import next from "next";
 import { ClassColors } from "@/utils/consts";
 import urls from "@/utils/urls";
@@ -204,6 +204,27 @@ export const getGraphData = async (
   return { characters, runs, layerChars };
 };
 
+const callGetPopulatedRunsWithCharacters = async (chars: Character[]) => {
+  return (
+    fetch(urls.baseURL + "/api/character/getRunsWithCharacters", {
+      method: "POST",
+      body: JSON.stringify({ characters: chars }),
+    })
+      .then((res) => res.json())
+      // TODO: consider error handling patterns here
+      .then((res) => {
+        if (res.error) {
+          throw new Error(res.error);
+        }
+        return res;
+      })
+      .catch((e) => {
+        console.error(e);
+        return [];
+      })
+  );
+};
+
 // start from [[mainChar]], with all the runs of mainChar, and an empty mainChar link array
 // add [[mainChar], [all adjacent chars]]
 // this works by first call func -> find all characters connected to the last layer
@@ -237,47 +258,30 @@ export const getNextLayer = async (
   nextLayer.push(...newChars);
   previousCharacters.push(...newChars);
 
-  /*
-  // get all runs for new characters
   const allNewCharRequests = newChars
     .reduce(
       (acc, char) => {
-        // batch requests to 5 characters to prevent payload size errors
+        // batch requests to 1000 characters to prevent payload size and timeout errors
         acc[acc.length - 1].push(char);
-        if (acc[acc.length - 1].length === 5) {
+        if (acc[acc.length - 1].length === 100) {
           acc.push([]);
         }
         return acc;
       },
       [[]] as Character[][],
     )
-    .map(chars => getPopulatedRunsWithCharacters(chars));
-    */
+    .map((chars) => callGetPopulatedRunsWithCharacters(chars));
 
-  // const allNewCharRequests = [getPopulatedRunsWithCharacters(newChars)];
-  /*
-  const allNewCharRequests = newChars.map((char) =>
-    getPopulatedRunsWithCharacter(char),
-  );
-  */
+  const allNewCharRunRetrieved: Run[] = (
+    await Promise.all(allNewCharRequests)
+  ).flat();
+  // remove duplicate runs - happens when we do multiple requests
+  const allNewRunIds = allNewCharRunRetrieved.map((run) => run.keystone_run_id);
+  const allNewCharRuns = allNewCharRunRetrieved.filter((run, index) => {
+    return !allNewRunIds.includes(run.keystone_run_id, index + 1);
+  });
 
-  // const allNewCharRuns = (await Promise.all(allNewCharRequests)).flat();
-
-  const allNewCharRuns: Run[] = await fetch(
-    urls.baseURL + "/api/character/getRunsWithCharacters",
-    {
-      method: "POST",
-      body: JSON.stringify({ characters: newChars }),
-    },
-  )
-    .then((res) => {
-      console.log(res);
-      return res.json();
-    })
-    .catch((e) => {
-      console.error(e);
-      return [];
-    });
+  // const allNewCharRuns: Run[] = await callGetPopulatedRunsWithCharacters(newChars);
 
   newChars.map((newChar) => {
     const newCharRuns = allNewCharRuns.filter((run) =>

@@ -23,8 +23,6 @@ import { Run } from "@/utils/types";
 
 import {
   appendNextLayer,
-  getCharGraph,
-  getDenseCharGraph,
   getNextLayer,
 } from "@/components/CharForceGraph/run_graphs";
 import { graphDataToForceGraph } from "./GraphDataProcessing";

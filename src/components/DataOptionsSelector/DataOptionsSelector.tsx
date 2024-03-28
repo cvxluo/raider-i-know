@@ -36,7 +36,7 @@ const DataOptionsSelector = ({
             width={100}
             defaultValue={2}
             min={1}
-            max={6}
+            max={5}
             onChange={(value) =>
               setGraphOptions({
                 ...graphOptions,
@@ -57,7 +57,7 @@ const DataOptionsSelector = ({
           <NumberInput
             width={100}
             defaultValue={15}
-            min={10}
+            min={15}
             value={runLimit}
             onChange={(value) =>
               setGraphOptions({

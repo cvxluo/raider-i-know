@@ -10,6 +10,10 @@ import { testAppendingLayer, testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character, CharacterGraph } from "@/utils/types";
 import {
   Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -53,6 +57,7 @@ export default function Home() {
   });
 
   const loadButtons = false;
+  const [expandOptions, setExpandOptions] = useState(true);
 
   const [graphOptions, setGraphOptions] = useState({
     showLabels: false,
@@ -122,31 +127,54 @@ export default function Home() {
           <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
         </Box>
       )}
-      <Box maxW="6xl" mx="auto" p={4}>
-        <CharacterSelector handleCharSubmit={handleCharSubmit} />
-        {charError && (
-          <Alert status="error">
-            <AlertIcon />
+      <Accordion
+        allowToggle
+        onChange={() => {
+          setExpandOptions(!expandOptions);
+        }}
+        defaultIndex={0}
+        pb={4}
+        reduceMotion={true}
+      >
+        <AccordionItem>
+          <AccordionPanel pb={0}>
+            <Box maxW="6xl" mx="auto" pt={2} px={4}>
+              <CharacterSelector handleCharSubmit={handleCharSubmit} />
+              {charError && (
+                <Alert status="error">
+                  <AlertIcon />
 
-            <AlertTitle>Character not found</AlertTitle>
-            <Link href="/faq">
-              <QuestionIcon />
-            </Link>
-          </Alert>
-        )}
-        <Spacer height="10px" />
+                  <AlertTitle>Character not found</AlertTitle>
+                  <Link href="/faq">
+                    <QuestionIcon />
+                  </Link>
+                </Alert>
+              )}
+              <Spacer height="10px" />
 
-        <DataOptionsSelector
-          graphOptions={graphOptions}
-          setGraphOptions={setGraphOptions}
-        />
-        <Spacer height="10px" />
-        <GraphOptionsSelector
-          graphOptions={graphOptions}
-          setGraphOptions={setGraphOptions}
-        />
-      </Box>
-      <CharForceGraph mainChar={mainChar} graphOptions={graphOptions} />
+              <DataOptionsSelector
+                graphOptions={graphOptions}
+                setGraphOptions={setGraphOptions}
+              />
+              <Spacer height="10px" />
+              <GraphOptionsSelector
+                graphOptions={graphOptions}
+                setGraphOptions={setGraphOptions}
+              />
+            </Box>
+          </AccordionPanel>
+          <AccordionButton p={0}>
+            <Flex mx="auto">
+              <AccordionIcon />
+            </Flex>
+          </AccordionButton>
+        </AccordionItem>
+      </Accordion>
+      <CharForceGraph
+        mainChar={mainChar}
+        graphOptions={graphOptions}
+        large={!expandOptions}
+      />
     </Box>
   );
 }

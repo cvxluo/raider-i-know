@@ -37,9 +37,11 @@ var lastRequest = 0;
 const CharForceGraph = ({
   mainChar,
   graphOptions,
+  large,
 }: {
   mainChar: Character;
   graphOptions: GraphOptions;
+  large: boolean;
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedNode, setSelectedNode] = useState<Character | null>(null);
@@ -250,33 +252,44 @@ const CharForceGraph = ({
       flexDirection="column"
       alignItems="center"
     >
-      <ForceGraph2D
-        ref={graphRef}
-        graphData={{
-          nodes: charGraph.nodes,
-          links: charGraph.links,
-        }}
-        nodeLabel={(node) => node.name}
-        nodeVal={(node) => {
-          return (
-            Math.max(...charGraph.nodes.map((char) => char.layer || 0)) -
-            (charGraph.nodes.find((n) => n.id === node.id)?.layer || 1)
-          );
-        }}
-        nodeColor={(node) => {
-          return (
-            charGraph.nodes.find((n) => n.id === node.id)?.nodeColor || "blue"
-          );
-        }}
-        nodeCanvasObject={graphOptions.showLabels ? canvasObject : undefined}
-        dagMode={dagMode}
-        onNodeClick={(node) => {
-          // TODO: consider using onNodeHover to prevent graph moving on click
-          setSelectedNode(node);
-          onOpen();
-        }}
-        height={window.innerHeight * 0.5}
-      />
+      <Box
+        shadow="md"
+        borderWidth="1px"
+        borderRadius="lg"
+        overflow="hidden"
+        w="80%"
+        h="80%"
+        mb={2}
+      >
+        <ForceGraph2D
+          ref={graphRef}
+          graphData={{
+            nodes: charGraph.nodes,
+            links: charGraph.links,
+          }}
+          nodeLabel={(node) => node.name}
+          nodeVal={(node) => {
+            return (
+              Math.max(...charGraph.nodes.map((char) => char.layer || 0)) -
+              (charGraph.nodes.find((n) => n.id === node.id)?.layer || 1)
+            );
+          }}
+          nodeColor={(node) => {
+            return (
+              charGraph.nodes.find((n) => n.id === node.id)?.nodeColor || "blue"
+            );
+          }}
+          nodeCanvasObject={graphOptions.showLabels ? canvasObject : undefined}
+          dagMode={dagMode}
+          onNodeClick={(node) => {
+            // TODO: consider using onNodeHover to prevent graph moving on click
+            setSelectedNode(node);
+            onOpen();
+          }}
+          height={large ? window.innerHeight * 0.8 : window.innerHeight * 0.5}
+          width={window.innerWidth * 0.8}
+        />
+      </Box>
 
       {loading && (
         <Box
@@ -299,44 +312,46 @@ const CharForceGraph = ({
             {selectedNode ? selectedNode.name : "Character not found"}
           </ModalHeader>
           <ModalCloseButton />
-          {selectedNode && graphInfo.runs && (
-            <ModalBody>
-              <Text as="b">
-                Number of runs in database:{" "}
-                {graphInfo.runs[selectedNode.id as number].length}
-              </Text>
-              <br />
-              <Text as="b">Most Frequently Played With:</Text>
-              <br />
-              <UnorderedList>
-                {
-                  // shows most played with characters
-                  mostPlayedWith(selectedNode as Character).map((char) => {
-                    return <ListItem key={char}>{char}</ListItem>;
-                  })
-                }
-              </UnorderedList>
-              <Text as="b"># Runs Per Dungeon:</Text>
-              <br />
-              <UnorderedList>
-                {
-                  // shows how many runs for each dungeon
-                  DungeonIds.map((dungeonId) => {
-                    return (
-                      <ListItem key={dungeonId}>
-                        {DungeonIdToName[dungeonId]}:{" "}
-                        {
-                          graphInfo.runs[selectedNode.id as number].filter(
-                            (run) => run.dungeon.id === dungeonId,
-                          ).length
-                        }
-                      </ListItem>
-                    );
-                  })
-                }
-              </UnorderedList>
-            </ModalBody>
-          )}
+          {selectedNode &&
+            graphInfo.runs &&
+            graphInfo.runs[selectedNode.id as number] && (
+              <ModalBody>
+                <Text as="b">
+                  Number of runs in database:{" "}
+                  {graphInfo.runs[selectedNode.id as number].length}
+                </Text>
+                <br />
+                <Text as="b">Most Frequently Played With:</Text>
+                <br />
+                <UnorderedList>
+                  {
+                    // shows most played with characters
+                    mostPlayedWith(selectedNode as Character).map((char) => {
+                      return <ListItem key={char}>{char}</ListItem>;
+                    })
+                  }
+                </UnorderedList>
+                <Text as="b"># Runs Per Dungeon:</Text>
+                <br />
+                <UnorderedList>
+                  {
+                    // shows how many runs for each dungeon
+                    DungeonIds.map((dungeonId) => {
+                      return (
+                        <ListItem key={dungeonId}>
+                          {DungeonIdToName[dungeonId]}:{" "}
+                          {
+                            graphInfo.runs[selectedNode.id as number].filter(
+                              (run) => run.dungeon.id === dungeonId,
+                            ).length
+                          }
+                        </ListItem>
+                      );
+                    })
+                  }
+                </UnorderedList>
+              </ModalBody>
+            )}
 
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>

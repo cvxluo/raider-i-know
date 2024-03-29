@@ -24,6 +24,14 @@ const FAQPage = () => {
         </Text>
         <br />
 
+        <Heading size="md">The site is crashing!</Heading>
+        <Text>
+          Unfortunately, there simply is a lot of data to load, and the site may
+          crash on slower devices. If you are looking to view large degrees
+          (usually {">"}4), try increasing the run limit to reduce render times.
+        </Text>
+        <br />
+
         <Heading size="md">Where is the data from?</Heading>
         <Text>
           All data is from{" "}
@@ -37,6 +45,19 @@ const FAQPage = () => {
           .
         </Text>
         <br />
+
+        <Heading size="md">
+          Why don{"'"}t you have my character/all characters/Europe support?
+        </Heading>
+        <Text>
+          Season 3 of DF (as of 3/28/2024) has around 10M runs total, while my
+          database stores around 200K - around 2 orders of magnitude off.
+          Additionally, the API is rate limited to 300 requests per minute, so
+          pulling runs individually, without having access to bulk access
+          methods such as the Raider IO API top run endpoint, would take a very
+          long time. After this season, I plan to offer the runs collected this
+          season as a backup, and reset the database for Season 4.
+        </Text>
 
         <Heading size="md">
           How often is the data updated/when was this data taken?

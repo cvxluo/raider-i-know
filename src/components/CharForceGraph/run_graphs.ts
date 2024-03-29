@@ -16,7 +16,7 @@ import urls from "@/utils/urls";
 
 const callGetPopulatedRunsWithCharacters = async (chars: Character[]) => {
   return (
-    fetch(urls.baseURL + "/api/character/getRunsWithCharacters", {
+    fetch("/api/character/getRunsWithCharacters", {
       method: "POST",
       body: JSON.stringify({ characters: chars }),
     })

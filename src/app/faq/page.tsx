@@ -1,4 +1,4 @@
-import { Link, Spacer } from "@chakra-ui/react";
+import { Divider, Link, Spacer } from "@chakra-ui/react";
 import { Box, Heading, Text } from "@chakra-ui/react";
 
 const FAQPage = () => {
@@ -22,7 +22,7 @@ const FAQPage = () => {
           affect the your runs. If you believe some bug or error is occuring,
           contact me at vexvex on Discord.
         </Text>
-        <br />
+        <Divider my={4} />
 
         <Heading size="md">The site is crashing!</Heading>
         <Text>
@@ -30,7 +30,7 @@ const FAQPage = () => {
           crash on slower devices. If you are looking to view large degrees
           (usually {">"}4), try increasing the run limit to reduce render times.
         </Text>
-        <br />
+        <Divider my={4} />
 
         <Heading size="md">Where is the data from?</Heading>
         <Text>
@@ -44,7 +44,7 @@ const FAQPage = () => {
           </Link>
           .
         </Text>
-        <br />
+        <Divider my={4} />
 
         <Heading size="md">
           Why don{"'"}t you have my character/all characters/Europe support?
@@ -59,11 +59,13 @@ const FAQPage = () => {
           season as a backup, and reset the database for Season 4.
         </Text>
 
+        <Divider my={4} />
+
         <Heading size="md">
           How often is the data updated/when was this data taken?
         </Heading>
         <Text>The last snapshot was taken 3/1/2024.</Text>
-        <br />
+        <Divider my={4} />
 
         <Heading size="md">Code?</Heading>
         <Text>
@@ -76,7 +78,7 @@ const FAQPage = () => {
             GitHub
           </Link>
         </Text>
-        <br />
+        <Divider my={4} />
 
         <Heading size="md">Contact</Heading>
         <Text>

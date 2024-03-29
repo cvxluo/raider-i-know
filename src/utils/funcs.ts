@@ -62,12 +62,10 @@ export const getCharactersInRuns = (runs: Run[]) => {
     })
     .flat();
   // assume id exists
-  console.log("Number of characters in runs: ", characters.length);
   const charIds = characters.map((char) => char.id);
   const uniqueCharacters = characters.filter((char, index) => {
     return !charIds.includes(char.id, index + 1);
   });
-  console.log("Number of unique characters in runs: ", uniqueCharacters.length);
 
   return uniqueCharacters;
 };

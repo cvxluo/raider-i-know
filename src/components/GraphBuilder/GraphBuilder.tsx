@@ -141,7 +141,7 @@ export default function GraphBuilder() {
             <Box maxW="6xl" mx="auto" pt={2} px={4}>
               <CharacterSelector handleCharSubmit={handleCharSubmit} />
               {charError && (
-                <Alert status="error">
+                <Alert status="error" mt={2} variant="top-accent">
                   <AlertIcon />
 
                   <AlertTitle>Character not found</AlertTitle>

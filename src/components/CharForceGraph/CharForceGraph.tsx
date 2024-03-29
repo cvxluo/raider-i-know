@@ -14,6 +14,10 @@ import {
   List,
   ListItem,
   UnorderedList,
+  Toast,
+  useToast,
+  Tooltip,
+  HStack,
 } from "@chakra-ui/react";
 
 import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
@@ -29,8 +33,27 @@ import { graphDataToForceGraph } from "./GraphDataProcessing";
 import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
 import { DungeonIdToName, DungeonIds } from "@/utils/consts";
 import { useRouter } from "next/navigation";
+import {
+  InfoIcon,
+  InfoOutlineIcon,
+  QuestionIcon,
+  QuestionOutlineIcon,
+} from "@chakra-ui/icons";
+import CharGraphModal from "./CharGraphModal";
 
 var lastRequest = 0;
+
+const canvasObject = (node: any, ctx: CanvasRenderingContext2D) => {
+  const label = node.name;
+  const fontSize = 12;
+  ctx.font = `${fontSize}px Sans-Serif`;
+  const textWidth = ctx.measureText(label).width;
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = node.nodeColor || "black";
+  ctx.fillText(label, node.x as number, node.y as number);
+};
 
 const CharForceGraph = ({
   mainChar,
@@ -44,7 +67,56 @@ const CharForceGraph = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedNode, setSelectedNode] = useState<Character | null>(null);
 
+  const toast = useToast();
+
   const graphRef = useRef<any>();
+
+  const [graphInfo, setGraphInfo] = useState<{
+    layers: Character[][];
+    linkCounts: { [key: number]: { [key: number]: number } };
+    runs: { [key: number]: Run[] };
+  }>({
+    layers: [],
+    linkCounts: {},
+    runs: {},
+  });
+  const [charGraph, setCharGraph] = useState<CharacterGraph>({
+    nodes: [],
+    links: [],
+  });
+
+  useEffect(() => {
+    console.log(mainChar);
+
+    // TODO: this is a hack - verifying mainChar is not null should be CharacterSelector responsibility,
+    // but because mainChar can change (in region/realm), triggering the useEffect, we need to check here as well
+    if (mainChar.name === "") {
+      return;
+    }
+
+    lastRequest++;
+
+    const retrievePromise = retrieveGraphData(
+      mainChar,
+      graphOptions.degree,
+      lastRequest,
+    );
+
+    toast.promise(retrievePromise, {
+      loading: {
+        title: `Loading graph for ${mainChar.name}-${mainChar.realm.name} (${graphOptions.degree})`,
+        isClosable: true,
+      },
+      success: {
+        title: `Loaded graph for ${mainChar.name}-${mainChar.realm.name} (${graphOptions.degree})`,
+        isClosable: true,
+      },
+      error: {
+        title: "Error loading graph, try again later.",
+        isClosable: true,
+      },
+    });
+  }, [mainChar, graphOptions.degree]);
 
   useEffect(() => {
     const graph = graphRef.current;
@@ -65,49 +137,6 @@ const CharForceGraph = ({
     }
   }, [graphRef, graphOptions.nodeForceStrength, graphOptions.linkDistance]);
 
-  const [graphInfo, setGraphInfo] = useState<{
-    layers: Character[][];
-    linkCounts: { [key: number]: { [key: number]: number } };
-    runs: { [key: number]: Run[] };
-  }>({
-    layers: [],
-    linkCounts: {},
-    runs: {},
-  });
-  const [charGraph, setCharGraph] = useState<CharacterGraph>({
-    nodes: [],
-    links: [],
-  });
-
-  const [loading, setLoading] = useState(false);
-  // note that loading message is not necessarily completely accurate, since it updates async
-  const [loadingMessage, setLoadingMessage] = useState<string>("");
-
-  const router = useRouter();
-
-  useEffect(() => {
-    console.log(mainChar);
-
-    // TODO: this is a hack - verifying mainChar is not null should be CharacterSelector responsibility,
-    // but because mainChar can change (in region/realm), triggering the useEffect, we need to check here as well
-    if (mainChar.name === "") {
-      return;
-    }
-
-    setLoading(true);
-    lastRequest++;
-    setLoadingMessage(
-      `Loading graph for ${mainChar.name}-${mainChar.realm.name} (${graphOptions.degree})`,
-    );
-
-    retrieveGraphData(mainChar, graphOptions.degree, lastRequest).then(
-      (res) => {
-        // multiple requests can be inflight - we only stop loading if the LAST request is done,
-        setLoading(res.stillLoading);
-      },
-    );
-  }, [mainChar, graphOptions.degree]);
-
   const retrieveGraphData = async (
     char: Character,
     degreeToRetrieve: number,
@@ -118,56 +147,30 @@ const CharForceGraph = ({
       degreeToRetrieve < graphInfo.layers.length &&
       graphInfo.layers[0][0].id === char.id
     ) {
-      return { stillLoading: false };
+      // Already loaded - success, close toast
+      return;
     }
     // if we do not have all the graph data, but already retrieved some, use that as a basis
     // note that if the character id is different, we always skip this and start from scratch
+    var layers = [[char]];
+    var linkCounts: {
+      [key: number]: { [key: number]: number };
+    } = {};
+    const charId = char.id as number;
+    linkCounts[charId] = {};
+    var runs: { [key: number]: Run[] } = {};
+    runs[charId] = await getPopulatedRunsWithCharacter(char);
 
-    var layers;
     if (
       graphInfo.layers.length !== 0 &&
       graphInfo.layers[0][0].id === char.id
     ) {
       layers = graphInfo.layers;
-      const linkCounts = graphInfo.linkCounts;
-      const runs = graphInfo.runs;
-
-      for (let i = graphInfo.layers.length; i <= degreeToRetrieve; i++) {
-        const nextLayerData = await getNextLayer(
-          layers,
-          linkCounts,
-          runs,
-          i - 1,
-        );
-        layers = [...layers.slice(0, i + 1), nextLayerData.nextLayer];
-        Object.keys(nextLayerData.nextLinks).forEach((source) => {
-          linkCounts[parseInt(source)] =
-            nextLayerData.nextLinks[parseInt(source)];
-        });
-        Object.keys(nextLayerData.nextRuns).forEach((charId) => {
-          runs[parseInt(charId)] = nextLayerData.nextRuns[parseInt(charId)];
-        });
-
-        // TODO: hacky race condition check
-        if (lastRequest !== reqNum) {
-          return { stillLoading: true };
-        }
-
-        setGraphInfo({ layers, linkCounts, runs });
-      }
-      return { stillLoading: false };
+      linkCounts = graphInfo.linkCounts;
+      runs = graphInfo.runs;
     }
-    // otherwise, start from scratch
-    layers = [[char]];
-    const linkCounts: {
-      [key: number]: { [key: number]: number };
-    } = {};
-    linkCounts[char.id as number] = {};
-    const charId = char.id as number;
-    const runs: { [key: number]: Run[] } = {};
-    runs[charId] = await getPopulatedRunsWithCharacter(char);
-    for (let i = 0; i < graphOptions.degree; i++) {
-      // note this can be a long process - multiple processes can get to this step
+
+    for (let i = layers.length; i < degreeToRetrieve + 1; i++) {
       const nextLayerData = await getNextLayer(layers, linkCounts, runs, i);
       layers = [...layers.slice(0, i + 1), nextLayerData.nextLayer];
       Object.keys(nextLayerData.nextLinks).forEach((source) => {
@@ -178,15 +181,16 @@ const CharForceGraph = ({
         runs[parseInt(charId)] = nextLayerData.nextRuns[parseInt(charId)];
       });
 
-      // TODO: hacky race condition check - if, between the time we started retrieving and now, the mainChar has changed, stop
+      // TODO: hacky race condition check
       if (lastRequest !== reqNum) {
-        return { stillLoading: true };
+        // request changed, send an error toast
+        throw new Error("Request changed");
       }
 
       setGraphInfo({ layers, linkCounts, runs });
     }
-
-    return { stillLoading: false };
+    // success, close toast
+    return;
   };
 
   // get graph from info
@@ -204,43 +208,11 @@ const CharForceGraph = ({
     setCharGraph(graph);
   }, [graphInfo, graphOptions]);
 
-  const canvasObject = (node: any, ctx: CanvasRenderingContext2D) => {
-    const label = node.name;
-    const fontSize = 12;
-    ctx.font = `${fontSize}px Sans-Serif`;
-    const textWidth = ctx.measureText(label).width;
-
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = node.nodeColor || "black";
-    ctx.fillText(label, node.x as number, node.y as number);
-  };
-
   const dagMode = graphOptions.treeMode
     ? graphOptions.radialMode
       ? "radialout"
       : "td"
     : undefined;
-
-  /*
-  backgroundColor="#101020"
-  linkColor={() => 'rgba(255,255,255,0.2)'}
-  linkDirectionalParticles={2}
-  linkDirectionalParticleWidth={2}
-  */
-
-  const mostPlayedWith = (char: Character, n = 5) => {
-    const linkCounts = graphInfo.linkCounts[char.id as number];
-    if (!linkCounts) {
-      return [];
-    }
-    return Object.entries(linkCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, n)
-      .map(([id, count]) => {
-        return graphInfo.layers.flat().find((c) => c.id === parseInt(id))?.name;
-      });
-  };
 
   return (
     <Box
@@ -289,83 +261,28 @@ const CharForceGraph = ({
         />
       </Box>
 
-      {loading && (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          w="100%"
-          h="100%"
+      <CharGraphModal
+        isOpen={isOpen}
+        onClose={onClose}
+        selectedNode={selectedNode}
+        graphInfo={graphInfo}
+      />
+      <HStack>
+        <Tooltip
+          label={`${graphInfo.layers.flat().length} characters (${charGraph.nodes.length} displayed), ${Object.values(graphInfo.runs).flat().length} runs`}
         >
-          <Text>{loadingMessage}</Text>
-          <Spinner />
-        </Box>
-      )}
-
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            {selectedNode ? selectedNode.name : "Character not found"}
-          </ModalHeader>
-          <ModalCloseButton />
-          {selectedNode &&
-            graphInfo.runs &&
-            graphInfo.runs[selectedNode.id as number] && (
-              <ModalBody>
-                <Text as="b">
-                  Number of runs in database:{" "}
-                  {graphInfo.runs[selectedNode.id as number].length}
-                </Text>
-                <br />
-                <Text as="b">Most Frequently Played With:</Text>
-                <br />
-                <UnorderedList>
-                  {
-                    // shows most played with characters
-                    mostPlayedWith(selectedNode as Character).map((char) => {
-                      return <ListItem key={char}>{char}</ListItem>;
-                    })
-                  }
-                </UnorderedList>
-                <Text as="b"># Runs Per Dungeon:</Text>
-                <br />
-                <UnorderedList>
-                  {
-                    // shows how many runs for each dungeon
-                    DungeonIds.map((dungeonId) => {
-                      return (
-                        <ListItem key={dungeonId}>
-                          {DungeonIdToName[dungeonId]}:{" "}
-                          {
-                            graphInfo.runs[selectedNode.id as number].filter(
-                              (run) => run.dungeon.id === dungeonId,
-                            ).length
-                          }
-                        </ListItem>
-                      );
-                    })
-                  }
-                </UnorderedList>
-              </ModalBody>
-            )}
-
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                if (selectedNode) router.push(`/character/${selectedNode.id}`);
-              }}
-            >
-              More Info
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          <InfoIcon />
+        </Tooltip>
+        <Tooltip
+          label={
+            graphInfo.layers.length
+              ? "Click on a node to see more info"
+              : "Enter your character's info to see the graph"
+          }
+        >
+          <QuestionIcon />
+        </Tooltip>
+      </HStack>
     </Box>
   );
 };

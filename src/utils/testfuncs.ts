@@ -16,7 +16,7 @@ import {
   saveAllRunsForCharacter,
   saveDungeonRunsForCharacter,
 } from "@/actions/mongodb/data_collection/character_runs";
-import { appendNextLayer } from "@/actions/mongodb/run_graphs";
+import { appendNextLayer } from "@/components/CharForceGraph/run_graphs";
 
 export const testCreateRun = async () => {
   const testRun = {

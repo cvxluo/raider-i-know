@@ -11,9 +11,7 @@ import { Skeleton } from "@chakra-ui/react";
 import { Box, Heading, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-import DungeonCountChart from "@/components/CharacterInfoGraphs/DungeonCountChart";
-import FrequentlyPlayedWithTree from "@/components/CharacterInfoGraphs/FrequentlyPlayedWithTree";
-import RunLevelPie from "@/components/CharacterInfoGraphs/RunLevelPie";
+import CharacterInfoGraphs from "@/components/CharacterInfoGraphs";
 
 const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
   const characterId = params.characterId;
@@ -40,7 +38,7 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
   }, []);
 
   return (
-    <Box maxW="6xl" mx="auto" py={4}>
+    <Box maxW="6xl" mx="auto" p={4}>
       <Heading>
         {character ? character.name : <Skeleton>Loading</Skeleton>}
       </Heading>
@@ -54,15 +52,10 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
           overflow="hidden"
           boxShadow="md"
         >
-          <Heading size="md">Runs</Heading>
-          <Text>Total Runs in Database: {characterRuns.length}</Text>
-          <DungeonCountChart runs={characterRuns} />
-
-          <Heading size="md">Frequently Played With</Heading>
-          <FrequentlyPlayedWithTree runs={characterRuns} />
-
-          <Heading size="md">Key Levels</Heading>
-          <RunLevelPie runs={characterRuns} />
+          <CharacterInfoGraphs
+            character={character}
+            characterRuns={characterRuns}
+          />
         </Box>
       </Skeleton>
     </Box>

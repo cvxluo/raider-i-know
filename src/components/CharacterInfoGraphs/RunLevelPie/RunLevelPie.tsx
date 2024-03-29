@@ -28,6 +28,7 @@ const RunLevelPie = ({ runs }: { runs: Run[] }) => {
               type: "pie",
             },
             labels: Object.keys(keyLevelCounts),
+            title: { text: "Runs per key level" },
           }}
           series={Object.values(keyLevelCounts)}
           type="pie"

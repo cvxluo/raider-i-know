@@ -9,7 +9,7 @@ import { useState } from "react";
 const CharacterInfoPage = () => {
   const router = useRouter();
   return (
-    <Box maxW="6xl" mx="auto" py={4}>
+    <Box maxW="6xl" mx="auto" p={4}>
       <Heading>Character Statistics</Heading>
       <CharacterSelector
         handleCharSubmit={(char) => {

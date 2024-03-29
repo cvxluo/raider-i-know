@@ -36,13 +36,19 @@ const DataOptionsSelector = ({
             width={100}
             defaultValue={2}
             min={1}
-            max={6}
-            onChange={(value) =>
-              setGraphOptions({
-                ...graphOptions,
-                degree: parseInt(value || "0"),
-              })
-            }
+            max={5}
+            onChange={(value) => {
+              // this adds some extra clamping to degree
+              // since changing degree can be very expensive both rendering and backend wise,
+              // sending an invalid degree can be dangerous
+              const val = parseInt(value || "0");
+              const clampedVal = Math.min(5, Math.max(1, val));
+              if (clampedVal !== degree)
+                setGraphOptions({
+                  ...graphOptions,
+                  degree: clampedVal,
+                });
+            }}
             value={degree}
           >
             <NumberInputField />
@@ -57,14 +63,16 @@ const DataOptionsSelector = ({
           <NumberInput
             width={100}
             defaultValue={15}
-            min={10}
+            min={15}
             value={runLimit}
-            onChange={(value) =>
-              setGraphOptions({
-                ...graphOptions,
-                runLimit: parseInt(value || "0"),
-              })
-            }
+            onChange={(value) => {
+              const val = parseInt(value || "0");
+              if (val !== runLimit)
+                setGraphOptions({
+                  ...graphOptions,
+                  runLimit: parseInt(value || "0"),
+                });
+            }}
           >
             <NumberInputField />
 

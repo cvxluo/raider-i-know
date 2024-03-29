@@ -36,9 +36,15 @@ const CharacterSelector = ({
           <Input
             placeholder="Character Name"
             value={charInfo.name}
-            onChange={(e) => setCharInfo({ ...charInfo, name: e.target.value })}
+            onChange={(e) => {
+              const nameCapitalized =
+                e.target.value.charAt(0).toUpperCase() +
+                e.target.value.slice(1).toLowerCase();
+              setCharInfo({ ...charInfo, name: nameCapitalized });
+            }}
             isRequired
             isInvalid={isError}
+            width="40%"
           />
           <Select
             value={charInfo.realm.name}
@@ -50,7 +56,7 @@ const CharacterSelector = ({
                 ) as Realm,
               })
             }
-            width={600}
+            width="20%"
           >
             {Realms.map((realm, index) => (
               <option key={index} value={realm.name}>
@@ -68,7 +74,7 @@ const CharacterSelector = ({
                 ) as Region,
               })
             }
-            width={1200}
+            width="25%"
           >
             {Regions.map((region, index) => (
               <option key={index} value={region.name}>
@@ -78,7 +84,7 @@ const CharacterSelector = ({
           </Select>
           <Button
             colorScheme="teal"
-            width={400}
+            width="15%"
             onClick={() => {
               if (charInfo.name === "") {
                 setIsError(true);

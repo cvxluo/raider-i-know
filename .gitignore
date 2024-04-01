@@ -34,3 +34,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# large data files for analysis
+analysis/data
+analysis/.env
+analysis/env
+analysis/__pycache__

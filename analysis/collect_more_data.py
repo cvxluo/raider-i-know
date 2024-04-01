@@ -114,6 +114,16 @@ def save_character_runs (character) :
 
 def save_all_character_runs () :
     i = 0
+    if (client.raideriknow.runs.count_documents({}) != len(database_runs)) :
+        print("Database runs do not match the actual number of runs in the database")
+        print("Please redownload the database")
+        return
+    
+    if (client.raideriknow.characters.count_documents({}) != len(database_characters)) :
+        print("Database characters do not match the actual number of characters in the database")
+        print("Please redownload the database")
+        return
+    
     for character in database_characters :
         save_character_runs(character)
 

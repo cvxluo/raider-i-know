@@ -1,4 +1,5 @@
 import datetime
+from bson import ObjectId
 
 class Character (object) :
     _id = 0
@@ -108,7 +109,8 @@ class Run (object) :
         self._id = _id
 
     def from_json (json):
-        return Run(json['keystone_run_id'], json['completed_at'], json['dungeon'], json['mythic_level'], json['roster'], json['season'], json['weekly_modifiers'], json['keystone_team_id'], json['_id']['$oid'])
+        roster = list(map(lambda c: ObjectId(c['$oid']), json['roster']))
+        return Run(json['keystone_run_id'], json['completed_at'], json['dungeon'], json['mythic_level'], roster, json['season'], json['weekly_modifiers'], json['keystone_team_id'], json['_id']['$oid'])
     
     def to_json (self):
         return {

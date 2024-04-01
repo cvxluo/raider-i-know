@@ -26,6 +26,7 @@ remember to redownload the database each time this is run!
 
 database_runs = open('data/raideriknow.runs.json', 'r')
 database_runs = json.load(database_runs)
+# small error here - run rosters end in form { "oid" : string } instead of just string
 database_runs = [Run.from_json(run) for run in database_runs]
 database_run_ids = { run.keystone_run_id: run for run in database_runs }
 

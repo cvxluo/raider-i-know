@@ -1,43 +1,21 @@
 import {
-  Box,
-  Spinner,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   Button,
-  Text,
-  List,
   ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
   UnorderedList,
-  Toast,
-  useToast,
-  Tooltip,
-  HStack,
 } from "@chakra-ui/react";
 
-import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
-import { ForceGraph2D } from "react-force-graph";
-import { useEffect, useRef, useState } from "react";
-import { Run } from "@/utils/types";
+import { Character, Run } from "@/utils/types";
 
-import {
-  appendNextLayer,
-  getNextLayer,
-} from "@/components/CharForceGraph/run_graphs";
-import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
 import { DungeonIdToName, DungeonIds } from "@/utils/consts";
 import { useRouter } from "next/navigation";
-import {
-  InfoIcon,
-  InfoOutlineIcon,
-  QuestionIcon,
-  QuestionOutlineIcon,
-} from "@chakra-ui/icons";
 
 const CharGraphModal = ({
   isOpen,

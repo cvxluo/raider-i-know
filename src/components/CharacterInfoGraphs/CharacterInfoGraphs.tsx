@@ -1,14 +1,8 @@
 "use client";
 
-import { getCharacterByRIOID } from "@/actions/mongodb/character";
-import {
-  getPopulatedRunsWithCharacter,
-  getRunsWithCharacter,
-} from "@/actions/mongodb/run";
-import { Character, Run, RunReducedRoster } from "@/utils/types";
+import { Character, Run } from "@/utils/types";
 
 import { Box, Heading, Text } from "@chakra-ui/react";
-import { SetStateAction, useEffect, useState } from "react";
 
 import DungeonCountChart from "@/components/CharacterInfoGraphs/DungeonCountChart";
 import FrequentlyPlayedWithTree from "@/components/CharacterInfoGraphs/FrequentlyPlayedWithTree";

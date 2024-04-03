@@ -5,9 +5,19 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
   ssr: false,
 });
 
+import { getRunLevels } from "@/actions/mongodb/aggregations/run_stats";
+import { getCharacter } from "@/actions/mongodb/character";
+import {
+  getRunsForAllCharacters,
+  purgeCharacters,
+  purgeRuns,
+} from "@/actions/mongodb/data_collection/character_trawling";
 import CharacterSelector from "@/components/CharacterSelector";
-import { testAppendingLayer, testSaveTopAffixes } from "@/utils/testfuncs";
-import { Character, CharacterGraph } from "@/utils/types";
+import DataOptionsSelector from "@/components/DataOptionsSelector";
+import GraphOptionsSelector from "@/components/GraphOptionsSelector";
+import { testSaveTopAffixes } from "@/utils/testfuncs";
+import { Character } from "@/utils/types";
+import { QuestionIcon } from "@chakra-ui/icons";
 import {
   Accordion,
   AccordionButton,
@@ -22,22 +32,8 @@ import {
   Flex,
   Spacer,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { getCharacter } from "@/actions/mongodb/character";
-import GraphOptionsSelector from "@/components/GraphOptionsSelector";
-import DataOptionsSelector from "@/components/DataOptionsSelector";
-import {
-  getRunsForAllCharacters,
-  purgeCharacters,
-  purgeRuns,
-} from "@/actions/mongodb/data_collection/character_trawling";
-import { getClassCounts } from "@/actions/mongodb/aggregations/character_stats";
-import {
-  getDungeonCounts,
-  getRunLevels,
-} from "@/actions/mongodb/aggregations/run_stats";
-import { QuestionIcon } from "@chakra-ui/icons";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function GraphBuilder() {
   const [mainChar, setMainChar] = useState<Character>({

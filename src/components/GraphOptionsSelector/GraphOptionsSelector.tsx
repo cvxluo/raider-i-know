@@ -20,14 +20,7 @@ const GraphOptionsSelector = ({
   graphOptions: GraphOptions;
   setGraphOptions: (graphOptions: GraphOptions) => void;
 }) => {
-  const {
-    showLabels,
-    treeMode,
-    radialMode,
-    nodeForceStrength,
-    linkDistance,
-    runBasedLinks,
-  } = graphOptions;
+  const { showLabels, treeMode, radialMode, runBasedLinks } = graphOptions;
 
   return (
     <Box>

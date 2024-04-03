@@ -1,5 +1,4 @@
-import { Divider, Link, Spacer } from "@chakra-ui/react";
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box, Divider, Heading, Link, Text } from "@chakra-ui/react";
 
 const FAQPage = () => {
   return (

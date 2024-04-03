@@ -1,26 +1,22 @@
 "use client";
-import { Run, RunReducedRoster } from "@/utils/types";
+import { Run } from "@/utils/types";
 // note that since this page uses apex charts, this can't be a server component
 
 import {
-  RangeSlider,
-  RangeSliderTrack,
-  RangeSliderFilledTrack,
-  RangeSliderThumb,
-  RangeSliderMark,
+  Box,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
-  NumberIncrementStepper,
   NumberInputStepper,
-  NumberDecrementStepper,
+  Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { Box, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
+import { getLimitedChars } from "@/utils/funcs";
 import dynamic from "next/dynamic";
 import RunLevelRangeSlider from "../RunLevelRangeSlider";
-import { getLimitedChars } from "@/utils/funcs";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
@@ -80,9 +76,6 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
       },
       {} as Record<string, number>,
     );
-
-  console.log(playerCountData);
-  console.log(limitedPlayerCountData);
 
   return (
     <Box>

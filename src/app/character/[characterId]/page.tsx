@@ -1,14 +1,10 @@
 "use client";
 import { getCharacterByRIOID } from "@/actions/mongodb/character";
-import {
-  getPopulatedRunsWithCharacter,
-  getRunsWithCharacter,
-} from "@/actions/mongodb/run";
-import { Character, Run, RunReducedRoster } from "@/utils/types";
+import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
+import { Character, Run } from "@/utils/types";
 // note that since this page uses apex charts, this can't be a server component
 
-import { Skeleton } from "@chakra-ui/react";
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box, Heading, Skeleton } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 import CharacterInfoGraphs from "@/components/CharacterInfoGraphs";

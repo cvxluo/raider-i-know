@@ -1,5 +1,4 @@
 import { getCharacter } from "@/actions/mongodb/character";
-import urls from "@/utils/urls";
 import { NextRequest } from "next/server";
 
 // this only retrieves the ObjectID from the database

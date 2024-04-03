@@ -1,7 +1,7 @@
+import { GraphOptions } from "@/utils/types";
 import {
   Box,
   FormControl,
-  FormHelperText,
   FormLabel,
   HStack,
   NumberDecrementStepper,
@@ -13,7 +13,6 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { GraphOptions } from "@/utils/types";
 
 const DataOptionsSelector = ({
   graphOptions,

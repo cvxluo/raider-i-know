@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, Text } from "@chakra-ui/react";
 import DatabaseStats from "@/components/DatabaseStats";
+import { Box, Text } from "@chakra-ui/react";
 
 const StatsPage = () => {
   return (

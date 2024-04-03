@@ -1,7 +1,7 @@
 // https://stackoverflow.com/questions/65850544/rate-limit-the-number-of-request-made-from-react-client-to-api
 // need to look more into error handling when using - sometimes we run into rate limits even with this.
 
-import { Request, RequestReturn } from "../types";
+import { RequestReturn } from "../types";
 
 const LOG_RIO_REQUESTS = true;
 

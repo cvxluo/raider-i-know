@@ -2,9 +2,8 @@
 
 import { getCharacter } from "@/actions/mongodb/character";
 import CharacterSelector from "@/components/CharacterSelector";
-import { Box, Text, Input, Heading } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 const CharacterInfoPage = () => {
   const router = useRouter();

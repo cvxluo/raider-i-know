@@ -1,9 +1,9 @@
 import { Grid } from "@chakra-ui/react";
-import DungeonCountChart from "./DungeonCountChart";
-import RunLevelChart from "./RunLevelChart";
-import RunCountByWeekChart from "./RunCountByWeekChart";
 import CharacterClassCountChart from "./CharacterClassCountChart";
 import CharacterServerCountChart from "./CharacterServerCountChart";
+import DungeonCountChart from "./DungeonCountChart";
+import RunCountByWeekChart from "./RunCountByWeekChart";
+import RunLevelChart from "./RunLevelChart";
 
 const DatabaseStats = () => {
   return (

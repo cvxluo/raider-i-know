@@ -1,14 +1,7 @@
 "use client";
-import { Run, RunReducedRoster } from "@/utils/types";
+import { Run } from "@/utils/types";
 // note that since this page uses apex charts, this can't be a server component
 
-import {
-  RangeSlider,
-  RangeSliderTrack,
-  RangeSliderFilledTrack,
-  RangeSliderThumb,
-  RangeSliderMark,
-} from "@chakra-ui/react";
 import { Box, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 

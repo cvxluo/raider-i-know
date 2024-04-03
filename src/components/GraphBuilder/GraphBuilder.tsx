@@ -61,7 +61,7 @@ export default function GraphBuilder() {
 
   const [graphOptions, setGraphOptions] = useState({
     showLabels: false,
-    degree: 2,
+    degree: 3,
     runLimit: 15,
     treeMode: true,
     radialMode: true,

@@ -34,7 +34,7 @@ const DataOptionsSelector = ({
           </Tooltip>
           <NumberInput
             width={100}
-            defaultValue={2}
+            defaultValue={3}
             min={1}
             max={5}
             onChange={(value) => {

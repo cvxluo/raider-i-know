@@ -9,7 +9,7 @@ import {
   Input,
   Select,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const CharacterSelector = ({
   handleCharSubmit,
@@ -23,10 +23,6 @@ const CharacterSelector = ({
   });
 
   const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    console.log(charInfo);
-  }, [charInfo]);
 
   return (
     <Box>

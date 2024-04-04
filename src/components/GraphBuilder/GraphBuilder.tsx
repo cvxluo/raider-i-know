@@ -5,17 +5,10 @@ const CharForceGraph = dynamic(() => import("@/components/CharForceGraph"), {
   ssr: false,
 });
 
-import { getRunLevels } from "@/actions/mongodb/aggregations/run_stats";
 import { getCharacter } from "@/actions/mongodb/character";
-import {
-  getRunsForAllCharacters,
-  purgeCharacters,
-  purgeRuns,
-} from "@/actions/mongodb/data_collection/character_trawling";
 import CharacterSelector from "@/components/CharacterSelector";
 import DataOptionsSelector from "@/components/DataOptionsSelector";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
-import { testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character } from "@/utils/types";
 import { QuestionIcon } from "@chakra-ui/icons";
 import {
@@ -28,7 +21,6 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
-  Button,
   Flex,
   Spacer,
 } from "@chakra-ui/react";
@@ -52,7 +44,6 @@ export default function GraphBuilder() {
     },
   });
 
-  const loadButtons = false;
   const [expandOptions, setExpandOptions] = useState(true);
 
   const [graphOptions, setGraphOptions] = useState({
@@ -81,48 +72,8 @@ export default function GraphBuilder() {
       },
     );
   };
-
-  const handleTestSaveLimited = async () => {
-    await getRunsForAllCharacters(0, 25);
-  };
-
-  const handleTestSaveLessLimited = async () => {
-    await getRunsForAllCharacters(0, 20);
-  };
-
-  const handleDeleteRuns = async () => {
-    const purgeResult = await purgeRuns(20);
-    console.log(purgeResult);
-  };
-
-  const handleDeleteChars = async () => {
-    const purgeResult = await purgeCharacters();
-    console.log(purgeResult);
-  };
-
-  const handleSaveTopRuns = async () => {
-    await testSaveTopAffixes();
-  };
-
-  const test = async () => {
-    const result = await getRunLevels();
-    console.log(result);
-  };
-
   return (
     <Box>
-      {loadButtons && (
-        <Box>
-          <Button onClick={test}>Test</Button>
-          <Button onClick={handleTestSaveLimited}>Test Save Runs 25+</Button>
-          <Button onClick={handleTestSaveLessLimited}>
-            Test Save Runs 20+
-          </Button>
-          <Button onClick={handleDeleteRuns}>Delete Runs</Button>
-          <Button onClick={handleDeleteChars}>Delete Characters</Button>
-          <Button onClick={handleSaveTopRuns}>Save Top Runs</Button>
-        </Box>
-      )}
       <Accordion
         allowToggle
         onChange={() => {

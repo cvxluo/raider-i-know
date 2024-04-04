@@ -61,8 +61,6 @@ const CharForceGraph = ({
   });
 
   useEffect(() => {
-    console.log(mainChar);
-
     // TODO: this is a hack - verifying mainChar is not null should be CharacterSelector responsibility,
     // but because mainChar can change (in region/realm), triggering the useEffect, we need to check here as well
     if (mainChar.name === "") {
@@ -170,7 +168,6 @@ const CharForceGraph = ({
 
   // get graph from info
   useEffect(() => {
-    console.log("Graph Info", graphInfo);
     const graph = graphDataToForceGraph(
       graphInfo.layers,
       graphInfo.linkCounts,
@@ -179,7 +176,6 @@ const CharForceGraph = ({
       graphOptions.runLimit,
       graphOptions.degree,
     );
-    console.log("Graph data", graph);
     setCharGraph(graph);
   }, [graphInfo, graphOptions]);
 

@@ -58,6 +58,7 @@ const GraphOptionsSelector = ({
             id="treeMode"
             colorScheme="teal"
             isChecked={runBasedLinks}
+            isDisabled={treeMode}
             onChange={(e) =>
               setGraphOptions({
                 ...graphOptions,
@@ -77,6 +78,7 @@ const GraphOptionsSelector = ({
               min={0}
               max={200}
               step={1}
+              isDisabled={treeMode}
               onChange={(value) =>
                 setGraphOptions({ ...graphOptions, nodeForceStrength: -value })
               }
@@ -99,6 +101,7 @@ const GraphOptionsSelector = ({
               min={0}
               max={60}
               step={5}
+              isDisabled={treeMode}
               onChange={(value) =>
                 setGraphOptions({ ...graphOptions, linkDistance: value })
               }

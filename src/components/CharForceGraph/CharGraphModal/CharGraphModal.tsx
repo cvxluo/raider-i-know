@@ -43,7 +43,10 @@ const CharGraphModal = ({
       .sort((a, b) => b[1] - a[1])
       .slice(0, n)
       .map(([id, count]) => {
-        return graphInfo.layers.flat().find((c) => c.id === parseInt(id))?.name;
+        return [
+          graphInfo.layers.flat().find((c) => c.id === parseInt(id))?.name,
+          count,
+        ];
       });
   };
 
@@ -69,9 +72,15 @@ const CharGraphModal = ({
               <UnorderedList>
                 {
                   // shows most played with characters
-                  mostPlayedWith(selectedNode as Character).map((char) => {
-                    return <ListItem key={char}>{char}</ListItem>;
-                  })
+                  mostPlayedWith(selectedNode as Character).map(
+                    ([char, count]) => {
+                      return (
+                        <ListItem key={char}>
+                          {char} ({count})
+                        </ListItem>
+                      );
+                    },
+                  )
                 }
               </UnorderedList>
               <Text as="b"># Runs Per Dungeon:</Text>

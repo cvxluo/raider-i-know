@@ -28,7 +28,6 @@ const CharacterDataPage = ({ params }: { params: { characterId: string } }) => {
       getPopulatedRunsWithCharacter(char).then((runs) => {
         setCharacterRuns(runs);
         setIsLoaded(true);
-        console.log(runs);
       });
     });
   }, []);

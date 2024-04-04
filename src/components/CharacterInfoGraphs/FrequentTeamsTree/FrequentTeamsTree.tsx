@@ -14,12 +14,11 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-import { getLimitedChars } from "@/utils/funcs";
 import dynamic from "next/dynamic";
 import RunLevelRangeSlider from "../RunLevelRangeSlider";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
+const FrequenTeamsTree = ({ runs }: { runs: Run[] }) => {
   const [dungeonCountSliderValue, setDungeonCountSliderValue] = useState([
     0, 100,
   ]);
@@ -39,16 +38,23 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
     }
   }, [runs]);
 
-  const playerNames = getLimitedChars(
-    runs.filter(
+  const teamRuns = runs
+    .filter(
       (run) =>
         run.mythic_level >= dungeonCountSliderValue[0] &&
         run.mythic_level <= dungeonCountSliderValue[1],
-    ),
-    runLimit,
-  ).map((char) => char.name);
+    )
+    .map((run) => run.keystone_team_id);
 
-  const playerCountData = runs
+  const teamIdToNames = runs.reduce(
+    (acc, run) => {
+      acc[run.keystone_team_id] = run.roster.map((char) => char.name);
+      return acc;
+    },
+    {} as Record<string, string[]>,
+  );
+
+  const teamRunData = runs
     .filter(
       (run) =>
         run.mythic_level >= dungeonCountSliderValue[0] &&
@@ -56,21 +62,19 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
     )
     .reduce(
       (acc, run) => {
-        run.roster.forEach((player) => {
-          acc[player.name] = acc[player.name] ? acc[player.name] + 1 : 1;
-        });
+        acc[run.keystone_team_id] = acc[run.keystone_team_id]
+          ? acc[run.keystone_team_id] + 1
+          : 1;
         return acc;
       },
       {} as Record<string, number>,
     );
 
-  const limitedPlayerCountData = Object.entries(playerCountData)
-    .filter(([name, count]) => playerNames.includes(name))
+  const limitedTeamRunData = Object.entries(teamRunData)
+    .filter(([team, count]) => count >= runLimit)
     .reduce(
-      // TODO: this reduction is only necessary to keep playerCountData and
-      // limitedPlayerCountData in the same format - probably remove
-      (acc, [name, count]) => {
-        acc[name] = count;
+      (acc, [team, count]) => {
+        acc[team] = count;
         return acc;
       },
       {} as Record<string, number>,
@@ -88,7 +92,7 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
           ).length
         }
       </Text>
-      <Text>Number of unique characters: {playerNames.length}</Text>
+      <Text>Number of unique teams: {teamRuns.length}</Text>
       <Box mt={4} p={4}>
         <RunLevelRangeSlider
           range={dungeonCountSliderValue}
@@ -122,12 +126,13 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
             title: {
               text: "Adjacent character breakdown by number of runs",
             },
+            colors: ["#FF0000"],
           }}
           series={[
             {
-              data: Object.entries(limitedPlayerCountData)
-                .map(([name, count]) => ({
-                  x: name,
+              data: Object.entries(limitedTeamRunData)
+                .map(([keystone_team_id, count]) => ({
+                  x: teamIdToNames[keystone_team_id].join(", "),
                   y: count,
                 }))
                 .sort((a, b) => b.y - a.y),
@@ -142,4 +147,4 @@ const FrequentlyPlayedWithTree = ({ runs }: { runs: Run[] }) => {
   );
 };
 
-export default FrequentlyPlayedWithTree;
+export default FrequenTeamsTree;

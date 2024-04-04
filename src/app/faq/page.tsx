@@ -104,6 +104,46 @@ const FAQPage = () => {
         </Text>
         <Divider my={4} />
 
+        <Heading size="md">Inspirations</Heading>
+        <Text>Shoutout to other projects that inspired this one:</Text>
+        <Text>
+          -{" "}
+          <Link href="https://threechest.io/" isExternal color="teal.500">
+            Threechest.io
+          </Link>{" "}
+          by Ortemis
+        </Text>
+        <Text>
+          -{" "}
+          <Link href="https://not-even-close.com/" isExternal color="teal.500">
+            Not Even Close
+          </Link>{" "}
+          also by Ortemis
+        </Text>
+        <Text>
+          -{" "}
+          <Link
+            href="https://mplus-title-tracker.web.app/us"
+            isExternal
+            color="teal.500"
+          >
+            M+ Title Tracker
+          </Link>{" "}
+          by Orthrus
+        </Text>
+        <Text>
+          -{" "}
+          <Link
+            href="(https://bestkeystone.com/statistics/dungeons"
+            isExternal
+            color="teal.500"
+          >
+            Best Keystone
+          </Link>{" "}
+          by SindreMA
+        </Text>
+        <Divider my={4} />
+
         <Heading size="md">Contact</Heading>
         <Text>
           This website was built by Vexea-Azshara (vexvex on Discord). Feel free

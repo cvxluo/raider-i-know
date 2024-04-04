@@ -7,6 +7,7 @@ import { Box, Heading, Text } from "@chakra-ui/react";
 import DungeonCountChart from "@/components/CharacterInfoGraphs/DungeonCountChart";
 import FrequentlyPlayedWithTree from "@/components/CharacterInfoGraphs/FrequentlyPlayedWithTree";
 import RunLevelPie from "@/components/CharacterInfoGraphs/RunLevelPie";
+import FrequenTeamsTree from "./FrequentTeamsTree";
 
 const CharacterInfoGraphs = ({
   character,
@@ -27,6 +28,9 @@ const CharacterInfoGraphs = ({
 
       <Heading size="md">Frequently Played With</Heading>
       <FrequentlyPlayedWithTree runs={characterRuns} />
+
+      <Heading size="md">Frequent Teams Played In</Heading>
+      <FrequenTeamsTree runs={characterRuns} />
 
       <Heading size="md">Key Levels</Heading>
       <RunLevelPie runs={characterRuns} />

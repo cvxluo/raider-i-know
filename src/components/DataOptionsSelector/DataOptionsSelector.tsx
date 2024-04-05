@@ -35,13 +35,13 @@ const DataOptionsSelector = ({
             width={100}
             defaultValue={3}
             min={1}
-            max={5}
+            max={6}
             onChange={(value) => {
               // this adds some extra clamping to degree
               // since changing degree can be very expensive both rendering and backend wise,
               // sending an invalid degree can be dangerous
               const val = parseInt(value || "0");
-              const clampedVal = Math.min(5, Math.max(1, val));
+              const clampedVal = Math.min(6, Math.max(1, val));
               if (clampedVal !== degree)
                 setGraphOptions({
                   ...graphOptions,

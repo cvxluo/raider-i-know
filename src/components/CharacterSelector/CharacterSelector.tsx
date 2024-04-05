@@ -54,7 +54,15 @@ const CharacterSelector = ({
             }
             width="20%"
           >
-            {Realms.map((realm, index) => (
+            {Realms.sort((realm1, realm2) => {
+              if (realm1.name < realm2.name) {
+                return -1;
+              }
+              if (realm1.name > realm2.name) {
+                return 1;
+              }
+              return 0;
+            }).map((realm, index) => (
               <option key={index} value={realm.name}>
                 {realm.name}
               </option>

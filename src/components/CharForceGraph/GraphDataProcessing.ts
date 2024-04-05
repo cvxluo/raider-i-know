@@ -1,7 +1,7 @@
 "use client";
 
-import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
 import { ClassColors } from "@/utils/consts";
+import { Character, CharacterGraph, CharacterNode, Run } from "@/utils/types";
 
 export const graphDataToForceGraph = (
   layers: Character[][],

@@ -1,36 +1,18 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Raider I Know
 
-## Getting Started
+Live at [https://raider-i-know.vercel.app/](https://raider-i-know.vercel.app/)
 
-First, run the development server:
+Built with Next.js, React, Chakra UI, and React Force Graph. Data from the [Raider IO API](https://raider.io/api#/). Deployed on Vercel and Heroku.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Contributing
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Contributions are welcome - feel free to raise issues or make PRs, and I'll take a look.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Inspirations
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Shoutout to other projects that inspired this one:
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [Threechest.io](https://threechest.io/) by Ortemis
+- [Not Even Close](https://not-even-close.com/) also by Ortemis
+- [Mythic Plus Title Tracker](https://mplus-title-tracker.web.app/us) by Orthrus
+- [Best Keystone](https://bestkeystone.com/statistics/dungeons) by SindreMA

@@ -1,5 +1,4 @@
 import { getRunsWithCharacter } from "@/actions/mongodb/run";
-import urls from "@/utils/urls";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {

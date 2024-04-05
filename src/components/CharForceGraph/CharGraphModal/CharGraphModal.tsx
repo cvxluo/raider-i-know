@@ -1,43 +1,21 @@
 import {
-  Box,
-  Spinner,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   Button,
-  Text,
-  List,
   ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
   UnorderedList,
-  Toast,
-  useToast,
-  Tooltip,
-  HStack,
 } from "@chakra-ui/react";
 
-import { Character, CharacterGraph, GraphOptions } from "@/utils/types";
-import { ForceGraph2D } from "react-force-graph";
-import { useEffect, useRef, useState } from "react";
-import { Run } from "@/utils/types";
+import { Character, Run } from "@/utils/types";
 
-import {
-  appendNextLayer,
-  getNextLayer,
-} from "@/components/CharForceGraph/run_graphs";
-import { getPopulatedRunsWithCharacter } from "@/actions/mongodb/run";
 import { DungeonIdToName, DungeonIds } from "@/utils/consts";
 import { useRouter } from "next/navigation";
-import {
-  InfoIcon,
-  InfoOutlineIcon,
-  QuestionIcon,
-  QuestionOutlineIcon,
-} from "@chakra-ui/icons";
 
 const CharGraphModal = ({
   isOpen,
@@ -65,7 +43,10 @@ const CharGraphModal = ({
       .sort((a, b) => b[1] - a[1])
       .slice(0, n)
       .map(([id, count]) => {
-        return graphInfo.layers.flat().find((c) => c.id === parseInt(id))?.name;
+        return [
+          graphInfo.layers.flat().find((c) => c.id === parseInt(id))?.name,
+          count,
+        ];
       });
   };
 
@@ -91,9 +72,15 @@ const CharGraphModal = ({
               <UnorderedList>
                 {
                   // shows most played with characters
-                  mostPlayedWith(selectedNode as Character).map((char) => {
-                    return <ListItem key={char}>{char}</ListItem>;
-                  })
+                  mostPlayedWith(selectedNode as Character).map(
+                    ([char, count]) => {
+                      return (
+                        <ListItem key={char}>
+                          {char} ({count})
+                        </ListItem>
+                      );
+                    },
+                  )
                 }
               </UnorderedList>
               <Text as="b"># Runs Per Dungeon:</Text>

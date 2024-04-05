@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 import { useEffect, useState } from "react";
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 import { getDungeonCounts } from "@/actions/mongodb/aggregations/run_stats";
 

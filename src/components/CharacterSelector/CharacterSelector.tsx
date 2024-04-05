@@ -1,15 +1,15 @@
+import { Realms, Regions } from "@/utils/consts";
+import { Character, Realm, Region } from "@/utils/types";
 import {
   Box,
+  Button,
   FormControl,
   FormLabel,
   HStack,
   Input,
   Select,
-  Button,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { Realms, Regions } from "@/utils/consts";
-import { Character, Realm, Region } from "@/utils/types";
+import { useState } from "react";
 
 const CharacterSelector = ({
   handleCharSubmit,
@@ -23,10 +23,6 @@ const CharacterSelector = ({
   });
 
   const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    console.log(charInfo);
-  }, [charInfo]);
 
   return (
     <Box>

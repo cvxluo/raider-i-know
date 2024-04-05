@@ -1,8 +1,8 @@
 "use server";
 
 import mongoDB from "@/actions/mongodb/mongodb";
-import RunModel from "@/models/Run";
 import CharacterModel from "@/models/Character";
+import RunModel from "@/models/Run";
 import mongoose from "mongoose";
 
 import { summarizeRoster, summarizeRunDetails } from "@/utils/funcs";

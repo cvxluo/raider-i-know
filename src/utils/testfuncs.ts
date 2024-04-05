@@ -96,7 +96,6 @@ export const testGetTopRuns = async () => {
 export const testSaveTopAffixes = async () => {
   const season = "season-df-3";
   const region = "us";
-  const affixes = "fortified-incorporeal-sanguine";
 
   saveAllTopRuns(season, region);
 };

@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 import { useEffect, useState } from "react";
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 import { getClassCounts } from "@/actions/mongodb/aggregations/character_stats";
 import { ClassColors } from "@/utils/consts";

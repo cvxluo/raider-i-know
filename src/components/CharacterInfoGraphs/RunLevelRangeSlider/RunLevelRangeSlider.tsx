@@ -1,12 +1,11 @@
 import { Box } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 
 import {
   RangeSlider,
-  RangeSliderTrack,
   RangeSliderFilledTrack,
-  RangeSliderThumb,
   RangeSliderMark,
+  RangeSliderThumb,
+  RangeSliderTrack,
 } from "@chakra-ui/react";
 
 const RunLevelRangeSlider = ({

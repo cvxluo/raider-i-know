@@ -1,4 +1,4 @@
-import mongoose, { ObjectId, Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 // this will be the character interface returned from runs, NOT the character api
 export interface Character {

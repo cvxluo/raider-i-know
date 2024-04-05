@@ -1,7 +1,7 @@
+import { GraphOptions } from "@/utils/types";
 import {
   Box,
   FormControl,
-  FormHelperText,
   FormLabel,
   HStack,
   NumberDecrementStepper,
@@ -13,7 +13,6 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { GraphOptions } from "@/utils/types";
 
 const DataOptionsSelector = ({
   graphOptions,
@@ -34,7 +33,7 @@ const DataOptionsSelector = ({
           </Tooltip>
           <NumberInput
             width={100}
-            defaultValue={2}
+            defaultValue={3}
             min={1}
             max={5}
             onChange={(value) => {

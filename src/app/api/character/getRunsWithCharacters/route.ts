@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getPopulatedRunsWithCharacters } from "@/actions/mongodb/run";
 import mongodb from "@/actions/mongodb/mongodb";
-import RunModel from "@/models/Run";
 import CharacterModel from "@/models/Character";
+import RunModel from "@/models/Run";
 import { Character } from "@/utils/types";
 
 // limit of 1000 characters per request

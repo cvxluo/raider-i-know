@@ -1,6 +1,6 @@
 "use client";
 
-import TitleInfoGraphs from "@/components/TitleInfoGraphs/TitleInfoGraphs";
+import TitleInfoGraphs from "@/components/TitleInfoGraphs";
 import { Box, Link, Text } from "@chakra-ui/react";
 
 const StatsPage = () => {

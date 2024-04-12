@@ -6,6 +6,7 @@ const Links = [
   { text: "Database Statistics", href: "/stats" },
   { text: "Character Info", href: "/character" },
   { text: "FAQ", href: "/faq" },
+  { text: "Title Tracker", href: "/title-tracker" },
 ];
 
 const NavLink = ({ text, href }: { text: string; href: string }) => {

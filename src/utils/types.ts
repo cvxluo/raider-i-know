@@ -116,6 +116,14 @@ export interface CharacterRaw {
   character: Character;
 }
 
+export interface TitleInfo {
+  title_score: number;
+  num_title_players: number;
+  title_range_chars: [Types.ObjectId];
+  title_top_runs: [Types.ObjectId];
+  level_counts: any;
+}
+
 export interface CharacterNode {
   id: number;
   name: string;

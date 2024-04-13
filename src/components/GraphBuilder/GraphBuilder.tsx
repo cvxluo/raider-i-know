@@ -9,7 +9,6 @@ import { getCharacter } from "@/actions/mongodb/character";
 import CharacterSelector from "@/components/CharacterSelector";
 import DataOptionsSelector from "@/components/DataOptionsSelector";
 import GraphOptionsSelector from "@/components/GraphOptionsSelector";
-import { testSaveTopAffixes } from "@/utils/testfuncs";
 import { Character } from "@/utils/types";
 import { QuestionIcon } from "@chakra-ui/icons";
 import {
@@ -22,7 +21,6 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
-  Button,
   Flex,
   Spacer,
 } from "@chakra-ui/react";
@@ -76,7 +74,6 @@ export default function GraphBuilder() {
   };
   return (
     <Box>
-      <Button onClick={() => testSaveTopAffixes()}>Test</Button>
       <Accordion
         allowToggle
         onChange={() => {

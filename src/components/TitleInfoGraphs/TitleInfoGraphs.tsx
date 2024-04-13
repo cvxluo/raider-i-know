@@ -53,7 +53,7 @@ const TitleDungeonChart = ({
         options={{
           chart: {
             type: "bar",
-            height: 350,
+            height: 200,
             stacked: true,
             stackType: "100%",
           },

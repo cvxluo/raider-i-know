@@ -40,6 +40,22 @@ const TitleCharCompare = ({
       return Math.round((numKeysEqualOrBelow / numTotalKeys) * 100) / 100;
     });
 
+  const lowestFortifiedPercentile = Math.min(...fortifiedPercentiles);
+  const lowestFortifiedDungeon = Object.entries(DungeonIdToName)
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .find(
+      ([dungeonID, dungeonName], i) =>
+        fortifiedPercentiles[i] === lowestFortifiedPercentile,
+    )?.[1];
+
+  const lowestTyrannicalPercentile = Math.min(...tyrannicalPercentiles);
+  const lowestTyrannicalDungeon = Object.entries(DungeonIdToName)
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .find(
+      ([dungeonID, dungeonName], i) =>
+        tyrannicalPercentiles[i] === lowestTyrannicalPercentile,
+    )?.[1];
+
   return (
     <Box>
       <Text fontWeight="bold" fontSize="xl">
@@ -76,6 +92,10 @@ const TitleCharCompare = ({
                 </Box>
               );
             })}
+          <Text fontSize="sm" as="i" display="inline">
+            Lowest Relative Fortified Key: {lowestFortifiedPercentile} -{" "}
+            {lowestFortifiedDungeon}
+          </Text>
         </Box>
 
         <Box>
@@ -96,6 +116,10 @@ const TitleCharCompare = ({
                 </Box>
               );
             })}
+          <Text fontSize="sm" as="i" display="inline">
+            Lowest Relative Tyrannical Key: {lowestTyrannicalPercentile} -{" "}
+            {lowestTyrannicalDungeon}
+          </Text>
         </Box>
       </Grid>
     </Box>

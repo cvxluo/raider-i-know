@@ -1,13 +1,21 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Hide, Text } from "@chakra-ui/react";
 import Link from "next/link";
 
 const Links = [
   { text: "Home", href: "/" },
   { text: "Database Statistics", href: "/stats" },
   { text: "Character Info", href: "/character" },
-  { text: "FAQ", href: "/faq" },
   { text: "Title Tracker", href: "/title-tracker" },
+  { text: "FAQ", href: "/faq" },
 ];
+
+const screenBreakpoints = {
+  base: "360px",
+  sm: "640px",
+  md: "768px",
+  lg: "1024px",
+  xl: "1280px",
+};
 
 const NavLink = ({ text, href }: { text: string; href: string }) => {
   return (
@@ -34,9 +42,11 @@ const NavBar = () => {
         <Text fontSize="2xl" fontWeight="bold" color="black" pl={2} pr={2}>
           Raider I Know
         </Text>
-        {Links.map((link) => (
-          <NavLink key={link.text} text={link.text} href={link.href} />
-        ))}
+        <Hide below={screenBreakpoints["md"]}>
+          {Links.map((link) => (
+            <NavLink key={link.text} text={link.text} href={link.href} />
+          ))}
+        </Hide>
       </Flex>
     </Box>
   );

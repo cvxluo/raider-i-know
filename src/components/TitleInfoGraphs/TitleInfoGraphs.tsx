@@ -6,7 +6,7 @@ import { getBestRunsForChar } from "@/actions/raiderio/characters/mplus_best_run
 import { getScoreColors } from "@/actions/raiderio/score_colors";
 import { DungeonIdToName } from "@/utils/consts";
 import { BestRuns, Character, LevelCounts, TitleInfo } from "@/utils/types";
-import { Box } from "@chakra-ui/react";
+import { Box, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import CharacterSelector from "../CharacterSelector";
 import TitleCharCompare from "./TitleCharCompare";
@@ -55,11 +55,13 @@ const TitleInfoGraphs = () => {
     }, {} as BestRuns),
   );
 
+  const toast = useToast();
+
   const handleCharacterSelect = async (character: Character) => {
     setSelectedCharacter(character);
 
     // TODO: clean up
-    getBestRunsForChar({
+    const bestRunsReq = getBestRunsForChar({
       region: character.region.slug,
       realm: character.realm.slug,
       name: character.name,
@@ -98,7 +100,7 @@ const TitleInfoGraphs = () => {
       });
     });
 
-    getBestAltRunsForChar({
+    const bestAltRunsReq = getBestAltRunsForChar({
       region: character.region.slug,
       realm: character.realm.slug,
       name: character.name,
@@ -135,6 +137,21 @@ const TitleInfoGraphs = () => {
         }, {} as BestRuns);
         return merged;
       });
+    });
+
+    toast.promise(Promise.all([bestRunsReq, bestAltRunsReq]), {
+      loading: {
+        title: `Loading best runs for ${character.name}-${character.realm.name}`,
+        isClosable: true,
+      },
+      success: {
+        title: `Loaded best runs for ${character.name}-${character.realm.name}`,
+        isClosable: true,
+      },
+      error: {
+        title: "Error loading best runs, try again later.",
+        isClosable: true,
+      },
     });
   };
 

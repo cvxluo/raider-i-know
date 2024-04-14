@@ -29,10 +29,13 @@ const config = {
     baseURL: "https://raider.io/api/v1",
     characters: {
       profile: "/characters/profile",
+      mplus_best_runs: "/characters/profile",
+      mplus_best_alternate_runs: "/characters/profile",
     },
     mythic_plus: {
       runs: "/mythic-plus/runs",
       run_details: "/mythic-plus/run-details",
+      score_colors: "/mythic-plus/score-tiers",
     },
   },
 };

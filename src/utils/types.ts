@@ -116,6 +116,23 @@ export interface CharacterRaw {
   character: Character;
 }
 
+export interface LevelCounts {
+  [key: string]: DungeonLevelCount;
+}
+
+export interface DungeonLevelCount {
+  [key: string]: {
+    [key: number]: number;
+  };
+}
+export interface TitleInfo {
+  title_score: number;
+  num_title_players: number;
+  title_range_chars: Types.ObjectId[];
+  title_top_runs: Types.ObjectId[];
+  level_counts: LevelCounts;
+}
+
 export interface CharacterNode {
   id: number;
   name: string;
@@ -145,6 +162,13 @@ export interface GraphOptions {
   nodeForceStrength: number;
   linkDistance: number;
   runBasedLinks: boolean;
+}
+
+export interface BestRuns {
+  [key: number]: {
+    Fortified: number;
+    Tyrannical: number;
+  };
 }
 
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;

@@ -234,7 +234,7 @@ export const getPopulatedRunsWithCharacters = async (
   const retrievedCharacterIds = await CharacterModel.find(
     {
       // TODO: europe region
-      // "region.name": { $in: characters.map((char) => char.region.name) },
+      "region.name": { $in: characters.map((char) => char.region.name) },
       "realm.name": { $in: characters.map((char) => char.realm.name) },
       name: { $in: characters.map((char) => char.name) },
     },

@@ -40,4 +40,4 @@ analysis/data
 analysis/.env
 analysis/env
 analysis/__pycache__
-analysis/*.synctex.gz
+**/**.synctex.gz

@@ -9,10 +9,15 @@ const TitleDungeonChart = ({
   dungeonLevelCounts,
   dungeonName,
   colors,
+  highlightLevels,
 }: {
   dungeonLevelCounts: DungeonLevelCount;
   dungeonName: string;
   colors: string[];
+  highlightLevels: {
+    Fortified: number;
+    Tyrannical: number;
+  };
 }) => {
   const dungeonLevelCountsKeys = Object.keys(dungeonLevelCounts["Fortified"])
     .concat(Object.keys(dungeonLevelCounts["Tyrannical"]))
@@ -41,10 +46,14 @@ const TitleDungeonChart = ({
     <Box>
       <Chart
         series={Array.from({ length: maxLevel - minLevel + 1 }, (_, i) => {
+          const c =
+            highlightLevels["Fortified"] === i + minLevel
+              ? "#000000"
+              : trimmedColors[i];
           return {
             name: `Level ${i + minLevel}`,
             data: [fortifiedData[i], tyrannicalData[i]],
-            color: trimmedColors[i],
+            color: c,
           };
         })}
         options={{

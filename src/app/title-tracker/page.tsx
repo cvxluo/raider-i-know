@@ -7,7 +7,7 @@ const StatsPage = () => {
   return (
     <Box p={4}>
       <Text fontSize="xl" fontWeight="bold" textAlign="center">
-        Title Key Level Tracker
+        Title Key Level Tracker (Alpha)
       </Text>
       <Text fontSize="lg" fontWeight="bold">
         What does this do?
@@ -26,13 +26,9 @@ const StatsPage = () => {
           >
             M+ Title Tracker
           </Link>{" "}
-          for the original idea - their information is most likely more accurate
-          than this one.
+          for the original idea.
         </Text>
-        <Text fontSize="sm">
-          Please note that these statistics are not reflective of all M+ runs -
-          only the ones stored in the database.
-        </Text>
+        <Text fontSize="sm">Enter a character to highlight their keys.</Text>
       </Box>
 
       <TitleInfoGraphs />

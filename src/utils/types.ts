@@ -164,5 +164,12 @@ export interface GraphOptions {
   runBasedLinks: boolean;
 }
 
+export interface BestRuns {
+  [key: number]: {
+    Fortified: number;
+    Tyrannical: number;
+  };
+}
+
 export type RequestReturn = RunRaw | CharacterRaw | RankingRaw;
 export type Request = (...args: any[]) => Promise<RequestReturn>;

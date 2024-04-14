@@ -5,18 +5,12 @@ import { getBestAltRunsForChar } from "@/actions/raiderio/characters/mplus_best_
 import { getBestRunsForChar } from "@/actions/raiderio/characters/mplus_best_runs";
 import { getScoreColors } from "@/actions/raiderio/score_colors";
 import { DungeonIdToName } from "@/utils/consts";
-import { Character, LevelCounts, TitleInfo } from "@/utils/types";
+import { BestRuns, Character, LevelCounts, TitleInfo } from "@/utils/types";
 import { Box } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import CharacterSelector from "../CharacterSelector";
+import TitleCharCompare from "./TitleCharCompare";
 import TitleDungeonChart from "./TitleDungeonChart";
-
-interface BestRuns {
-  [key: number]: {
-    Fortified: number;
-    Tyrannical: number;
-  };
-}
 
 const TitleInfoGraphs = () => {
   const [titleInfo, setTitleInfo] = useState<TitleInfo>({
@@ -165,6 +159,14 @@ const TitleInfoGraphs = () => {
   return (
     <Box>
       <CharacterSelector handleCharSubmit={handleCharacterSelect} />
+
+      {selectedCharacter.name && (
+        <TitleCharCompare
+          levelCounts={titleInfo.level_counts}
+          charRunLevels={bestRuns}
+          numTotalKeys={titleInfo.num_title_players}
+        />
+      )}
       {Object.entries(DungeonIdToName)
         .sort((a, b) => a[1].localeCompare(b[1]))
         .map((entry) => {

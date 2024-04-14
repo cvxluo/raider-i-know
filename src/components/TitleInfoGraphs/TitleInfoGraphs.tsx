@@ -1,5 +1,6 @@
 "use client";
 
+import { getCharacter } from "@/actions/mongodb/character";
 import { getLatestTitleCounts } from "@/actions/mongodb/title";
 import { getBestAltRunsForChar } from "@/actions/raiderio/characters/mplus_best_alt_runs";
 import { getBestRunsForChar } from "@/actions/raiderio/characters/mplus_best_runs";
@@ -59,6 +60,16 @@ const TitleInfoGraphs = () => {
 
   const handleCharacterSelect = async (character: Character) => {
     setSelectedCharacter(character);
+
+    const testCharExists = getCharacter(
+      character.region.name,
+      character.realm.name,
+      character.name,
+    ).then((res) => {
+      if (!res) {
+        throw new Error("Character does not exist in database.");
+      }
+    });
 
     // TODO: clean up
     const bestRunsReq = getBestRunsForChar({
@@ -139,7 +150,7 @@ const TitleInfoGraphs = () => {
       });
     });
 
-    toast.promise(Promise.all([bestRunsReq, bestAltRunsReq]), {
+    toast.promise(Promise.all([bestRunsReq, bestAltRunsReq, testCharExists]), {
       loading: {
         title: `Loading best runs for ${character.name}-${character.realm.name}`,
         isClosable: true,
@@ -149,7 +160,7 @@ const TitleInfoGraphs = () => {
         isClosable: true,
       },
       error: {
-        title: "Error loading best runs, try again later.",
+        title: "Error loading best runs, character might not be in database.",
         isClosable: true,
       },
     });

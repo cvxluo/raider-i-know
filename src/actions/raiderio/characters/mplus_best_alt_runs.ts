@@ -24,7 +24,10 @@ export const getBestAltRunsForChar = async (req: {
   });
 
   return fetch(
-    urls.raiderio.baseURL + urls.raiderio.characters.profile + "?" + params,
+    urls.raiderio.baseURL +
+      urls.raiderio.characters.mplus_best_alternate_runs +
+      "?" +
+      params,
     {
       method: "GET",
       headers: {

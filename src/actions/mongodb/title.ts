@@ -31,6 +31,7 @@ export const getLatestTitleCounts = async () => {
       title_score: 1,
       num_title_players: 1,
       level_counts: 1,
+      num_title_range_chars_tracked: 1,
     })
     .lean()
     .catch((e) => {

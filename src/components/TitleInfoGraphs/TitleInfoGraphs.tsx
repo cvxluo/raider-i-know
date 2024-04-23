@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import CharacterSelector from "../CharacterSelector";
 import TitleCharCompare from "./TitleCharCompare";
 import TitleDungeonChart from "./TitleDungeonChart";
+import TitleTrackerStats from "./TitleTrackerStats";
 
 const TitleInfoGraphs = () => {
   const [titleInfo, setTitleInfo] = useState<TitleInfo>({
@@ -26,6 +27,8 @@ const TitleInfoGraphs = () => {
       };
       return acc;
     }, {} as LevelCounts),
+    num_title_range_chars_tracked: 0,
+    num_title_top_runs_tracked: 0,
   });
 
   const [colors, setColors] = useState<string[]>([]);
@@ -168,6 +171,7 @@ const TitleInfoGraphs = () => {
 
   useEffect(() => {
     getLatestTitleCounts().then((res) => {
+      console.log(res);
       setTitleInfo(res);
     });
 
@@ -187,6 +191,7 @@ const TitleInfoGraphs = () => {
   return (
     <Box>
       <CharacterSelector handleCharSubmit={handleCharacterSelect} />
+      <TitleTrackerStats titleInfo={titleInfo} />
 
       {selectedCharacter.name && (
         <TitleCharCompare

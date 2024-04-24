@@ -66,3 +66,25 @@ def get_title_range () :
         return None
 
 
+
+def get_top_runs (season, region, dungeon, affixes, page) :
+    payload = {
+        'season': season,
+        'region': region,
+        'dungeon': dungeon,
+        'affixes': affixes,
+        'page': page,
+    }
+
+    try :
+        r = requests.get(consts.TOP_RUNS_URL, params=payload)
+
+        if r.status_code == 200 :
+            return r.json()
+
+        else :
+            raise Exception('Request failed with status code: ' + str(r.status_code))
+        
+    except Exception as e :
+        print('Error: Request failed for top runs with error: ' + str(e))
+        return None

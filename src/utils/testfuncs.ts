@@ -1,4 +1,8 @@
 import {
+  saveAllRunsForCharacter,
+  saveDungeonRunsForCharacter,
+} from "@/actions/mongodb/data_collection/character_runs";
+import {
   saveAllTopRuns,
   saveTopDungeonRuns,
   saveTopRuns,
@@ -9,14 +13,11 @@ import {
   getPopulatedRunsWithCharacter,
 } from "@/actions/mongodb/run";
 import { getRunsForCharacter } from "@/actions/raiderio/character_runs";
+import { getCurrentAffixes } from "@/actions/raiderio/mythic_plus/affixes";
 import { getRuns } from "@/actions/raiderio/mythic_plus/runs";
+import { appendNextLayer } from "@/components/CharForceGraph/run_graphs";
 import { AffixSets, DungeonIds } from "./consts";
 import { Character, Run, RunSummary } from "./types";
-import {
-  saveAllRunsForCharacter,
-  saveDungeonRunsForCharacter,
-} from "@/actions/mongodb/data_collection/character_runs";
-import { appendNextLayer } from "@/components/CharForceGraph/run_graphs";
 
 export const testCreateRun = async () => {
   const testRun = {
@@ -86,7 +87,7 @@ export const testsaveTopDungeonRuns = async () => {
 export const testGetTopRuns = async () => {
   const season = "season-df-3";
   const region = "us";
-  const affixes = "fortified-incorporeal-sanguine";
+  const affixes = "fortified-volcanic-spiteful";
 
   saveTopRuns(season, region, affixes).then((res) => {
     console.log(res);
@@ -180,4 +181,12 @@ export const testAppendingLayer = async (char: Character) => {
   console.log(testLayers);
   console.log(links);
   console.log(runs);
+};
+
+export const testGetAffixes = async () => {
+  const region = "us";
+
+  getCurrentAffixes(region).then((res) => {
+    console.log(res);
+  });
 };

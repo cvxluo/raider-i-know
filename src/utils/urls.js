@@ -36,6 +36,7 @@ const config = {
       runs: "/mythic-plus/runs",
       run_details: "/mythic-plus/run-details",
       score_colors: "/mythic-plus/score-tiers",
+      affixes: "/mythic-plus/affixes",
     },
   },
 };

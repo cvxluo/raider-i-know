@@ -1,5 +1,7 @@
 import datetime
+
 from bson import ObjectId
+
 
 class Character (object) :
     _id = 0

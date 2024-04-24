@@ -131,6 +131,8 @@ export interface TitleInfo {
   title_range_chars: Types.ObjectId[];
   title_top_runs: Types.ObjectId[];
   level_counts: LevelCounts;
+  num_title_range_chars_tracked: number;
+  num_title_top_runs_tracked: number;
 }
 
 export interface CharacterNode {

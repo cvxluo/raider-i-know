@@ -265,7 +265,10 @@ export const Realms: Realm[] = RealmNames.map((realm) => {
     id: 0,
     connected_realm_id: 0,
     name: realm,
-    slug: realm.toLowerCase().replace(/ /g, "-"),
+    slug: realm
+      .replace(/[!@#$%^&*()~`_+=[]{};:".,<>\/?'-]/g, "")
+      .replace(/\s+/g, "-")
+      .toLowerCase(),
     locale: "en_US",
   };
 });

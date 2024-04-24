@@ -3,6 +3,7 @@ SEASON = 'season-df-3'
 CHARACTER_RUNS_URL = 'https://raider.io/api/characters/mythic-plus-runs'
 RUN_DETAILS_URL = 'https://raider.io/api/v1/mythic-plus/run-details'
 TITLE_RANGE_URL = 'https://raider.io/api/v1/mythic-plus/season-cutoffs'
+TOP_RUNS_URL = 'https://raider.io/api/v1/mythic-plus/runs'
 
 MYTHIC_RUN_LEVEL_LIMIT = 25
 
